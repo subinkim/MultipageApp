@@ -1,9 +1,10 @@
 import React from 'react';
-import { Button, Image, View, Text, StyleSheet, Dimensions, TextInput, Alert, Platform } from 'react-native';
+import { Button, Image, View, Text, StyleSheet, Dimensions, TextInput, Alert, Platform, TouchableOpacity } from 'react-native';
 import { createStackNavigator, createAppContainer } from 'react-navigation';
 import WifiManager from 'react-native-wifi';
 import { WebView } from 'react-native-webview';
 import Wifi from 'react-native-iot-wifi';
+import QRCodeScanner from 'react-native-qrcode-scanner';
 
 const URI = 'http://wireless.devemerald.com';
 
@@ -31,7 +32,6 @@ class HomeScreen extends React.Component {
       Wifi.getSSID((initialSSID) => {
         if (initialSSID != null){
           this.setState({initialSSID});
-          Alert.alert(initialSSID);
         }
       })
     }
@@ -41,12 +41,21 @@ class HomeScreen extends React.Component {
       passButton = (<Button
       title="Already connected?"
       onPress={() => {this.props.navigation.navigate('Details', {
-        ssid: this.state.ssid, //edit so that it passes currentSSID to the function
+        ssid: this.state.initialSSID, //edit so that it passes currentSSID to the function
       });}}/>);
+    } else {
+      scannerButton = (<Button
+        title="Scan QR code"
+        onPress={() => {this.props.navigation.navigate('Scanner', {
+          currentSSID: this.state.initialSSID,
+        });}}
+      />);
     }
+
     return (
       <View style={ styles.container }>
         <Text style={ styles.instruction }>Connect to your device</Text>
+        <Text>Manually enter SSID and password of your device or scan QR code.</Text>
         <View style={{ flexDirection: 'row' }}>
           <Text style={{ marginTop: 10, fontSize: 15 }}>Device SSID:</Text>
           <TextInput
@@ -69,6 +78,7 @@ class HomeScreen extends React.Component {
           title="Join"
           onPress={() => connectToDevice(this.state.ssid, this.state.password, this.props.navigation, this.state.initialSSID)}
         />
+        { scannerButton }
         { passButton }
       </View>
     );
@@ -97,6 +107,34 @@ function connectToDevice(ssid, pwd, nav, currentSSID){
         Alert.alert('Wrong SSID or password');
       })
     }
+  }
+}
+
+class ScannerScreen extends React.Component {
+
+  onSuccess = (e) => {
+    let data = JSON.parse(e.data);
+    let ssid = data.SSID;
+    let password = data.password;
+    Alert.alert("ssid: " + ssid + " password: " + password);
+    connectToDevice(ssid, password, this.props.navigation, null);
+  }
+
+  render() {
+
+    const params = this.props.navigation.state;
+    const currentSSID = params.currentSSID;
+
+    return (
+      <QRCodeScanner
+        onRead={() => {onSuccess(currentSSID)}}
+        topContent={
+          <Text>
+             Scan the QR code attached to the bottom of device.
+          </Text>
+        }
+      />
+    );
   }
 }
 
@@ -178,6 +216,9 @@ const RootStack = createStackNavigator(
     },
     Info: {
       screen: InfoScreen,
+    },
+    Scanner: {
+      screen: ScannerScreen,
     }
   },
   {

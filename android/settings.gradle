@@ -1,4 +1,8 @@
 rootProject.name = 'MultipageApp'
+include ':react-native-permission'
+project(':react-native-permission').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-permission/android')
+include ':react-native-camera'
+project(':react-native-camera').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-camera/android')
 include ':react-native-iot-wifi'
 project(':react-native-iot-wifi').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-iot-wifi/android')
 include ':react-native-gesture-handler'

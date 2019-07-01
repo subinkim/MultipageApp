@@ -12,7 +12,7 @@ def generator(ssid, pwd):
     print(ssid, pwd)
 
     credentials = '"SSID":"{}", "password":"{}"'
-    data = '"' + credentials.format(ssid, pwd) + '"'
+    data = '{' + credentials.format(ssid, pwd) + '}'
     fileName = ssid + ".jpg"    
 
     qr.add_data(data)
