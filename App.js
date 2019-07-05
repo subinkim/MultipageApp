@@ -5,6 +5,8 @@ import WifiManager from 'react-native-wifi';
 import { WebView } from 'react-native-webview';
 import Wifi from 'react-native-iot-wifi';
 import QRCodeScanner from 'react-native-qrcode-scanner';
+import PasswordTextBox from './PasswordTextBox/PasswordTextBox.js';
+import SSIDTextBox from './SSIDTextBox/SSIDTextBox.js';
 
 const URI = 'http://wireless.devemerald.com';
 
@@ -20,8 +22,8 @@ class HomeScreen extends React.Component {
   constructor(props){
     super(props);
     this.state = {
-      ssid: 'emerald-ecf7d9',
-      password: 'ahZ2,VPDip',
+      ssid: '',
+      password: '',
       initialSSID: '',
     };
   }
@@ -36,50 +38,36 @@ class HomeScreen extends React.Component {
       })
     }
 
-    let passButton;
-    if (this.state.initialSSID.includes("emerald")){
-      passButton = (<Button
-      title="Already connected?"
-      onPress={() => {this.props.navigation.navigate('Details', {
-        ssid: this.state.initialSSID, //edit so that it passes currentSSID to the function
-      });}}/>);
-    } else {
-      scannerButton = (<Button
-        title="Scan QR code"
-        onPress={() => {this.props.navigation.navigate('Scanner', {
+    const scannerButton = (<Button
+      title="Scan QR code"
+      onPress={() => {
+        this.props.navigation.navigate('Scanner',{
           currentSSID: this.state.initialSSID,
-        });}}
-      />);
-    }
+        });
+      }}
+    />);
+
+    const passButton =(<Button
+      title="Already connected?"
+      onPress={() => {
+        this.props.navigation.navigate('Details', {
+          currentSSID: this.state.initialSSID,
+        })
+      }}
+    />);
 
     return (
       <View style={ styles.container }>
         <Text style={ styles.instruction }>Connect to your device</Text>
         <Text>Manually enter SSID and password of your device or scan QR code.</Text>
-        <View style={{ flexDirection: 'row' }}>
-          <Text style={{ marginTop: 10, fontSize: 15 }}>Device SSID:</Text>
-          <TextInput
-            style={{ height: 19, marginTop: 10, marginBottom: 10, marginLeft: 42, flex: 1 }}
-            onChangeText={ (ssid) => this.setState({ssid}) }
-            value={ this.state.ssid }
-            placeholder='Enter device SSID'
-          />
-        </View>
-        <View style={{flexDirection: 'row'}}>
-          <Text style={{ fontSize: 15 }}>Device password:</Text>
-          <TextInput
-            style={{height: 19, marginBottom: 20, marginLeft: 10, flex: 1}}
-            onChangeText={(password) => this.setState({password})}
-            value={this.state.password}
-            placeholder='Enter device password'
-          />
-        </View>
+        <SSIDTextBox label='Device SSID' onChange={(ssid) => {this.setState({ssid})}}/>
+        <PasswordTextBox icon='lock' label=' Device password' onChange={(password) => {this.setState({password})}} />
         <Button
-          title="Join"
+          title="Connect"
           onPress={() => connectToDevice(this.state.ssid, this.state.password, this.props.navigation, this.state.initialSSID)}
         />
         { scannerButton }
-        { passButton }
+        { this.state.initialSSID.includes('emerald')?passButton:null }
       </View>
     );
   }
@@ -87,52 +75,79 @@ class HomeScreen extends React.Component {
 
 function connectToDevice(ssid, pwd, nav, currentSSID){
 
+  Wifi.getSSID((initial) => {
+    if (initial != null && initial !== currentSSID){
+      Alert.alert(initial);
+      currentSSID = initial
+    }
+  })
+
   if (ssid === '' || pwd === ''){
     Alert.alert('Incomplete','Please complete both fields');
   } else {
     if (ssid === currentSSID){
       Alert.alert('You are already connected to this network');
       nav.navigate('Details', {
-        ssid: currentSSID,
+        ssid: ssid,
       });
     } else {
       WifiManager.connectToProtectedSSID(ssid,pwd,false).then(() => {
-        console.log('connection success');
         nav.navigate('Details', {
             ssid: ssid,
             initialSSID: currentSSID,
         });
       }, () => {
-        console.log('connection failed');
-        Alert.alert('Wrong SSID or password');
+        Alert.alert('Cannot connect');
+        nav.navigate('Home');
       })
     }
   }
 }
 
+
 class ScannerScreen extends React.Component {
 
-  onSuccess = (e) => {
-    let data = JSON.parse(e.data);
-    let ssid = data.SSID;
-    let password = data.password;
-    Alert.alert("ssid: " + ssid + " password: " + password);
-    connectToDevice(ssid, password, this.props.navigation, null);
+  static navigationOptions = ({ navigation, navigationOptions }) => {
+    const { params } = navigation.state;
+
+    return {
+      title: 'Scan QR code',
+    };
+  };
+
+  loadOnSuccess = (initial, nav) => {
+    function onSuccess(e){
+      let data = JSON.parse(e.data);
+      let ssid = data.ssid;
+      let password = data.password;
+      if (ssid == null || password == null){
+        Alert.alert("Not a valid QR code.");
+        this.props.navigation.navigate('Home');
+      }
+      connectToDevice(ssid, password, nav, initial);
+    }
+    return onSuccess;
   }
 
   render() {
 
-    const params = this.props.navigation.state;
-    const currentSSID = params.currentSSID;
+    const { navigation } = this.props;
+    const currentSSID = navigation.getParam('currentSSID', null);
+
+    let {height, width} = Dimensions.get('window');
 
     return (
       <QRCodeScanner
-        onRead={() => {onSuccess(currentSSID)}}
+        onRead={this.loadOnSuccess(currentSSID, this.props.navigation)}
         topContent={
           <Text>
-             Scan the QR code attached to the bottom of device.
+              Scan the QR code attached to the bottom of device.
           </Text>
         }
+        style={{ height: scannerHeight, width: scannerWidth }}
+        reactivate={true}
+        permissionDialogTitle="Permission required"
+        permissionDialogMessage="This app would like to access your camera."
       />
     );
   }
@@ -154,7 +169,7 @@ class InfoScreen extends React.Component {
           source={require('./deviceInfo.png')}
           style={{width:imageWidth, height: imageHeight, top: 40}}
         />
-        <Text style={ styles.description }>{'\t'}To connect to your device, you need its SSID and password. Check the bottom of the device to get the necessary credentials. {'\n'}{'\t'}Make sure you use the first password to connect to the device.</Text>
+        <Text style={ styles.description }>To connect to your device, you need its SSID and password. Check the bottom of the device to get the necessary credentials. Make sure you use the first password to connect to the device.</Text>
       </View>
     );
   }
@@ -162,10 +177,14 @@ class InfoScreen extends React.Component {
 
 function disconnectFromDevice(ssid, initialSSID, nav){
 
-  Alert.alert("Initial SSID: " + initialSSID);
-  if (initialSSID !== 'Cannot detect SSID'){
-    WifiManager.connectToSSID(initialSSID);
-    nav.navigate('Home');
+  if (initialSSID != null){
+    if (initialSSID !== 'Cannot detect SSID' && !(initialSSID.includes('emerald'))){
+      WifiManager.connectToSSID(initialSSID);
+      nav.navigate('Home');
+    } else {
+      WifiManager.disconnectFromSSID(ssid);
+      nav.navigate('Home');
+    }
   } else {
     WifiManager.disconnectFromSSID(ssid);
     nav.navigate('Home');
@@ -178,11 +197,17 @@ class DetailsScreen extends React.Component {
     const { params } = navigation.state;
 
     return {
-      title: params ? 'Connect ' + params.ssid : 'Connect device to wifi',
+      title: params ? params.ssid : 'Connect',
       headerRight: (
         <Button
           title="Done"
           onPress={() => {disconnectFromDevice(params.ssid, params.initialSSID, navigation);}}
+        />
+      ),
+      headerLeft:(
+        <Button
+          title="Back"
+          onPress={() => navigation.navigate('Home')}
         />
       ),
     };
@@ -192,16 +217,27 @@ class DetailsScreen extends React.Component {
 
     let {height, width} = Dimensions.get('window');
 
-    let windowHeight = height * 0.7;
+    let windowHeight = height * 0.8;
     let windowWidth = width * 0.9;
 
     let botMargin = height * 0.1;
+    let leftMargin = width * 0.05;
+    let rightMargin = width * 0.05;
 
     return (
-      <WebView
-        source={{ uri: URI }}
-        style={{ width: windowWidth, height: windowHeight, flex: 1 , marginBottom: botMargin, marginLeft: 10, marginRight: 10 }}
-      />
+      <View style={{ flex: 1 }}>
+        <WebView
+          source={{ uri: URI }}
+          style={{ width: windowWidth, height: windowHeight, flex: 1 , marginBottom: botMargin, marginLeft: leftMargin, marginRight: rightMargin }}
+        />
+        <Button
+          title="Reload"
+          onPress={() => {this.props.navigation.push('Details',{
+            initialSSID: this.props.navigation.getParam('initialSSID'),
+            ssid: this.props.navigation.getParam('ssid'),
+          })}}
+        />
+      </View>
     );
   }
 }
@@ -235,17 +271,17 @@ const RootStack = createStackNavigator(
 const styles = StyleSheet.create({
     container: {
       flex: 1,
-      marginTop: 40,
-      alignItems: 'center',
-      marginLeft: 20,
-      marginRight: 20,
+      marginTop: 30,
+      marginLeft: 10,
+      marginRight: 10,
     },
     instruction: {
-      fontSize: 20,
+      fontWeight: 'bold',
+      fontSize: 23,
       marginBottom: 10,
     },
     description: {
-      top: 70,
+      top: 50,
       fontSize: 15,
     },
 })

@@ -1,6 +1,6 @@
 import qrcode
 
-def generator(ssid, pwd, uuid):
+def generator(ssid, pwd):
 
     qr = qrcode.QRCode(
         version = 1,
@@ -9,9 +9,9 @@ def generator(ssid, pwd, uuid):
         border = 4,
     )
 
-    credentials = '"ssid":"{}", "password":"{}", "uuid":"{}"'
-    data = '{' + credentials.format(ssid, pwd, uuid) + '}'
-    fileName = ssid + ".jpg"    
+    credentials = '"ssid":"{}", "password":"{}"'
+    data = '{' + credentials.format(ssid, pwd) + '}'
+    fileName = ssid + ":NoUUID" + ".jpg"    
 
     qr.add_data(data)
     qr.make(fit=True)
@@ -27,11 +27,7 @@ with open('ssidList.txt', 'r') as f:
 with open('passwordList.txt', 'r') as f:
     passwordList = [line.rstrip() for line in f]
     f.close()
-
-with open('uuidList.txt', 'r') as f:
-    uuidList = [line.rstrip() for line in f]
-    f.close()
-
+    
 for x in range(0, len(ssidList)):
-    generator(ssidList[x], passwordList[x], uuidList[x])
+    generator(ssidList[x], passwordList[x])
 
