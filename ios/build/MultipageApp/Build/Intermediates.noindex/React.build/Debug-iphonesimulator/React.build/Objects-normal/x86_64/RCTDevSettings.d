@@ -1,0 +1,20 @@
+dependencies: \
+  /Users/subinrachaelkim/MultipageApp/node_modules/react-native/React/Modules/RCTDevSettings.mm \
+  /Users/subinrachaelkim/MultipageApp/node_modules/react-native/React/Modules/RCTDevSettings.h \
+  /Users/subinrachaelkim/MultipageApp/node_modules/react-native/React/Base/RCTBridge.h \
+  /Users/subinrachaelkim/MultipageApp/node_modules/react-native/React/Base/RCTBridgeDelegate.h \
+  /Users/subinrachaelkim/MultipageApp/node_modules/react-native/React/Base/RCTJavaScriptLoader.h \
+  /Users/subinrachaelkim/MultipageApp/node_modules/react-native/React/Base/RCTDefines.h \
+  /Users/subinrachaelkim/MultipageApp/node_modules/react-native/React/DevSupport/RCTInspectorDevServerHelper.h \
+  /Users/subinrachaelkim/MultipageApp/node_modules/react-native/React/DevSupport/RCTPackagerConnection.h \
+  /Users/subinrachaelkim/MultipageApp/node_modules/react-native/React/Base/RCTBridgeModule.h \
+  /Users/subinrachaelkim/MultipageApp/node_modules/react-native/React/Base/RCTFrameUpdate.h \
+  /Users/subinrachaelkim/MultipageApp/node_modules/react-native/React/Base/RCTInvalidating.h \
+  /Users/subinrachaelkim/MultipageApp/node_modules/react-native/React/Base/RCTBridge+Private.h \
+  /Users/subinrachaelkim/MultipageApp/node_modules/react-native/React/Base/RCTEventDispatcher.h \
+  /Users/subinrachaelkim/MultipageApp/node_modules/react-native/React/Base/RCTLog.h \
+  /Users/subinrachaelkim/MultipageApp/node_modules/react-native/React/Base/RCTAssert.h \
+  /Users/subinrachaelkim/MultipageApp/node_modules/react-native/React/Base/RCTUtils.h \
+  /Users/subinrachaelkim/MultipageApp/node_modules/react-native/React/Profiler/RCTProfile.h \
+  /Users/subinrachaelkim/MultipageApp/node_modules/react-native/React/DevSupport/RCTPackagerClient.h \
+  /Users/subinrachaelkim/MultipageApp/node_modules/react-native/React/Inspector/RCTInspectorPackagerConnection.h

@@ -5,10 +5,12 @@ import WifiManager from 'react-native-wifi';
 import { WebView } from 'react-native-webview';
 import Wifi from 'react-native-iot-wifi';
 import QRCodeScanner from 'react-native-qrcode-scanner';
-import PasswordTextBox from './PasswordTextBox/PasswordTextBox.js';
-import SSIDTextBox from './SSIDTextBox/SSIDTextBox.js';
+import PasswordTextBox from './src/PasswordTextBox.js';
+import InputTextBox from './src/InputTextBox.js';
+import ActivityIndicatorCustom from './src/ActivityIndicatorCustom.js';
 
 const URI = 'http://wireless.devemerald.com';
+const HTTPURL = 'https://www.devemerald.com/login';
 
 class HomeScreen extends React.Component {
   static navigationOptions = ({navigation}) => ({
@@ -60,7 +62,7 @@ class HomeScreen extends React.Component {
       <View style={ styles.container }>
         <Text style={ styles.instruction }>Connect to your device</Text>
         <Text>Manually enter SSID and password of your device or scan QR code.</Text>
-        <SSIDTextBox label='Device SSID' onChange={(ssid) => {this.setState({ssid})}}/>
+        <InputTextBox icon="wifi" label='Device SSID' onChange={(ssid) => {this.setState({ssid})}} keyboard='default' returnKey='next'/>
         <PasswordTextBox icon='lock' label=' Device password' onChange={(password) => {this.setState({password})}} />
         <Button
           title="Connect"
@@ -68,19 +70,16 @@ class HomeScreen extends React.Component {
         />
         { scannerButton }
         { this.state.initialSSID.includes('emerald')?passButton:null }
+        <Button
+          title="Register device"
+          onPress={() => {this.props.navigation.navigate('Register');}}
+        />
       </View>
     );
   }
 }
 
 function connectToDevice(ssid, pwd, nav, currentSSID){
-
-  Wifi.getSSID((initial) => {
-    if (initial != null && initial !== currentSSID){
-      Alert.alert(initial);
-      currentSSID = initial
-    }
-  })
 
   if (ssid === '' || pwd === ''){
     Alert.alert('Incomplete','Please complete both fields');
@@ -92,6 +91,7 @@ function connectToDevice(ssid, pwd, nav, currentSSID){
       });
     } else {
       WifiManager.connectToProtectedSSID(ssid,pwd,false).then(() => {
+        Alert.alert("Connected");
         nav.navigate('Details', {
             ssid: ssid,
             initialSSID: currentSSID,
@@ -103,7 +103,6 @@ function connectToDevice(ssid, pwd, nav, currentSSID){
     }
   }
 }
-
 
 class ScannerScreen extends React.Component {
 
@@ -144,8 +143,6 @@ class ScannerScreen extends React.Component {
               Scan the QR code attached to the bottom of device.
           </Text>
         }
-        style={{ height: scannerHeight, width: scannerWidth }}
-        reactivate={true}
         permissionDialogTitle="Permission required"
         permissionDialogMessage="This app would like to access your camera."
       />
@@ -227,19 +224,130 @@ class DetailsScreen extends React.Component {
     return (
       <View style={{ flex: 1 }}>
         <WebView
+          ref={WEBVIEW_REF => (WebViewRef = WEBVIEW_REF)}
           source={{ uri: URI }}
           style={{ width: windowWidth, height: windowHeight, flex: 1 , marginBottom: botMargin, marginLeft: leftMargin, marginRight: rightMargin }}
         />
         <Button
           title="Reload"
-          onPress={() => {this.props.navigation.push('Details',{
-            initialSSID: this.props.navigation.getParam('initialSSID'),
-            ssid: this.props.navigation.getParam('ssid'),
-          })}}
+          onPress={() => {WebViewRef && WebViewRef.reload();}}
         />
       </View>
     );
   }
+}
+
+class RegisterScreen extends React.Component {
+
+  static navigationOptions = ({navigation}) => ({
+    headerTitle: "Sign In",
+  });
+
+  constructor(props){
+    super(props);
+    this.state = {
+      email: 'skim1@exeter.edu',
+      password: 'Subin0306',
+    };
+  }
+
+  render(){
+    return(
+      <View style={ styles.container }>
+        <Text style={ styles.instruction }>Sign in to devemerald.com</Text>
+        <Text>Enter your crendentials for devemerald.com</Text>
+        <View>
+          <InputTextBox
+            icon="at"
+            label="Enter email"
+            onChange = {(email) => this.setState({email})}
+            keyboard='email-address'
+            returnKey='next'
+          />
+          <PasswordTextBox
+            icon='lock'
+            label=' Enter password'
+            onChange={(password) => {this.setState({password})}}
+          />
+          <Button
+            title="Sign in"
+            onPress={() => {requestData(this.state.email, this.state.password)}}
+          />
+        </View>
+      </View>
+    );
+  }
+}
+
+function requestData(email, password){
+
+  // var sessionId;
+  //
+  // var http = new XMLHttpRequest();
+  // var params = 'email='+email+'&password='+password;
+  // http.open('POST', HTTPURL, true);
+  //
+  // console.log(http);
+  //
+  // http.setRequestHeader('content-type', 'application/x-www-form-urlencoded');
+  //
+  // http.onreadystatechange = function() {
+  //     if(http.readyState == 4 && http.status == 200) {
+  //       var headers = http.getAllResponseHeaders();
+  //       var arr = headers.trim().split(/[\r\n]+/);
+  //       // Create a map of header names to values
+  //       var headerMap = {};
+  //       arr.forEach(function (line) {
+  //         var parts = line.split(': ');
+  //         var header = parts.shift();
+  //         var value = parts.join(': ');
+  //         headerMap[header.toLowerCase()] = value;
+  //       });
+  //       //Alert.alert('Response headers', arr);
+  //       console.log("got data");
+  //       console.log(http.response);
+  //       console.log(http.getAllResponseHeaders());
+  //       //Alert.alert('Data response', http.response);
+  //       //Alert.alert('Response headers', headerMap);
+  //     }
+  // }
+  // http.send(params);
+
+
+  fetch("https://www.devemerald.com/login", {
+    method: 'POST',
+    headers: {
+      Accept:'*/*',
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: 'email=skim1@exeter.edu&password=Subin0306',
+    redirect: "manual",
+    credentials: "include",
+  }).then((response) => {
+    console.log("******************");
+    console.log(response);
+    console.log(response.headers);
+    getHomes();
+  }).catch((error) => {
+    console.log(error);
+  });
+
+}
+
+function getHomes(){
+  fetch("https://www.devemerald.com/api/v1/ops/get-homes", {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: '*/*',
+    },
+    crendentials: "include"
+  }).then((response) => {
+    console.log("********GETHOMES********");
+    console.log(response);
+  }).catch((error) => {
+    console.log(error);
+  });
 }
 
 const RootStack = createStackNavigator(
@@ -255,6 +363,9 @@ const RootStack = createStackNavigator(
     },
     Scanner: {
       screen: ScannerScreen,
+    },
+    Register: {
+      screen: RegisterScreen,
     }
   },
   {

@@ -1,0 +1,26 @@
+dependencies: \
+  /Users/subinrachaelkim/MultipageApp/node_modules/react-native/third-party/folly-2018.10.22.00/folly/container/detail/F14Table.cpp \
+  /Users/subinrachaelkim/MultipageApp/node_modules/react-native/third-party/folly-2018.10.22.00/folly/container/detail/F14Table.h \
+  /Users/subinrachaelkim/MultipageApp/node_modules/react-native/third-party/folly-2018.10.22.00/folly/Bits.h \
+  /Users/subinrachaelkim/MultipageApp/node_modules/react-native/third-party/folly-2018.10.22.00/folly/lang/Bits.h \
+  /Users/subinrachaelkim/MultipageApp/node_modules/react-native/third-party/folly-2018.10.22.00/folly/ConstexprMath.h \
+  /Users/subinrachaelkim/MultipageApp/node_modules/react-native/third-party/folly-2018.10.22.00/folly/Portability.h \
+  /Users/subinrachaelkim/MultipageApp/node_modules/react-native/third-party/folly-2018.10.22.00/folly/portability/Config.h \
+  /Users/subinrachaelkim/MultipageApp/node_modules/react-native/third-party/folly-2018.10.22.00/folly/CPortability.h \
+  /Users/subinrachaelkim/MultipageApp/node_modules/react-native/third-party/folly-2018.10.22.00/folly/Utility.h \
+  /Users/subinrachaelkim/MultipageApp/node_modules/react-native/third-party/folly-2018.10.22.00/folly/Traits.h \
+  /Users/subinrachaelkim/MultipageApp/node_modules/react-native/third-party/folly-2018.10.22.00/folly/lang/Assume.h \
+  /Users/subinrachaelkim/MultipageApp/node_modules/react-native/third-party/folly-2018.10.22.00/folly/portability/Builtins.h \
+  /Users/subinrachaelkim/MultipageApp/node_modules/react-native/third-party/folly-2018.10.22.00/folly/Likely.h \
+  /Users/subinrachaelkim/MultipageApp/node_modules/react-native/third-party/folly-2018.10.22.00/folly/ScopeGuard.h \
+  /Users/subinrachaelkim/MultipageApp/node_modules/react-native/third-party/folly-2018.10.22.00/folly/Preprocessor.h \
+  /Users/subinrachaelkim/MultipageApp/node_modules/react-native/third-party/folly-2018.10.22.00/folly/lang/UncaughtExceptions.h \
+  /Users/subinrachaelkim/MultipageApp/node_modules/react-native/third-party/folly-2018.10.22.00/folly/functional/ApplyTuple.h \
+  /Users/subinrachaelkim/MultipageApp/node_modules/react-native/third-party/folly-2018.10.22.00/folly/functional/Invoke.h \
+  /Users/subinrachaelkim/MultipageApp/node_modules/react-native/third-party/folly-2018.10.22.00/folly/lang/Align.h \
+  /Users/subinrachaelkim/MultipageApp/node_modules/react-native/third-party/folly-2018.10.22.00/folly/lang/Exception.h \
+  /Users/subinrachaelkim/MultipageApp/node_modules/react-native/third-party/folly-2018.10.22.00/folly/CppAttributes.h \
+  /Users/subinrachaelkim/MultipageApp/node_modules/react-native/third-party/folly-2018.10.22.00/folly/lang/Launder.h \
+  /Users/subinrachaelkim/MultipageApp/node_modules/react-native/third-party/folly-2018.10.22.00/folly/lang/SafeAssert.h \
+  /Users/subinrachaelkim/MultipageApp/node_modules/react-native/third-party/folly-2018.10.22.00/folly/container/detail/F14Defaults.h \
+  /Users/subinrachaelkim/MultipageApp/node_modules/react-native/third-party/folly-2018.10.22.00/folly/container/detail/F14IntrinsicsAvailability.h

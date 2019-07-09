@@ -1,0 +1,22 @@
+dependencies: \
+  /Users/subinrachaelkim/MultipageApp/node_modules/react-native/React/Views/SafeAreaView/RCTSafeAreaShadowView.m \
+  /Users/subinrachaelkim/MultipageApp/node_modules/react-native/React/Views/SafeAreaView/RCTSafeAreaShadowView.h \
+  /Users/subinrachaelkim/MultipageApp/node_modules/react-native/React/Views/RCTShadowView.h \
+  /Users/subinrachaelkim/MultipageApp/node_modules/react-native/React/Views/RCTComponent.h \
+  /Users/subinrachaelkim/MultipageApp/node_modules/react-native/React/Views/RCTLayout.h \
+  /Users/subinrachaelkim/MultipageApp/node_modules/react-native/React/Base/RCTDefines.h \
+  /Users/subinrachaelkim/MultipageApp/node_modules/react-native/React/DevSupport/RCTInspectorDevServerHelper.h \
+  /Users/subinrachaelkim/MultipageApp/node_modules/react-native/React/DevSupport/RCTPackagerConnection.h \
+  /Users/subinrachaelkim/MultipageApp/ios/build/MultipageApp/Build/Products/Debug-iphonesimulator/include/yoga/Yoga.h \
+  /Users/subinrachaelkim/MultipageApp/ios/build/MultipageApp/Build/Products/Debug-iphonesimulator/include/yoga/YGEnums.h \
+  /Users/subinrachaelkim/MultipageApp/ios/build/MultipageApp/Build/Products/Debug-iphonesimulator/include/yoga/YGMacros.h \
+  /Users/subinrachaelkim/MultipageApp/ios/build/MultipageApp/Build/Products/Debug-iphonesimulator/include/yoga/YGValue.h \
+  /Users/subinrachaelkim/MultipageApp/node_modules/react-native/React/Base/RCTRootView.h \
+  /Users/subinrachaelkim/MultipageApp/node_modules/react-native/React/Base/RCTBridge.h \
+  /Users/subinrachaelkim/MultipageApp/node_modules/react-native/React/Base/RCTBridgeDelegate.h \
+  /Users/subinrachaelkim/MultipageApp/node_modules/react-native/React/Base/RCTJavaScriptLoader.h \
+  /Users/subinrachaelkim/MultipageApp/node_modules/react-native/React/Base/RCTBridgeModule.h \
+  /Users/subinrachaelkim/MultipageApp/node_modules/react-native/React/Base/RCTFrameUpdate.h \
+  /Users/subinrachaelkim/MultipageApp/node_modules/react-native/React/Base/RCTInvalidating.h \
+  /Users/subinrachaelkim/MultipageApp/node_modules/react-native/React/Base/RCTAssert.h \
+  /Users/subinrachaelkim/MultipageApp/node_modules/react-native/React/Views/SafeAreaView/RCTSafeAreaViewLocalData.h

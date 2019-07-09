@@ -1,0 +1,24 @@
+dependencies: \
+  /Users/subinrachaelkim/MultipageApp/node_modules/react-native/Libraries/Text/VirtualText/RCTVirtualTextShadowView.m \
+  /Users/subinrachaelkim/MultipageApp/node_modules/react-native/Libraries/Text/VirtualText/RCTVirtualTextShadowView.h \
+  /Users/subinrachaelkim/MultipageApp/node_modules/react-native/Libraries/Text/BaseText/RCTBaseTextShadowView.h \
+  /Users/subinrachaelkim/MultipageApp/ios/build/MultipageApp/Build/Products/Debug-iphonesimulator/include/React/RCTShadowView.h \
+  /Users/subinrachaelkim/MultipageApp/ios/build/MultipageApp/Build/Products/Debug-iphonesimulator/include/React/RCTComponent.h \
+  /Users/subinrachaelkim/MultipageApp/ios/build/MultipageApp/Build/Products/Debug-iphonesimulator/include/React/RCTLayout.h \
+  /Users/subinrachaelkim/MultipageApp/ios/build/MultipageApp/Build/Products/Debug-iphonesimulator/include/React/RCTDefines.h \
+  /Users/subinrachaelkim/MultipageApp/ios/build/MultipageApp/Build/Products/Debug-iphonesimulator/include/yoga/Yoga.h \
+  /Users/subinrachaelkim/MultipageApp/ios/build/MultipageApp/Build/Products/Debug-iphonesimulator/include/yoga/YGEnums.h \
+  /Users/subinrachaelkim/MultipageApp/ios/build/MultipageApp/Build/Products/Debug-iphonesimulator/include/yoga/YGMacros.h \
+  /Users/subinrachaelkim/MultipageApp/ios/build/MultipageApp/Build/Products/Debug-iphonesimulator/include/yoga/YGValue.h \
+  /Users/subinrachaelkim/MultipageApp/ios/build/MultipageApp/Build/Products/Debug-iphonesimulator/include/React/RCTRootView.h \
+  /Users/subinrachaelkim/MultipageApp/ios/build/MultipageApp/Build/Products/Debug-iphonesimulator/include/React/RCTBridge.h \
+  /Users/subinrachaelkim/MultipageApp/ios/build/MultipageApp/Build/Products/Debug-iphonesimulator/include/React/RCTBridgeDelegate.h \
+  /Users/subinrachaelkim/MultipageApp/ios/build/MultipageApp/Build/Products/Debug-iphonesimulator/include/React/RCTJavaScriptLoader.h \
+  /Users/subinrachaelkim/MultipageApp/ios/build/MultipageApp/Build/Products/Debug-iphonesimulator/include/React/RCTBridgeModule.h \
+  /Users/subinrachaelkim/MultipageApp/ios/build/MultipageApp/Build/Products/Debug-iphonesimulator/include/React/RCTFrameUpdate.h \
+  /Users/subinrachaelkim/MultipageApp/ios/build/MultipageApp/Build/Products/Debug-iphonesimulator/include/React/RCTInvalidating.h \
+  /Users/subinrachaelkim/MultipageApp/node_modules/react-native/Libraries/Text/RCTTextAttributes.h \
+  /Users/subinrachaelkim/MultipageApp/ios/build/MultipageApp/Build/Products/Debug-iphonesimulator/include/React/RCTTextDecorationLineType.h \
+  /Users/subinrachaelkim/MultipageApp/node_modules/react-native/Libraries/Text/RCTTextTransform.h \
+  /Users/subinrachaelkim/MultipageApp/ios/build/MultipageApp/Build/Products/Debug-iphonesimulator/include/React/RCTShadowView+Layout.h \
+  /Users/subinrachaelkim/MultipageApp/node_modules/react-native/Libraries/Text/RawText/RCTRawTextShadowView.h

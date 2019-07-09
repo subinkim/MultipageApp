@@ -1,0 +1,20 @@
+dependencies: \
+  /Users/subinrachaelkim/MultipageApp/node_modules/react-native/React/Modules/RCTAsyncLocalStorage.m \
+  /Users/subinrachaelkim/MultipageApp/node_modules/react-native/React/Modules/RCTAsyncLocalStorage.h \
+  /Users/subinrachaelkim/MultipageApp/node_modules/react-native/React/Base/RCTBridgeModule.h \
+  /Users/subinrachaelkim/MultipageApp/node_modules/react-native/React/Base/RCTDefines.h \
+  /Users/subinrachaelkim/MultipageApp/node_modules/react-native/React/DevSupport/RCTInspectorDevServerHelper.h \
+  /Users/subinrachaelkim/MultipageApp/node_modules/react-native/React/DevSupport/RCTPackagerConnection.h \
+  /Users/subinrachaelkim/MultipageApp/node_modules/react-native/React/Base/RCTInvalidating.h \
+  /Users/subinrachaelkim/MultipageApp/node_modules/react-native/React/Base/RCTConvert.h \
+  /Users/subinrachaelkim/MultipageApp/node_modules/react-native/React/Views/RCTAnimationType.h \
+  /Users/subinrachaelkim/MultipageApp/node_modules/react-native/React/Views/RCTBorderStyle.h \
+  /Users/subinrachaelkim/MultipageApp/node_modules/react-native/React/Base/RCTLog.h \
+  /Users/subinrachaelkim/MultipageApp/node_modules/react-native/React/Base/RCTAssert.h \
+  /Users/subinrachaelkim/MultipageApp/node_modules/react-native/React/Base/RCTUtils.h \
+  /Users/subinrachaelkim/MultipageApp/node_modules/react-native/React/Views/RCTPointerEvents.h \
+  /Users/subinrachaelkim/MultipageApp/node_modules/react-native/React/Views/RCTTextDecorationLineType.h \
+  /Users/subinrachaelkim/MultipageApp/ios/build/MultipageApp/Build/Products/Debug-iphonesimulator/include/yoga/Yoga.h \
+  /Users/subinrachaelkim/MultipageApp/ios/build/MultipageApp/Build/Products/Debug-iphonesimulator/include/yoga/YGEnums.h \
+  /Users/subinrachaelkim/MultipageApp/ios/build/MultipageApp/Build/Products/Debug-iphonesimulator/include/yoga/YGMacros.h \
+  /Users/subinrachaelkim/MultipageApp/ios/build/MultipageApp/Build/Products/Debug-iphonesimulator/include/yoga/YGValue.h

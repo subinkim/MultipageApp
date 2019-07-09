@@ -1,0 +1,35 @@
+dependencies: \
+  /Users/subinrachaelkim/MultipageApp/node_modules/react-native-permissions/ios/ReactNativePermissions.m \
+  /Users/subinrachaelkim/MultipageApp/node_modules/react-native-permissions/ios/ReactNativePermissions.h \
+  /Users/subinrachaelkim/MultipageApp/ios/build/MultipageApp/Build/Products/Debug-iphonesimulator/include/React/RCTBridgeModule.h \
+  /Users/subinrachaelkim/MultipageApp/ios/build/MultipageApp/Build/Products/Debug-iphonesimulator/include/React/RCTDefines.h \
+  /Users/subinrachaelkim/MultipageApp/ios/build/MultipageApp/Build/Products/Debug-iphonesimulator/include/React/RCTBridge.h \
+  /Users/subinrachaelkim/MultipageApp/ios/build/MultipageApp/Build/Products/Debug-iphonesimulator/include/React/RCTBridgeDelegate.h \
+  /Users/subinrachaelkim/MultipageApp/ios/build/MultipageApp/Build/Products/Debug-iphonesimulator/include/React/RCTJavaScriptLoader.h \
+  /Users/subinrachaelkim/MultipageApp/ios/build/MultipageApp/Build/Products/Debug-iphonesimulator/include/React/RCTFrameUpdate.h \
+  /Users/subinrachaelkim/MultipageApp/ios/build/MultipageApp/Build/Products/Debug-iphonesimulator/include/React/RCTInvalidating.h \
+  /Users/subinrachaelkim/MultipageApp/ios/build/MultipageApp/Build/Products/Debug-iphonesimulator/include/React/RCTConvert.h \
+  /Users/subinrachaelkim/MultipageApp/ios/build/MultipageApp/Build/Products/Debug-iphonesimulator/include/React/RCTAnimationType.h \
+  /Users/subinrachaelkim/MultipageApp/ios/build/MultipageApp/Build/Products/Debug-iphonesimulator/include/React/RCTBorderStyle.h \
+  /Users/subinrachaelkim/MultipageApp/ios/build/MultipageApp/Build/Products/Debug-iphonesimulator/include/React/RCTLog.h \
+  /Users/subinrachaelkim/MultipageApp/ios/build/MultipageApp/Build/Products/Debug-iphonesimulator/include/React/RCTAssert.h \
+  /Users/subinrachaelkim/MultipageApp/ios/build/MultipageApp/Build/Products/Debug-iphonesimulator/include/React/RCTUtils.h \
+  /Users/subinrachaelkim/MultipageApp/ios/build/MultipageApp/Build/Products/Debug-iphonesimulator/include/React/RCTPointerEvents.h \
+  /Users/subinrachaelkim/MultipageApp/ios/build/MultipageApp/Build/Products/Debug-iphonesimulator/include/React/RCTTextDecorationLineType.h \
+  /Users/subinrachaelkim/MultipageApp/ios/build/MultipageApp/Build/Products/Debug-iphonesimulator/include/yoga/Yoga.h \
+  /Users/subinrachaelkim/MultipageApp/ios/build/MultipageApp/Build/Products/Debug-iphonesimulator/include/yoga/YGEnums.h \
+  /Users/subinrachaelkim/MultipageApp/ios/build/MultipageApp/Build/Products/Debug-iphonesimulator/include/yoga/YGMacros.h \
+  /Users/subinrachaelkim/MultipageApp/ios/build/MultipageApp/Build/Products/Debug-iphonesimulator/include/yoga/YGValue.h \
+  /Users/subinrachaelkim/MultipageApp/ios/build/MultipageApp/Build/Products/Debug-iphonesimulator/include/React/RCTEventDispatcher.h \
+  /Users/subinrachaelkim/MultipageApp/node_modules/react-native-permissions/ios/Permissions/RNPLocation.h \
+  /Users/subinrachaelkim/MultipageApp/node_modules/react-native-permissions/ios/RCTConvert+RNPStatus.h \
+  /Users/subinrachaelkim/MultipageApp/node_modules/react-native-permissions/ios/Permissions/RNPBluetooth.h \
+  /Users/subinrachaelkim/MultipageApp/node_modules/react-native-permissions/ios/Permissions/RNPNotification.h \
+  /Users/subinrachaelkim/MultipageApp/node_modules/react-native-permissions/ios/Permissions/RNPAudioVideo.h \
+  /Users/subinrachaelkim/MultipageApp/node_modules/react-native-permissions/ios/Permissions/RNPEvent.h \
+  /Users/subinrachaelkim/MultipageApp/node_modules/react-native-permissions/ios/Permissions/RNPPhoto.h \
+  /Users/subinrachaelkim/MultipageApp/node_modules/react-native-permissions/ios/Permissions/RNPContacts.h \
+  /Users/subinrachaelkim/MultipageApp/node_modules/react-native-permissions/ios/Permissions/RNPBackgroundRefresh.h \
+  /Users/subinrachaelkim/MultipageApp/node_modules/react-native-permissions/ios/Permissions/RNPSpeechRecognition.h \
+  /Users/subinrachaelkim/MultipageApp/node_modules/react-native-permissions/ios/Permissions/RNPMediaLibrary.h \
+  /Users/subinrachaelkim/MultipageApp/node_modules/react-native-permissions/ios/Permissions/RNPMotion.h
