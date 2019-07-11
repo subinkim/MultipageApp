@@ -1,4 +1,8 @@
 rootProject.name = 'MultipageApp'
+include ':@react-native-community_async-storage'
+project(':@react-native-community_async-storage').projectDir = new File(rootProject.projectDir, '../node_modules/@react-native-community/async-storage/android')
+include ':react-native-cookies'
+project(':react-native-cookies').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-cookies/android')
 include ':react-native-permission'
 project(':react-native-permission').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-permission/android')
 include ':react-native-camera'

@@ -1,16 +1,22 @@
 import React from 'react';
-import { Button, Image, View, Text, StyleSheet, Dimensions, TextInput, Alert, Platform, TouchableOpacity } from 'react-native';
+import { Button, Image, View, Text, StyleSheet, Dimensions, TextInput, Alert, Platform, TouchableOpacity, AsyncStorage } from 'react-native';
+//import AsyncStorage from '@react-native-community/async-storage';
+
 import { createStackNavigator, createAppContainer } from 'react-navigation';
 import WifiManager from 'react-native-wifi';
 import { WebView } from 'react-native-webview';
 import Wifi from 'react-native-iot-wifi';
 import QRCodeScanner from 'react-native-qrcode-scanner';
+import CookieManager from 'react-native-cookies';
+
 import PasswordTextBox from './src/PasswordTextBox.js';
 import InputTextBox from './src/InputTextBox.js';
 import ActivityIndicatorCustom from './src/ActivityIndicatorCustom.js';
 
 const URI = 'http://wireless.devemerald.com';
-const HTTPURL = 'https://www.devemerald.com/login';
+const LoginURL = 'https://www.devemerald.com/login';
+const TrialSiteURL = "https://www.devemerald.com/trialsite/";
+const GetHomesURL = "https://www.devemerald.com/api/v1/ops/get-homes";
 
 class HomeScreen extends React.Component {
   static navigationOptions = ({navigation}) => ({
@@ -271,7 +277,11 @@ class RegisterScreen extends React.Component {
           />
           <Button
             title="Sign in"
-            onPress={() => {requestData(this.state.email, this.state.password)}}
+            onPress={() => {requestData(this.state.email, this.state.password, this.props.navigation)}}
+          />
+          <Button
+            title="get homes"
+            onPress={() => {this.props.navigation.navigate('Load')}}
           />
         </View>
       </View>
@@ -279,75 +289,88 @@ class RegisterScreen extends React.Component {
   }
 }
 
-function requestData(email, password){
+function requestData(email, password, nav){
 
-  // var sessionId;
-  //
-  // var http = new XMLHttpRequest();
-  // var params = 'email='+email+'&password='+password;
-  // http.open('POST', HTTPURL, true);
-  //
-  // console.log(http);
-  //
-  // http.setRequestHeader('content-type', 'application/x-www-form-urlencoded');
-  //
-  // http.onreadystatechange = function() {
-  //     if(http.readyState == 4 && http.status == 200) {
-  //       var headers = http.getAllResponseHeaders();
-  //       var arr = headers.trim().split(/[\r\n]+/);
-  //       // Create a map of header names to values
-  //       var headerMap = {};
-  //       arr.forEach(function (line) {
-  //         var parts = line.split(': ');
-  //         var header = parts.shift();
-  //         var value = parts.join(': ');
-  //         headerMap[header.toLowerCase()] = value;
-  //       });
-  //       //Alert.alert('Response headers', arr);
-  //       console.log("got data");
-  //       console.log(http.response);
-  //       console.log(http.getAllResponseHeaders());
-  //       //Alert.alert('Data response', http.response);
-  //       //Alert.alert('Response headers', headerMap);
-  //     }
-  // }
-  // http.send(params);
+  let sessionid;
+  let csrftoken;
+  let cookie;
 
-
-  fetch("https://www.devemerald.com/login", {
+  fetch(LoginURL, {
     method: 'POST',
     headers: {
       Accept:'*/*',
       'Content-Type': 'application/x-www-form-urlencoded',
     },
     body: 'email=skim1@exeter.edu&password=Subin0306',
-    redirect: "manual",
     credentials: "include",
+    //redirect: "manual",
   }).then((response) => {
-    console.log("******************");
     console.log(response);
-    console.log(response.headers);
-    getHomes();
+    CookieManager.getAll()
+    .then((res) => {
+      sessionid = res['sessionid']['value'];
+      csrftoken = res['csrftoken']['value'];
+      cookie = 'sessionid='+sessionid+'; csrftoken='+csrftoken;
+      function navigateToLoad(){
+        nav.navigate('Load', {
+          'sessionid': sessionid,
+          'cookie': cookie,
+          'csrftoken': csrftoken,
+        });
+      }
+      navigateToLoad();
+    });
   }).catch((error) => {
-    console.log(error);
+    console.log(error.message);
   });
-
 }
 
-function getHomes(){
-  fetch("https://www.devemerald.com/api/v1/ops/get-homes", {
-    method: 'POST',
+function getHomes(sessionID, csrftoken, cookie){
+
+  console.log(sessionID);
+  console.log(csrftoken);
+  console.log(cookie);
+
+  fetch(GetHomesURL, {
+    credentials:"include",
     headers: {
-      'Content-Type': 'application/json',
-      Accept: '*/*',
+        'X-CSRFToken': csrftoken,
+        referer: 'https://www.devemerald.com/',
+        Accept: '*/*',
+        'Content-Type': 'application/x-www-form-urlencoded',
     },
-    crendentials: "include"
-  }).then((response) => {
-    console.log("********GETHOMES********");
+    method:'POST',
+    mode:'cors',
+  }).then(function(response){
+    console.log("trialsite");
     console.log(response);
-  }).catch((error) => {
-    console.log(error);
+    return response.text();
+  }).then(function(text){
+    console.log(text);
   });
+}
+
+class LoadScreen extends React.Component {
+
+  render(){
+
+    const sessionID = this.props.navigation.getParam('sessionid',null);
+    const csrftoken = this.props.navigation.getParam('csrftoken',null);
+    const cookie = this.props.navigation.getParam('cookie', null);
+
+    return(
+      <View>
+        <Text>Load Screen</Text>
+        <Text>session id: {sessionID}</Text>
+        <Text>csrftoken: {csrftoken}</Text>
+        <Text>cookie: {cookie}</Text>
+        <Button
+          title="get Homes"
+          onPress={() => {getHomes(sessionID, csrftoken, cookie)}}
+        />
+      </View>
+    );
+  }
 }
 
 const RootStack = createStackNavigator(
@@ -366,6 +389,9 @@ const RootStack = createStackNavigator(
     },
     Register: {
       screen: RegisterScreen,
+    },
+    Load: {
+      screen: LoadScreen,
     }
   },
   {

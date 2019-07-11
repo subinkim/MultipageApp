@@ -138,6 +138,8 @@ android {
 }
 
 dependencies {
+    implementation project(':@react-native-community_async-storage')
+    implementation project(':react-native-cookies')
     implementation project(':react-native-permission')
     implementation project(':react-native-camera')
     implementation project(':react-native-iot-wifi')

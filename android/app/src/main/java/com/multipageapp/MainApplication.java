@@ -3,6 +3,8 @@ package com.multipageapp;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.reactnativecommunity.asyncstorage.AsyncStoragePackage;
+import com.psykar.cookiemanager.CookieManagerPackage;
 import com.beefe.permission.PermissionPackage;
 import org.reactnative.camera.RNCameraPackage;
 import com.tadasr.IOTWifi.IOTWifiPackage;
@@ -29,6 +31,8 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new AsyncStoragePackage(),
+            new CookieManagerPackage(),
             new PermissionPackage(),
             new RNCameraPackage(),
             new IOTWifiPackage(),
