@@ -1,6 +1,5 @@
 import React from 'react';
-import { Button, Image, View, Text, StyleSheet, Dimensions, TextInput, Alert, Platform, TouchableOpacity, AsyncStorage } from 'react-native';
-//import AsyncStorage from '@react-native-community/async-storage';
+import { Button, Image, View, Text, StyleSheet, Dimensions, TextInput, Alert, Platform, TouchableOpacity } from 'react-native';
 
 import { createStackNavigator, createAppContainer } from 'react-navigation';
 import WifiManager from 'react-native-wifi';
