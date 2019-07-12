@@ -1,9 +1,0 @@
-dependencies: \
-  /Users/subinrachaelkim/MultipageApp/node_modules/react-native/React/DevSupport/RCTInspectorDevServerHelper.mm \
-  /Users/subinrachaelkim/MultipageApp/node_modules/react-native/React/DevSupport/RCTInspectorDevServerHelper.h \
-  /Users/subinrachaelkim/MultipageApp/node_modules/react-native/React/Base/RCTDefines.h \
-  /Users/subinrachaelkim/MultipageApp/node_modules/react-native/React/DevSupport/RCTPackagerConnection.h \
-  /Users/subinrachaelkim/MultipageApp/node_modules/react-native/React/Inspector/RCTInspectorPackagerConnection.h \
-  /Users/subinrachaelkim/MultipageApp/node_modules/react-native/React/Base/RCTLog.h \
-  /Users/subinrachaelkim/MultipageApp/node_modules/react-native/React/Base/RCTAssert.h \
-  /Users/subinrachaelkim/MultipageApp/node_modules/react-native/React/Base/RCTUtils.h
