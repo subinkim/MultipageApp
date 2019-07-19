@@ -1,22 +1,106 @@
 import React from 'react';
-import { Button, View, Text, StyleSheet, Alert, TouchableOpacity } from 'react-native';
+import { Button, View, Text, StyleSheet, Alert, TouchableOpacity, FlatList, ScrollView } from 'react-native';
 
-import { createStackNavigator, createAppContainer } from 'react-navigation';
+import { createStackNavigator, createAppContainer, HeaderBackButton } from 'react-navigation';
+import AsyncStorage from '@react-native-community/async-storage';
 import CookieManager from 'react-native-cookies';
+import Swipeout from 'react-native-swipeout';
 
+const CSRF_KEY = '@csrftoken';
 
 class Load extends React.Component {
 
+  static navigationOptions = ({navigation, navigationOptions}) => {
+
+    return {
+      headerLeft:(
+        <HeaderBackButton
+          title="Back"
+          onPress={() => {navigation.goBack()}}
+        />
+      )
+    };
+  }
+
+
+  constructor(){
+    super();
+    this.state = {
+      rowID: null,
+      uuid: null,
+    }
+  }
+
   render(){
     const csrftoken = this.props.navigation.getParam('csrftoken',null);
+    const response = this.props.navigation.getParam('response', null);
+
+    let json = JSON.parse(response);
+
+    var swipeoutBtns = [
+      {
+        text: 'Edit',
+        type: 'primary',
+        onPress: function(){editItem()},
+      },
+      {
+        text: 'Delete',
+        type: 'delete',
+        onPress: function(){deleteItem()},
+      }
+    ]
+
+    const items = json.data.map((item) => {
+      return (
+        <Swipeout
+          right={swipeoutBtns}
+          key={item.uuid}
+          style={styles.swipeout}
+          autoClose={true}
+          onOpen={(sectionID, rowID) => {
+            this.setState({
+              rowID,
+            })
+          }}
+          >
+          <TouchableOpacity onPress={() => {}}>
+            <View>
+              <Text style={styles.item}>{item.nickname}</Text>
+            </View>
+          </TouchableOpacity>
+        </Swipeout>
+    )});
 
     return(
-      <View>
-        <Text>Load Screen</Text>
-        <Text>csrftoken: {csrftoken}</Text>
-      </View>
+      <ScrollView style={styles.container}>
+        <Button
+          title="Sign out"
+          onPress={()=> {signOut(this.props.navigation)}}
+        />
+        <Text style={styles.instruction}>Manage Home/Device</Text>
+        { items }
+      </ScrollView>
     );
   }
+}
+
+async function signOut(nav){
+  try{
+    await AsyncStorage.removeItem(CSRF_KEY);
+    nav.navigate('Register',{
+      cookieValid: false,
+    })
+  } catch (e) {
+    console.log(e);
+  }
+}
+
+function editItem(){
+  console.log("EDIT");
+}
+
+function deleteItem(){
+  console.log("DELETE");
 }
 
 const styles = StyleSheet.create({
@@ -35,6 +119,17 @@ const styles = StyleSheet.create({
       top: 50,
       fontSize: 15,
     },
+    item:{
+      fontSize: 18,
+      padding:10,
+    },
+    swipeout:{
+      backgroundColor: '#ffffff',
+      borderColor: 'gray',
+      borderWidth: 0.5,
+      marginBottom: 2,
+      borderRadius: 5,
+    }
 });
 
 export default Load;

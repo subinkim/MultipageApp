@@ -8,7 +8,13 @@ class InputTextBox extends React.Component {
         return (
             <Item>
                 <Icon active name={icon} />
-                <Input placeholder = { label } onChangeText={(e) => onChange(e)} keyboardType={ keyboard } returnKeyType = { returnKey }/>
+                <Input
+                  placeholder = { label }
+                  onChangeText={(e) => onChange(e)}
+                  keyboardType={ keyboard }
+                  returnKeyType = { returnKey }
+                  autoCapitalize="none"
+                />
             </Item>
         );
     }

@@ -9,14 +9,14 @@ const MyDrawerNavigator = createDrawerNavigator({
     screen: TabNavigator,
     navigationOptions: {
       drawerLabel: 'New Device',
-      drawerIcon: ({ tintColor }) => <Icon name={ Platform.OS ==="ios"?"add":"md-add"} size={17} />,
+      drawerIcon: ({ tintColor }) => <Icon name={"add"} size={17} />,
     }
   },
   Manage:{ //TODO:change so that it gets the list of current devices and display them - should be able to manage them
     screen: TabNavigator,
     navigationOptions: {
       drawerLabel: 'Current Devices',
-      drawerIcon: ({ tintColor }) => <Icon name={ Platform.OS === "ios"?"list":"md-format-list-bulleted" } size={17}/>
+      drawerIcon: ({ tintColor }) => <Icon name={"list"} size={17}/>
     }
   }
 });

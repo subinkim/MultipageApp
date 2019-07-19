@@ -55,6 +55,9 @@ class Scanner extends React.Component {
 
 function connectToDevice(ssid, pwd, nav, currentSSID){
 
+  console.log("ssid=>", ssid);
+  console.log("pwd=>", pwd);
+
   if (ssid === '' || pwd === ''){
     Alert.alert('Incomplete','Please complete both fields');
   } else {

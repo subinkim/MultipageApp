@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Button, Image, View, Text, StyleSheet, Dimensions, Alert, TouchableOpacity } from 'react-native';
+import { Button, Image, View, Text, StyleSheet, Dimensions, Alert, TouchableOpacity, Platform, PermissionsAndroid } from 'react-native';
 
 import { createStackNavigator, createAppContainer } from 'react-navigation';
 import WifiManager from 'react-native-wifi';
@@ -25,6 +25,12 @@ class Home extends Component {
       password: '',
       initialSSID: '',
     };
+  }
+
+  componentDidMount(){
+    if (Platform.OS === 'android'){
+      requestLocationPermission();
+    }
   }
 
   render() {
@@ -94,6 +100,20 @@ function connectToDevice(ssid, pwd, nav, currentSSID){
         nav.navigate('Home');
       })
     }
+  }
+}
+
+async function requestLocationPermission(){
+  try {
+    const granted = await PermissionsAndroid.request(
+      PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+      {
+        'title': 'Location Permission',
+        'message': 'This app needs access to your location',
+      }
+    );
+  } catch (err) {
+    console.warn(err);
   }
 }
 
