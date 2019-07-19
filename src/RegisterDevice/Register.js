@@ -10,6 +10,7 @@ import InputTextBox from '../TextBox/InputTextBox.js';
 
 const LoginURL = 'https://www.devemerald.com/login';
 const GetHomesURL = "https://www.devemerald.com/api/v1/ops/get-homes";
+const LogoutURL = 'https://www.devemerald.com/logout';
 
 const CSRF_KEY = '@csrftoken';
 
@@ -57,6 +58,7 @@ class Register extends React.Component {
     this.setState({
       reload: reload++,
     });
+    console.log("reload:"+reload);
   }
 
   render(){
@@ -64,9 +66,11 @@ class Register extends React.Component {
     let cookie = this.props.navigation.getParam('cookieValid');
 
     if (cookie != null){
-      this.setState({
-        cookieValid: cookie,
-      })
+      if (cookie != this.state.cookieValid){
+        this.setState({
+          cookieValid: cookie,
+        })
+      }
     }
 
     return(
@@ -93,31 +97,35 @@ class Register extends React.Component {
         </View>)
         :
         (<View>
+          <Text style= { styles.instruction }>Sign out from devemerald.com</Text>
           <Button
             title="Sign out"
-            onPress={() => {signOut()}}
+            onPress={() => {signOut("dd")}} //TODO: change this
           />
-        </View>
-        )
+        </View>)
         }
       </View>
     );
   }
 }
 
-async function signOut(){
-  try{
-    await AsyncStorage.removeItem(CSRF_KEY);
-    console.log("signed out");
-    AsyncStorage.getAllKeys().then((item) => console.log("keys after signout=>", item));
-  } catch (e) {
-    console.log(e);
-  }
+function signOut(csrftoken){
+  fetch(LogoutURL, {
+    credentials:"include",
+    headers: {
+        'X-CSRFToken': csrftoken,
+        referer: 'https://www.devemerald.com/',
+        Accept: '*/*',
+        'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    method:'GET',
+    mode:'cors',
+  });
+  AsyncStorage.removeItem(CSRF_KEY);
 }
 
 function fetchData(csrftoken, nav){
-  let response;
-  fetch(GetHomesURL, {
+  let response = fetch(GetHomesURL, {
     credentials:"include",
     headers: {
         'X-CSRFToken': csrftoken,
@@ -131,11 +139,10 @@ function fetchData(csrftoken, nav){
     return response.text().then(function(text){
       text = JSON.parse(text);
       if (text['success'] != null){
-        response = text['success'];
+        return text['success'];
       } else {
-        response = false;
+        return false;
       }
-      console.log("response=>",response);
     });
   });
   return response;
