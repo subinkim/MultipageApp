@@ -65,8 +65,20 @@ class Home extends Component {
       <View style={ styles.container }>
         <Text style={ styles.instruction }>Connect to your device</Text>
         <Text>Manually enter SSID and password of your device or scan QR code.</Text>
-        <InputTextBox icon="wifi" label='Device SSID' onChange={(ssid) => {this.setState({ssid})}} keyboard='default' returnKey='next'/>
-        <PasswordTextBox icon='lock' label=' Device password' onChange={(password) => {this.setState({password})}} />
+        <InputTextBox
+          icon="wifi"
+          label='Device SSID'
+          onChange={(ssid) => {this.setState({ssid})}}
+          keyboard='default'
+          returnKey='next'
+          value={this.state.ssid}
+        />
+        <PasswordTextBox
+          icon='lock'
+          label=' Device password'
+          onChange={(password) => {this.setState({password})}}
+          value={this.state.password}
+        />
         <Button
           title="Connect"
           onPress={() => connectToDevice(this.state.ssid, this.state.password, this.props.navigation, this.state.initialSSID)}

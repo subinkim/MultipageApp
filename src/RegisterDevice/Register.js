@@ -37,14 +37,10 @@ class Register extends React.Component {
 
   componentWillMount(){
 
-    this.refresh();
-
     AsyncStorage.getAllKeys().then((item) => {
       if (item.includes(CSRF_KEY)){
         if (getItem(this.props.navigation, fetchData)){
-          this.setState({
-            cookieValid: true,
-          })
+          this.setState({cookieValid: true})
           getItem(this.props.navigation, fetchHomes);
         } else {
           AsyncStorage.removeItem(CSRF_KEY);
@@ -53,25 +49,41 @@ class Register extends React.Component {
     });
   }
 
-  refresh = () => {
-    let reload = this.state.reload;
-    this.setState({
-      reload: reload++,
-    });
-    console.log("reload:"+reload);
+  shouldComponentUpdate(nextProp, nextState){
+    console.log("should component update");
+    return true;
+  }
+
+  componentWillUpdate(){
+    console.log("Component will update");
+    let cookie = this.props.navigation.getParam('cookieValid', false);
+
+    if (cookie!=null){
+      if (cookie != this.state.cookieValid){
+        this.setState({
+          cookieValid: cookie,
+          email: '',
+          password: '',
+        })
+      }
+    }
+    console.log("cookie valid? =>", this.state.cookieValid);
+
   }
 
   render(){
 
-    let cookie = this.props.navigation.getParam('cookieValid');
+    // let cookie = this.props.navigation.getParam('cookieValid');
+    //
+    // if (cookie != null){
+    //   if (cookie != this.state.cookieValid){
+    //     this.setState({
+    //       cookieValid: cookie,
+    //     })
+    //   }
+    // }
 
-    if (cookie != null){
-      if (cookie != this.state.cookieValid){
-        this.setState({
-          cookieValid: cookie,
-        })
-      }
-    }
+    console.log("render called");
 
     return(
       <View style={ styles.container }>
@@ -84,10 +96,12 @@ class Register extends React.Component {
             onChange = {(email) => this.setState({email})}
             keyboard='email-address'
             returnKey='next'
+            value={ this.state.email }
           />
           <PasswordTextBox
             icon='lock'
             label=' Enter password'
+            value={ this.state.password }
             onChange={(password) => {this.setState({password})}}
           />
           <Button
@@ -100,7 +114,7 @@ class Register extends React.Component {
           <Text style= { styles.instruction }>Sign out from devemerald.com</Text>
           <Button
             title="Sign out"
-            onPress={() => {signOut("dd")}} //TODO: change this
+            onPress={() => {signOut()}}
           />
         </View>)
         }
@@ -109,19 +123,22 @@ class Register extends React.Component {
   }
 }
 
-function signOut(csrftoken){
-  fetch(LogoutURL, {
-    credentials:"include",
-    headers: {
-        'X-CSRFToken': csrftoken,
-        referer: 'https://www.devemerald.com/',
-        Accept: '*/*',
-        'Content-Type': 'application/x-www-form-urlencoded',
-    },
-    method:'GET',
-    mode:'cors',
+function signOut(){
+
+  AsyncStorage.getItem(CSRF_KEY).then((csrftoken) => {
+    fetch(LogoutURL, {
+      credentials:"include",
+      headers: {
+          'X-CSRFToken': csrftoken,
+          referer: 'https://www.devemerald.com/',
+          Accept: '*/*',
+          'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      method:'GET',
+      mode:'cors',
+    });
+    AsyncStorage.removeItem(CSRF_KEY);
   });
-  AsyncStorage.removeItem(CSRF_KEY);
 }
 
 function fetchData(csrftoken, nav){

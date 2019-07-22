@@ -7,6 +7,7 @@ import CookieManager from 'react-native-cookies';
 import Swipeout from 'react-native-swipeout';
 
 const CSRF_KEY = '@csrftoken';
+const VALID_KEY =  '@cookieValid';
 const LogoutURL = 'https://www.devemerald.com/logout';
 
 class Load extends React.Component {
@@ -17,7 +18,10 @@ class Load extends React.Component {
       headerLeft:(
         <HeaderBackButton
           title="Back"
-          onPress={() => {navigation.goBack()}}
+          onPress={() => {
+            navigation.setParams({cookieValid: true})
+            navigation.goBack();
+          }}
         />
       )
     };
@@ -75,7 +79,12 @@ class Load extends React.Component {
       <ScrollView style={styles.container}>
         <Button
           title="Sign out"
-          onPress={()=> {signOut(csrftoken,this.props.navigation)}}
+          onPress={()=> {
+            signOut(csrftoken);
+            this.props.navigation.navigate('Register',{
+              cookieValid: false,
+            })
+          }}
         />
         <Text style={styles.instruction}>Manage Home/Device</Text>
         { items }
@@ -84,7 +93,7 @@ class Load extends React.Component {
   }
 }
 
-function signOut(csrftoken,nav){
+function signOut(csrftoken){
   fetch(LogoutURL, {
     credentials:"include",
     headers: {
@@ -97,9 +106,6 @@ function signOut(csrftoken,nav){
     mode:'cors',
   });
   AsyncStorage.removeItem(CSRF_KEY);
-  nav.navigate('Register',{
-    cookieValid: false,
-  })
 }
 
 function editItem(){

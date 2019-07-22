@@ -15,11 +15,11 @@ class PasswordTextBox extends React.Component {
     }
 
     render() {
-        const { label, icon, onChange } = this.props;
+        const { label, icon, onChange, value } = this.props;
         return (
             <Item>
                 <Icon active name={icon} />
-                <Input secureTextEntry={this.state.password} placeholder = { label } onChangeText={(e) => onChange(e)} returnKeyType='done' />
+                <Input secureTextEntry={this.state.password} placeholder = { label } onChangeText={(e) => onChange(e)} returnKeyType='done' value={value}/>
                 <Icon name={this.state.icon} onPress={() => this._changeIcon()} />
             </Item>
         );
