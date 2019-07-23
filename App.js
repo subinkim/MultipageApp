@@ -1,21 +1,24 @@
 import React from 'react'
 import {Platform} from 'react-native';
+
 import { createDrawerNavigator, createAppContainer } from 'react-navigation';
 import {Icon} from 'native-base';
-import TabNavigator from './src/TabNav/TabNavigator.js';  //Tab Nav
+
+import RegisterStack from './src/Register';
+import ManageStack from './src/Manage';
 
 const MyDrawerNavigator = createDrawerNavigator({
-  TabNav:{
-    screen: TabNavigator,
+  Register:{
+    screen: RegisterStack,
     navigationOptions: {
-      drawerLabel: 'New Device',
+      drawerLabel: 'Register',
       drawerIcon: ({ tintColor }) => <Icon name={"add"} size={17} />,
     }
   },
-  Manage:{ //TODO:change so that it gets the list of current devices and display them - should be able to manage them
-    screen: TabNavigator,
+  Manage:{
+    screen: ManageStack,
     navigationOptions: {
-      drawerLabel: 'Current Devices',
+      drawerLabel: 'Manage',
       drawerIcon: ({ tintColor }) => <Icon name={"list"} size={17}/>
     }
   }

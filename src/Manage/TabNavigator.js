@@ -1,32 +1,32 @@
 import React from 'react';
 
 import { createBottomTabNavigator, createStackNavigator } from 'react-navigation';
-import ConnectDeviceScreen from './ConnectDevice'
-import RegisterDeviceScreen from './RegisterDevice';
+import ManageHomeStack from './ManageHome'
+import ConnectDeviceStack from './ConnectDevice';
 import { Icon } from 'native-base';
 
 const navigatorTab = createBottomTabNavigator(
   {
-    ConnectDevice:{
-      screen: ConnectDeviceScreen,
+    ManageHome:{
+      screen: ManageHomeStack,
       navigationOptions: {
-        title: "Connect",
+        title: "Manage",
         tabBarIcon: ({ focused, tintColor }) => (
           <Icon
-            name="wifi"
+            name="wifi" //TODO: change this
             size={11}
             active={focused?true:false}
           />
         )
       },
     },
-    RegisterDevice:{
-      screen: RegisterDeviceScreen,
+    ConnectDevice:{
+      screen: ConnectDeviceStack,
       navigationOptions: {
-        title: "Register",
+        title: "Connect",
         tabBarIcon: ({ focused, tintColor }) => (
           <Icon
-            name="add-circle"
+            name="wifi"
             size={11}
             active={focused?true:false}
           />
