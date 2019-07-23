@@ -2,7 +2,7 @@ import React from 'react'
 import {Platform} from 'react-native';
 import { createDrawerNavigator, createAppContainer } from 'react-navigation';
 import {Icon} from 'native-base';
-import TabNavigator from './src/TabNavigator.js';  //Tab Nav
+import TabNavigator from './src/TabNav/TabNavigator.js';  //Tab Nav
 
 const MyDrawerNavigator = createDrawerNavigator({
   TabNav:{

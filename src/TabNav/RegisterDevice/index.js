@@ -7,5 +7,5 @@ import Register from './Register.js';
 
 export default createStackNavigator({
   Register,
-  Load
+  Load,
 });

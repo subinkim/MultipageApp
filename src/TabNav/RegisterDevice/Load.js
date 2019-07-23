@@ -19,8 +19,9 @@ class Load extends React.Component {
         <HeaderBackButton
           title="Back"
           onPress={() => {
-            navigation.setParams({cookieValid: true})
-            navigation.goBack();
+            navigation.navigate('Register', {
+              cookieValid: true,
+            })
           }}
         />
       )
