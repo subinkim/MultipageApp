@@ -6,8 +6,8 @@ import WifiManager from 'react-native-wifi';
 import { WebView } from 'react-native-webview';
 import Wifi from 'react-native-iot-wifi';
 
-import PasswordTextBox from '../TextBox/PasswordTextBox.js';
-import InputTextBox from '../TextBox/InputTextBox.js';
+import PasswordTextBox from '../../CustomClass/PasswordTextBox.js';
+import InputTextBox from '../../CustomClass/InputTextBox.js';
 
 class Home extends Component {
   static navigationOptions = ({navigation}) => ({

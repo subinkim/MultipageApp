@@ -5,8 +5,8 @@ import { createStackNavigator, createAppContainer } from 'react-navigation';
 import CookieManager from 'react-native-cookies';
 import AsyncStorage from '@react-native-community/async-storage';
 
-import PasswordTextBox from '../TextBox/PasswordTextBox.js';
-import InputTextBox from '../TextBox/InputTextBox.js';
+import PasswordTextBox from '../../CustomClass/PasswordTextBox.js';
+import InputTextBox from '../../CustomClass/InputTextBox.js';
 
 const LoginURL = 'https://www.devemerald.com/login';
 const GetHomesURL = "https://www.devemerald.com/api/v1/ops/get-homes";

@@ -5,6 +5,8 @@ import PasswordTextBox from '../CustomClass/PasswordTextBox.js';
 import InputTextBox from '../CustomClass/InputTextBox.js';
 import Storage  from '../CustomClass/Storage.js';
 
+import AsyncStorage from '@react-native-community/async-storage';
+
 class Home extends React.Component {
 
   static navigationOptions = ({navigation, navigationOptions}) => {

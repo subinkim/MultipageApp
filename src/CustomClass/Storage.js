@@ -1,5 +1,7 @@
 /*import*/
 import React from 'react';
+import AsyncStorage from '@react-native-community/async-storage';
+import CookieManager from 'react-native-cookies';
 
 /*URLs*/
 export const LoginURL = 'https://www.devemerald.com/login';
