@@ -1,18 +1,9 @@
 import React from 'react';
 import { Button, View, Text, StyleSheet, Alert, TouchableOpacity } from 'react-native';
 
-import { createStackNavigator, createAppContainer } from 'react-navigation';
-import CookieManager from 'react-native-cookies';
-import AsyncStorage from '@react-native-community/async-storage';
-
-import PasswordTextBox from '../TextBox/PasswordTextBox.js';
-import InputTextBox from '../TextBox/InputTextBox.js';
-
-const LoginURL = 'https://www.devemerald.com/login';
-const GetHomesURL = "https://www.devemerald.com/api/v1/ops/get-homes";
-const LogoutURL = 'https://www.devemerald.com/logout';
-
-const CSRF_KEY = '@csrftoken';
+import PasswordTextBox from '../CustomClass/PasswordTextBox.js';
+import InputTextBox from '../CustomClass/InputTextBox.js';
+import Storage  from '../CustomClass/Storage.js';
 
 class Home extends React.Component {
 
@@ -34,6 +25,7 @@ class Home extends React.Component {
     };
   }
 
+  /*Checks if there's a valid csrftoken stored in AsyncStorage*/
   componentWillMount(){
     AsyncStorage.getAllKeys().then((item) => {
       if (item.includes(CSRF_KEY)){
