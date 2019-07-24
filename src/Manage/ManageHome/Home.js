@@ -30,13 +30,11 @@ class Register extends React.Component {
     this.state = {
       email: '',
       password: '',
-      reload: 0,
       cookieValid: false,
     };
   }
 
   componentWillMount(){
-
     AsyncStorage.getAllKeys().then((item) => {
       if (item.includes(CSRF_KEY)){
         if (getItem(this.props.navigation, fetchData)){
@@ -49,15 +47,8 @@ class Register extends React.Component {
     });
   }
 
-  shouldComponentUpdate(nextProp, nextState){
-    console.log("should component update");
-    return true;
-  }
-
   componentWillUpdate(){
-    console.log("Component will update");
     let cookie = this.props.navigation.getParam('cookieValid', false);
-
     if (cookie!=null){
       if (cookie != this.state.cookieValid){
         this.setState({
@@ -67,28 +58,13 @@ class Register extends React.Component {
         })
       }
     }
-    console.log("cookie valid? =>", this.state.cookieValid);
 
   }
 
   render(){
 
-    // let cookie = this.props.navigation.getParam('cookieValid');
-    //
-    // if (cookie != null){
-    //   if (cookie != this.state.cookieValid){
-    //     this.setState({
-    //       cookieValid: cookie,
-    //     })
-    //   }
-    // }
-
-    console.log("render called");
-
-    return(
-      <View style={ styles.container }>
-      {!this.state.cookieValid?
-        (<View><Text style={ styles.instruction }>Sign in to devemerald.com</Text>
+    const inputField = (
+      <View><Text style={ styles.instruction }>Sign in to devemerald.com</Text>
         <Text>Enter your crendentials for devemerald.com</Text>
           <InputTextBox
             icon="at"
@@ -106,18 +82,22 @@ class Register extends React.Component {
           />
           <Button
             title="Sign in"
-            onPress={() => {requestData(this.state.email, this.state.password, this.props.navigation)}}
+            onPress={() => {requestData(this.state.email, this.state.password, this.props.navigation); this.setState({cookieValid:true})}} //TODO: check if credentials are valid before this.setState
           />
-        </View>)
-        :
-        (<View>
-          <Text style= { styles.instruction }>Sign out from devemerald.com</Text>
-          <Button
-            title="Sign out"
-            onPress={() => {signOut()}}
-          />
-        </View>)
-        }
+        </View>
+      );
+    const signOutButton = (
+    <View>
+      <Text style= { styles.instruction }>Sign out from devemerald.com</Text>
+      <Button
+        title="Sign out"
+        onPress={() => {signOut()}}
+      />
+    </View>);
+
+    return(
+      <View style={ styles.container }>
+      {!this.state.cookieValid?inputField:signOutButton}
       </View>
     );
   }

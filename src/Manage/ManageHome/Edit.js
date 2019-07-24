@@ -10,7 +10,7 @@ const CSRF_KEY = '@csrftoken';
 const VALID_KEY =  '@cookieValid';
 const LogoutURL = 'https://www.devemerald.com/logout';
 
-class Load extends React.Component {
+class Edit extends React.Component {
 
   static navigationOptions = ({navigation, navigationOptions}) => {
 
@@ -19,8 +19,9 @@ class Load extends React.Component {
         <HeaderBackButton
           title="Back"
           onPress={() => {
-            navigation.setParams({cookieValid: true})
-            navigation.goBack();
+            navigation.navigate('Register', {
+              cookieValid: true,
+            })
           }}
         />
       )
@@ -145,4 +146,4 @@ const styles = StyleSheet.create({
     }
 });
 
-export default Load;
+export default Edit;
