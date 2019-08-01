@@ -3,9 +3,13 @@ import { Button, View, Text, StyleSheet, Alert, TouchableOpacity } from 'react-n
 
 import PasswordTextBox from '../CustomClass/PasswordTextBox.js';
 import InputTextBox from '../CustomClass/InputTextBox.js';
-import Storage  from '../CustomClass/Storage.js';
+import {CSRF_KEY} from '../CustomClass/Storage';
+import {MainURL, LoginURL, LogoutURL, GetHomesURL} from '../CustomClass/Storage';
 
 import AsyncStorage from '@react-native-community/async-storage';
+import CookieManager from 'react-native-cookies';
+
+const COOKIE_KEY = '@cookieValid';
 
 class Home extends React.Component {
 
@@ -27,23 +31,50 @@ class Home extends React.Component {
     };
   }
 
-  /*Checks if there's a valid csrftoken stored in AsyncStorage*/
   componentWillMount(){
-    AsyncStorage.getAllKeys().then((item) => {
-      if (item.includes(CSRF_KEY)){
-        if (getItem(this.props.navigation, fetchData)){
-          this.setState({cookieValid: true})
-          getItem(this.props.navigation, fetchHomes);
-        } else {
-          AsyncStorage.removeItem(CSRF_KEY);
-        }
+    CookieManager.clearAll();
+    AsyncStorage.getItem(COOKIE_KEY).then((item)=>{
+      if(item==='true'){this.setState({cookieValid:true})}
+      else{this.setState({cookieValid:false})}
+    })
+  }
+
+  componentDidMount(){
+
+    AsyncStorage.getAllKeys().then((res) => {
+
+      if(res.includes(CSRF_KEY)){
+
+        AsyncStorage.getItem(CSRF_KEY).then((csrftoken) => {
+          this.checkToken(csrftoken);
+
+          AsyncStorage.getItem(COOKIE_KEY).then((item) => {
+            if (item === 'true'){this.setState({cookieValid: true})}
+            else {this.setState({cookieValid: false})}
+          });
+
+          console.log("this.state.cookieValid?=>",this.state.cookieValid);
+
+          if (this.state.cookieValid){
+            console.log("Cookie is valid!");
+            // this.props.navigation.navigate('Scanner');
+          } else {
+            CookieManager.clearAll();
+          }
+
+        });
+
       }
     });
   }
 
   componentWillUpdate(){
-    let cookie = this.props.navigation.getParam('cookieValid', false);
+    var cookie = this.props.navigation.getParam('cookieValid', null);
+    console.log("Cookie=>",cookie);
     if (cookie!=null){
+      if (cookie){cookie = 'true'}
+      else {cookie = 'false'}
+      AsyncStorage.setItem(COOKIE_KEY, cookie);
       if (cookie != this.state.cookieValid){
         this.setState({
           cookieValid: cookie,
@@ -52,6 +83,77 @@ class Home extends React.Component {
         })
       }
     }
+  }
+
+  signIn(email, password, nav){
+    fetch(LoginURL, {
+      method: 'POST',
+      headers: {
+        Accept:'*/*',
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: 'email='+email+'&password='+password,
+      credentials: "include",
+    }).then((response) => {
+      CookieManager.getAll() //TODO: This doesn't work for Android
+      .then((res) => {
+        let csrftoken = res['csrftoken']['value'];
+        AsyncStorage.setItem(COOKIE_KEY, 'true');
+        AsyncStorage.setItem(CSRF_KEY, csrftoken);
+        this.props.navigation.navigate('Scanner');
+      });
+    }).catch((error) => {
+      console.log(error);
+    });
+  }
+
+  checkToken(csrftoken){
+    fetch(GetHomesURL, {
+      credentials:"include",
+      headers: {
+          'X-CSRFToken': csrftoken,
+          referer: 'https://www.devemerald.com/',
+          Accept: '*/*',
+          'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      method:'POST',
+      mode:'cors',
+    }).then(function(response){
+      return response.text().then(function(text){
+        text = JSON.parse(text);
+        if (text['success'] != null){
+          if (text['success']){AsyncStorage.setItem(COOKIE_KEY, 'true');}
+          else{AsyncStorage.setItem(COOKIE_KEY, 'false')}
+        } else {
+          AsyncStorage.setItem(COOKIE_KEY, 'false');
+        }
+      });
+    });
+  }
+
+  signOut(){
+    AsyncStorage.getItem(CSRF_KEY).then((csrftoken) => {
+      fetch(LogoutURL, {
+        credentials:"include",
+        headers: {
+            'X-CSRFToken': csrftoken,
+            referer: 'https://www.devemerald.com/',
+            Accept: '*/*',
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        method:'GET',
+        mode:'cors',
+      });
+      AsyncStorage.removeItem(CSRF_KEY);
+    });
+    AsyncStorage.setItem(COOKIE_KEY, 'false');
+    this.setState({cookieValid: false});
+    CookieManager.getAll().then((res)=>{
+      console.log("res after signout=>")
+    })
+    AsyncStorage.getItem(COOKIE_KEY).then((item)=>{
+      console.log("cookieValid after signout=>",item);
+    });
 
   }
 
@@ -76,7 +178,7 @@ class Home extends React.Component {
           />
           <Button
             title="Sign in"
-            onPress={() => {requestData(this.state.email, this.state.password, this.props.navigation); this.setState({cookieValid:true})}} //TODO: check if credentials are valid before this.setState
+            onPress={() => {this.signIn(this.state.email, this.state.password, this.props.navigation);}}
           />
         </View>
       );
@@ -85,7 +187,11 @@ class Home extends React.Component {
       <Text style= { styles.instruction }>Sign out from devemerald.com</Text>
       <Button
         title="Sign out"
-        onPress={() => {signOut()}}
+        onPress={() => {this.signOut()}}
+      />
+      <Button
+        title="Scan QR code"
+        onPress={() => {this.props.navigation.navigate('Scanner')}}
       />
     </View>);
 
@@ -95,106 +201,6 @@ class Home extends React.Component {
       </View>
     );
   }
-}
-
-function signOut(){
-
-  AsyncStorage.getItem(CSRF_KEY).then((csrftoken) => {
-    fetch(LogoutURL, {
-      credentials:"include",
-      headers: {
-          'X-CSRFToken': csrftoken,
-          referer: 'https://www.devemerald.com/',
-          Accept: '*/*',
-          'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      method:'GET',
-      mode:'cors',
-    });
-    AsyncStorage.removeItem(CSRF_KEY);
-  });
-}
-
-function fetchData(csrftoken, nav){
-  let response = fetch(GetHomesURL, {
-    credentials:"include",
-    headers: {
-        'X-CSRFToken': csrftoken,
-        referer: 'https://www.devemerald.com/',
-        Accept: '*/*',
-        'Content-Type': 'application/x-www-form-urlencoded',
-    },
-    method:'POST',
-    mode:'cors',
-  }).then(function(response){
-    return response.text().then(function(text){
-      text = JSON.parse(text);
-      if (text['success'] != null){
-        return text['success'];
-      } else {
-        return false;
-      }
-    });
-  });
-  return response;
-}
-
-function requestData(email, password, nav){
-
-  fetch(LoginURL, {
-    method: 'POST',
-    headers: {
-      Accept:'*/*',
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
-    body: 'email='+email+'&password='+password,
-    credentials: "include",
-  }).then((response) => {
-    CookieManager.getAll()
-    .then((res) => {
-      let csrftoken = res['csrftoken']['value'];
-      storeItem(CSRF_KEY, csrftoken);
-      getItem(nav, fetchHomes);
-    });
-  }).catch((error) => {
-    console.log(error);
-  });
-}
-
-async function storeItem(key, item){
-  try {
-    await AsyncStorage.setItem(key, item);
-  } catch (e) {
-    console.log(e);
-  }
-}
-
-async function getItem(nav, fetchFunc){
-  var value = await AsyncStorage.getItem(CSRF_KEY).then((item) => {
-    fetchFunc(item,nav);
-  });
-}
-
-function fetchHomes(csrftoken, nav){
-  fetch(GetHomesURL, {
-    credentials:"include",
-    headers: {
-        'X-CSRFToken': csrftoken,
-        referer: 'https://www.devemerald.com/',
-        Accept: '*/*',
-        'Content-Type': 'application/x-www-form-urlencoded',
-    },
-    method:'POST',
-    mode:'cors',
-  }).then(function(response){
-    return response.text().then(function(text){
-      text = JSON.parse(text);
-      nav.navigate('Load', {
-        csrftoken: csrftoken,
-        response: JSON.stringify(text),
-      });
-    });
-  });
 }
 
 const styles = StyleSheet.create({

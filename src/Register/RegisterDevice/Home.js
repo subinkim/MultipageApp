@@ -1,131 +1,70 @@
-import React, { Component } from 'react';
-import { Button, Image, View, Text, StyleSheet, Dimensions, Alert, TouchableOpacity, Platform, PermissionsAndroid } from 'react-native';
+import React from 'react';
+import { Button, View, Text, StyleSheet, Alert, TouchableOpacity, ScrollView } from 'react-native';
 
 import { createStackNavigator, createAppContainer } from 'react-navigation';
-import WifiManager from 'react-native-wifi';
-import { WebView } from 'react-native-webview';
-import Wifi from 'react-native-iot-wifi';
+import CookieManager from 'react-native-cookies';
+import AsyncStorage from '@react-native-community/async-storage';
 
 import PasswordTextBox from '../../CustomClass/PasswordTextBox.js';
 import InputTextBox from '../../CustomClass/InputTextBox.js';
 
-class Home extends Component {
-  static navigationOptions = ({navigation}) => ({
-    headerTitle: "Welcome!",
-    headerRight: <Button
-        onPress={() => {navigation.navigate('Info');}}
-        title="Help"
-      />
-  });
+import {MainURL, GetHomesURL} from '../../CustomClass/Storage.js';
 
-  constructor(props){
-    super(props);
+const CSRF_KEY = '@csrftoken';
+
+class RegisterHome extends React.Component {
+
+  static navigationOptions = ({navigation, navigationOptions}) => {
+
+    const { params } = navigation.state;
+
+    return {
+      title: 'Choose Home',
+    }
+  };
+
+  constructor(){
+    super();
     this.state = {
-      ssid: '',
-      password: '',
-      initialSSID: '',
-    };
-  }
-
-  componentDidMount(){
-    if (Platform.OS === 'android'){
-      requestLocationPermission();
+      csrftoken: '',
     }
   }
 
-  render() {
-
-    if (this.state.initialSSID === ''){
-      Wifi.getSSID((initialSSID) => {
-        if (initialSSID != null){
-          this.setState({initialSSID});
-        }
-      })
-    }
-
-    const scannerButton = (<Button
-      title="Scan QR code"
-      onPress={() => {
-        this.props.navigation.navigate('Scanner',{
-          currentSSID: this.state.initialSSID,
-        });
-      }}
-    />);
-
-    const passButton =(<Button
-      title="Already connected?"
-      onPress={() => {
-        this.props.navigation.navigate('Details', {
-          currentSSID: this.state.initialSSID,
-        })
-      }}
-    />);
-
-    return (
-      <View style={ styles.container }>
-        <Text style={ styles.instruction }>Connect to your device</Text>
-        <Text>Manually enter SSID and password of your device or scan QR code.</Text>
-        <InputTextBox
-          icon="wifi"
-          label='Device SSID'
-          onChange={(ssid) => {this.setState({ssid})}}
-          keyboard='default'
-          returnKey='next'
-          value={this.state.ssid}
-        />
-        <PasswordTextBox
-          icon='lock'
-          label=' Device password'
-          onChange={(password) => {this.setState({password})}}
-          value={this.state.password}
-        />
-        <Button
-          title="Connect"
-          onPress={() => connectToDevice(this.state.ssid, this.state.password, this.props.navigation, this.state.initialSSID)}
-        />
-        { scannerButton }
-        { this.state.initialSSID.includes('emerald')?passButton:null }
-      </View>
-    );
+  componentWillMount(){
+    CookieManager.get(MainURL).then((res)=>{this.setState({csrftoken: res['csrftoken']['value']})});
   }
-}
+  //TODO: get data from getHomes
 
-function connectToDevice(ssid, pwd, nav, currentSSID){
-
-  if (ssid === '' || pwd === ''){
-    Alert.alert('Incomplete','Please complete both fields');
-  } else {
-    if (ssid === currentSSID){
-      Alert.alert('You are already connected to this network');
-      nav.navigate('Details', {
-        ssid: ssid,
+  getHomes(csrftoken){
+    fetch(GetHomesURL, {
+      credentials:"include",
+      headers: {
+          'X-CSRFToken': csrftoken,
+          referer: 'https://www.devemerald.com/',
+          Accept: '*/*',
+          'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      method:'POST',
+      mode:'cors',
+    }).then(function(response){
+      return response.text().then(function(text){
+        text = JSON.parse(text);
       });
-    } else {
-      WifiManager.connectToProtectedSSID(ssid,pwd,false).then(() => {
-        Alert.alert("Connected");
-        nav.navigate('Details', {
-            ssid: ssid,
-            initialSSID: currentSSID,
-        });
-      }, () => {
-        Alert.alert('Cannot connect');
-        nav.navigate('Home');
-      })
-    }
+    });
   }
-}
 
-async function requestLocationPermission(){
-  try {
-    const granted = await PermissionsAndroid.request(
-      PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-      {
-        'title': 'Location Permission',
-        'message': 'This app needs access to your location',
-      }
+  render(){
+    let data = JSON.parse();
+
+    return(
+      <ScrollView style={styles.container}>
+        <FlatList
+          data={data}
+          keyExtractor={(item, index) => {item.uuid}}
+          renderItem={this._renderItem}
+        />
+      </ScrollView>
     );
-  } catch (err) {
-    console.warn(err);
   }
 }
 
@@ -147,4 +86,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default Home;
+export default RegisterHome;

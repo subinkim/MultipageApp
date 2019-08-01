@@ -17,6 +17,7 @@
     "react-native-iot-wifi": "^1.0.0",
     "react-native-loading-spinner-overlay": "^1.0.1",
     "react-native-qrcode-scanner": "^1.2.1",
+    "react-native-snap-carousel": "^3.8.0",
     "react-native-swipe-list-view": "^2.0.0",
     "react-native-swipeout": "^2.3.6",
     "react-native-webview": "^5.12.0",

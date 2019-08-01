@@ -24,7 +24,7 @@ class Details extends React.Component {
       headerLeft:(
         <Button
           title="Back"
-          onPress={() => navigation.navigate('Home')}
+          onPress={() => navigation.navigate('ConnectHome')}
         />
       ),
     };
@@ -62,16 +62,17 @@ function disconnectFromDevice(ssid, initialSSID, nav){
   if (initialSSID != null){
     if (initialSSID !== 'Cannot detect SSID' && !(initialSSID.includes('emerald'))){
       WifiManager.connectToSSID(initialSSID);
-      nav.navigate('Home');
+      nav.navigate('RegisterHome');
     } else {
       WifiManager.disconnectFromSSID(ssid);
-      nav.navigate('Home');
+      Alert.alert("Manually disconnect from emerald wifi in your device Settings.")
+      nav.navigate('RegisterHome');
     }
   } else {
     WifiManager.disconnectFromSSID(ssid);
-    nav.navigate('Home');
+    Alert.alert("Manually disconnect from emerald wifi in your device Settings.")
+    nav.navigate('RegisterHome');
   }
-
 }
 
 const styles = StyleSheet.create({
