@@ -61,7 +61,7 @@ class Instructions extends React.Component {
       <View>
         <Button
           title="Done"
-          onPress={() => {this.props.navigation.navigate('ConnectHome')}}
+          onPress={() => {this.props.navigation.navigate('Connection')}}
         />
       </View>
     );

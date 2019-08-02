@@ -32,45 +32,28 @@ class Home extends React.Component {
   }
 
   componentWillMount(){
-    CookieManager.clearAll();
-    AsyncStorage.getItem(COOKIE_KEY).then((item)=>{
-      if(item==='true'){this.setState({cookieValid:true})}
-      else{this.setState({cookieValid:false})}
-    })
-  }
-
-  componentDidMount(){
-
     AsyncStorage.getAllKeys().then((res) => {
-
-      if(res.includes(CSRF_KEY)){
-
+      if (res.includes(CSRF_KEY)){
         AsyncStorage.getItem(CSRF_KEY).then((csrftoken) => {
           this.checkToken(csrftoken);
-
-          AsyncStorage.getItem(COOKIE_KEY).then((item) => {
-            if (item === 'true'){this.setState({cookieValid: true})}
-            else {this.setState({cookieValid: false})}
-          });
-
-          console.log("this.state.cookieValid?=>",this.state.cookieValid);
-
-          if (this.state.cookieValid){
-            console.log("Cookie is valid!");
-            // this.props.navigation.navigate('Scanner');
-          } else {
-            CookieManager.clearAll();
-          }
-
         });
-
       }
     });
   }
 
+  componentDidMount(){
+    AsyncStorage.getItem(COOKIE_KEY).then((cookieValid) => {
+      if (cookieValid === 'true'){this.setState({cookieValid:true})}
+      else {this.setState({cookieValid:false})}
+    });
+
+    if (this.state.cookieValid){
+      this.props.navigation.navigate('Scanner');
+    }
+  }
+
   componentWillUpdate(){
     var cookie = this.props.navigation.getParam('cookieValid', null);
-    console.log("Cookie=>",cookie);
     if (cookie!=null){
       if (cookie){cookie = 'true'}
       else {cookie = 'false'}
@@ -123,9 +106,10 @@ class Home extends React.Component {
         text = JSON.parse(text);
         if (text['success'] != null){
           if (text['success']){AsyncStorage.setItem(COOKIE_KEY, 'true');}
-          else{AsyncStorage.setItem(COOKIE_KEY, 'false')}
+          else{AsyncStorage.setItem(COOKIE_KEY, 'false'); AsyncStorage.removeItem(CSRF_KEY)}
         } else {
           AsyncStorage.setItem(COOKIE_KEY, 'false');
+          AsyncStorage.removeItem(CSRF_KEY);
         }
       });
     });
@@ -148,13 +132,6 @@ class Home extends React.Component {
     });
     AsyncStorage.setItem(COOKIE_KEY, 'false');
     this.setState({cookieValid: false});
-    CookieManager.getAll().then((res)=>{
-      console.log("res after signout=>")
-    })
-    AsyncStorage.getItem(COOKIE_KEY).then((item)=>{
-      console.log("cookieValid after signout=>",item);
-    });
-
   }
 
   render(){
