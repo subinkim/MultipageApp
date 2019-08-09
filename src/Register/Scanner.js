@@ -46,7 +46,7 @@ class Scanner extends React.Component {
       this.scanner.reactivate();
     }
     AsyncStorage.setItem(DEVICE_SSID_KEY, ssid);
-    AsyncStorage.setItem(DEVICE_PWD_KEY, pwd);
+    AsyncStorage.setItem(DEVICE_PWD_KEY, password);
     AsyncStorage.setItem(DEVICE_UUID_KEY, uuid);
     this.props.navigation.navigate('Instructions');
   }

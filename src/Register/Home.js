@@ -170,8 +170,12 @@ class Home extends React.Component {
         title="Scan QR code"
         onPress={() => {this.props.navigation.navigate('Scanner')}}
       />
+      <Button
+        title="Skip to connection"
+        onPress={()=>{this.props.navigation.navigate('Details')}}
+      />
     </View>);
-
+    //MARK:get rid of skip button later
     return(
       <View style={ styles.container }>
       {!this.state.cookieValid?inputField:signOutButton}

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Button, Image, View, Text, StyleSheet, Dimensions, Alert, TouchableOpacity, Platform, PermissionsAndroid } from 'react-native';
+import { Button, Image, View, Text, StyleSheet, Dimensions, Alert, TouchableOpacity, Platform, PermissionsAndroid, ActivityIndicator } from 'react-native';
 
 import WifiManager from 'react-native-wifi';
 import { WebView } from 'react-native-webview';
@@ -11,9 +11,13 @@ import { DEVICE_SSID_KEY, DEVICE_PWD_KEY, INITIAL_SSID_KEY } from '../../CustomC
 import PasswordTextBox from '../../CustomClass/PasswordTextBox.js';
 import InputTextBox from '../../CustomClass/InputTextBox.js';
 
+const EMERALD_COLOUR1 = '#17AA9D';
+const EMERALD_COLOUR2 = '#28B674';
+const EMERALD_COLOUR3 = '#8CC641';
+
 class Connection extends Component {
   static navigationOptions = ({navigation}) => ({
-    headerTitle: "Finishing setup...",
+    headerTitle: "Set up device",
   });
 
   constructor(props){
@@ -22,26 +26,23 @@ class Connection extends Component {
       ssid: '',
       password: '',
       initialSSID: '',
-
+      indicatorText: 'Finishing to set up the device...',
+      indicatorColour: EMERALD_COLOUR1,
     };
   }
 
   componentDidMount(){
     //Sleep for 30 sec
-    setTimeout(function(){console.log("30sec")}, 30000);
+    setTimeout(()=>{
+      this.setState({indicatorText:'Trying to connect to the device...'});
+      if (Platform.OS === 'android'){
+        requestLocationPermission();
+      }
+      this.connect();
+    }, 45000); //MARK: change this to 30 sec later
 
-
-    //Activity Indicator running for max 2 mins while attempting to connect to the wifi
-
-
-
-  }
-
-  connect(){
-    if (Platform.OS === 'android'){
-      requestLocationPermission();
-    }
     if (this.state.initialSSID === ''){
+
       Wifi.getSSID((initialSSID) => {
         if (initialSSID != null){
           this.setState({initialSSID});
@@ -51,16 +52,57 @@ class Connection extends Component {
             initialSSID: initialSSID,
           })
         }
-      })
+      });
+
     }
-    let nav = this.props.navigation;
+
+  }
+
+  componentWillUpdate(){
+    if (this.state.indicatorColour === EMERALD_COLOUR1){
+      this.setState({indicatorColour:EMERALD_COLOUR3});
+    }
+  }
+
+  connect(){
+
     let initial = this.state.initialSSID;
+
     AsyncStorage.getAllKeys().then((keys)=>{
       if (keys.includes(DEVICE_SSID_KEY) && keys.includes(DEVICE_PWD_KEY)){
+
         AsyncStorage.getItem(DEVICE_SSID_KEY).then((ssid) => {
           AsyncStorage.getItem(DEVICE_PWD_KEY).then((pwd) => {
-            connectToDevice(ssid,pwd, nav, initial);
+            let count = Date.now();
+            let interval = setInterval(() => {
+              //TODO: check if this works
+              //IF less than 2 mins spent on attempting to connect
+              if (Date.now() - count < 75000 ){
+                if (connectToDevice(ssid,pwd)){
+                  clearInterval(interval);
+                  this.props.navigation.navigate('Details',{
+                    ssid:ssid,
+                    initialSSID:initial,
+                  });
+                }
+                count++;
+              } else {
+                clearInterval(interval);
+                Alert.alert("Failed to connect to device.");
+                this.props.navigation.navigate('ConnectHome', {
+                  initialSSID: initial,
+                });
+              }
+
+            },15000);
           });
+        });
+
+
+      } else{
+        Alert.alert("Failed to connect to the device.");
+        this.props.navigation.navigate('ConnectHome', {
+          initialSSID: initial,
         });
       }
     });
@@ -70,38 +112,22 @@ class Connection extends Component {
 
     return (
       <View style={styles.container}>
-
+        <Text>{this.state.indicatorText}</Text>
+        <Text>This can take up to 2 minutes. Please don't quit the app.</Text>
+        <ActivityIndicator size="large" color={this.state.indicatorColour} animating={true} style={{top: '2%'}}/>
       </View>
     );
   }
 }
 
-function connectToDevice(ssid, pwd, nav, initial){
-
-  if (ssid === '' || pwd === ''){
-    Alert.alert('Incomplete','Please complete both fields');
-  } else {
-    if (ssid === currentSSID){
-      Alert.alert('You are already connected to this network');
-      nav.navigate('Details', {
-        ssid: ssid,
-        initialSSID: ssid,
-      });
-    } else {
-      WifiManager.connectToProtectedSSID(ssid,pwd,false).then(() => {
-        Alert.alert("Connected");
-        nav.navigate('Details', {
-          ssid: ssid,
-          initialSSID: initial,
-        })
-      }, () => {
-        Alert.alert('Cannot connect');
-        nav.navigate('Home', {
-          initialSSID: initial,
-        })
-      })
-    }
-  }
+function connectToDevice(ssid, pwd){
+    Wifi.connectSecure(ssid,pwd,false).then(() => {
+      console.log("connected");
+      Alert.alert("Connected!");
+      return true;
+    }, () => {
+      console.log("error");
+    });
 }
 
 async function requestLocationPermission(){
@@ -121,9 +147,8 @@ async function requestLocationPermission(){
 const styles = StyleSheet.create({
     container: {
       flex: 1,
-      marginTop: 30,
-      marginLeft: 10,
-      marginRight: 10,
+      justifyContent: 'center',
+      alignItems: 'center',
     },
     instruction: {
       fontWeight: 'bold',

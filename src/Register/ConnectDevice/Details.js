@@ -1,11 +1,12 @@
 import React from 'react';
 import { Button, Image, View, Text, StyleSheet, Dimensions, Alert, TouchableOpacity } from 'react-native';
 
-import { createStackNavigator, createAppContainer } from 'react-navigation';
 import WifiManager from 'react-native-wifi';
 import { WebView } from 'react-native-webview';
 import Wifi from 'react-native-iot-wifi';
 import CookieManager from 'react-native-cookies';
+
+import {MainURL, GetHomesURL} from '../../CustomClass/Storage.js';
 
 const URI = 'http://wireless.devemerald.com';
 
@@ -15,10 +16,17 @@ class Details extends React.Component {
 
     return {
       title: params ? params.ssid : 'Connect',
-      headerRight: (
+      // MARK: uncomment this after debugging and get rid of the other headerRight button
+      // headerRight: (
+      //   <Button
+      //     title="Done"
+      //     onPress={() => {disconnectFromDevice(params.ssid, params.initialSSID, navigation);}}
+      //   />
+      // ),
+      headerRight:(
         <Button
           title="Done"
-          onPress={() => {disconnectFromDevice(params.ssid, params.initialSSID, navigation);}}
+          onPress={()=> {disconnectFromDevice('','',navigation)}}
         />
       ),
       headerLeft:(
@@ -59,20 +67,42 @@ class Details extends React.Component {
 
 function disconnectFromDevice(ssid, initialSSID, nav){
 
-  if (initialSSID != null){
-    if (initialSSID !== 'Cannot detect SSID' && !(initialSSID.includes('emerald'))){
-      WifiManager.connectToSSID(initialSSID);
-      nav.navigate('RegisterHome');
-    } else {
-      WifiManager.disconnectFromSSID(ssid);
-      Alert.alert("Manually disconnect from emerald wifi in your device Settings.")
-      nav.navigate('RegisterHome');
-    }
-  } else {
-    WifiManager.disconnectFromSSID(ssid);
-    Alert.alert("Manually disconnect from emerald wifi in your device Settings.")
-    nav.navigate('RegisterHome');
-  }
+  // MARK: uncomment this later
+  // if (initialSSID != null){
+  //   if (initialSSID !== 'Cannot detect SSID' && !(initialSSID.includes('emerald'))){
+  //     WifiManager.connectToSSID(initialSSID);
+  //   } else {
+  //     WifiManager.disconnectFromSSID(ssid);
+  //     Alert.alert("Manually disconnect from emerald wifi in your device Settings.")
+  //   }
+  // } else {
+  //   WifiManager.disconnectFromSSID(ssid);
+  //   Alert.alert("Manually disconnect from emerald wifi in your device Settings.")
+  // }
+
+  CookieManager.getAll().then((res)=>{
+    let csrftoken = res['csrftoken']['value'];
+
+    fetch(GetHomesURL, {
+      credentials:"include",
+      headers: {
+          'X-CSRFToken': csrftoken,
+          referer: 'https://www.devemerald.com/',
+          Accept: '*/*',
+          'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      method:'POST',
+      mode:'cors',
+    }).then(function(response){
+      return response.text().then(function(text){
+        nav.navigate('RegisterHome', {
+          data: text,
+        });
+      });
+    });
+
+  });
+
 }
 
 const styles = StyleSheet.create({

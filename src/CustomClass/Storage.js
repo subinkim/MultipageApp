@@ -8,6 +8,9 @@ export const MainURL = 'www.devemerald.com';
 export const LoginURL = 'https://www.devemerald.com/login';
 export const GetHomesURL = "https://www.devemerald.com/api/v1/ops/get-homes";
 export const LogoutURL = 'https://www.devemerald.com/logout';
+export const RegisterHomeURL = 'https://www.devemerald.com/api/v1/ops/register-home';
+export const RegisterURL = 'https://www.devemerald.com/api/v1/ops/register-deployment';
+export const ModifyDeploymentURL = 'https://www.devemerald.com/api/v1/ops/modify-deployment';
 
 /*AsyncStorage keys*/
 export const CSRF_KEY = '@csrftoken';

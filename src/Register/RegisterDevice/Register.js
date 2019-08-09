@@ -1,18 +1,13 @@
 import React from 'react';
 import { Button, View, Text, StyleSheet, Alert, TouchableOpacity } from 'react-native';
 
-import { createStackNavigator, createAppContainer } from 'react-navigation';
-import CookieManager from 'react-native-cookies';
 import AsyncStorage from '@react-native-community/async-storage';
 
-import PasswordTextBox from '../../CustomClass/PasswordTextBox.js';
 import InputTextBox from '../../CustomClass/InputTextBox.js';
+import {CSRF_KEY,DEVICE_UUID_KEY, RegisterURL, ModifyDeploymentURL} from '../../CustomClass/Storage.js';
 
-const LoginURL = 'https://www.devemerald.com/login';
-const GetHomesURL = "https://www.devemerald.com/api/v1/ops/get-homes";
-const LogoutURL = 'https://www.devemerald.com/logout';
-
-const CSRF_KEY = '@csrftoken';
+//MARK: for test trials
+const example_home_uuid = 'HOM-194da41f-6f80-4e0b-832f-b6ac7a5469c7';
 
 class Register extends React.Component {
 
@@ -21,186 +16,90 @@ class Register extends React.Component {
     const { params } = navigation.state;
 
     return {
-      title: 'Sign in',
+      title: 'Register',
     }
   };
 
   constructor(props){
     super(props);
     this.state = {
-      email: '',
-      password: '',
-      cookieValid: false,
+      nickname:null,
+      home_uuid:null,
+      device_uuid:null,
+      height: '1.15',
+      loc_nickname:null,
     };
   }
 
-  componentWillMount(){
-    AsyncStorage.getAllKeys().then((item) => {
-      if (item.includes(CSRF_KEY)){
-        if (getItem(this.props.navigation, fetchData)){
-          this.setState({cookieValid: true})
-          getItem(this.props.navigation, fetchHomes);
-        } else {
-          AsyncStorage.removeItem(CSRF_KEY);
-        }
-      }
+  componentDidMount(){
+    let nickname = this.props.navigation.getParam('nickname',null);
+    let home_uuid = this.props.navigation.getParam('home_uuid', null);
+    this.setState({
+      nickname:nickname,
+      home_uuid:home_uuid,
+    });
+
+    AsyncStorage.getItem(DEVICE_UUID_KEY).then((uuid)=>{
+      uuid = 'EMR-31d2dc94-ceba-4a4d-8f25-bd5efda1cbb1';//For test purpose
+      this.setState({device_uuid: uuid});
     });
   }
 
-  componentWillUpdate(){
-    let cookie = this.props.navigation.getParam('cookieValid', false);
-    if (cookie!=null){
-      if (cookie != this.state.cookieValid){
-        this.setState({
-          cookieValid: cookie,
-          email: '',
-          password: '',
-        })
-      }
-    }
+  register(){
+    let data = new FormData();
+    data.append("home_uuid", this.state.home_uuid);
+    data.append("nickname", this.state.loc_nickname);
+    data.append("register_id", this.state.device_uuid);
 
+    AsyncStorage.getItem(CSRF_KEY).then((csrftoken) => {
+
+      fetch(RegisterURL, {
+        method: 'POST',
+        mode: 'cors',
+        headers: {
+          Accept:'*/*',
+          'Content-Type': 'multipart/form-data',
+          referer: 'https://www.devemerald.com/trialsite/edit/'+this.state.home_uuid,
+          'X-CSRFToken': csrftoken,
+        },
+        body: data,
+        credentials: "include"
+      }).catch((error) => {
+        console.log(error);
+      });
+
+    });
   }
 
   render(){
-
-    const inputField = (
-      <View><Text style={ styles.instruction }>Sign in to devemerald.com</Text>
-        <Text>Enter your crendentials for devemerald.com</Text>
-          <InputTextBox
-            icon="at"
-            label="Enter email"
-            onChange = {(email) => this.setState({email})}
-            keyboard='email-address'
-            returnKey='next'
-            value={ this.state.email }
-          />
-          <PasswordTextBox
-            icon='lock'
-            label=' Enter password'
-            value={ this.state.password }
-            onChange={(password) => {this.setState({password})}}
-          />
-          <Button
-            title="Sign in"
-            onPress={() => {requestData(this.state.email, this.state.password, this.props.navigation); this.setState({cookieValid:true})}} //TODO: check if credentials are valid before this.setState
-          />
-        </View>
-      );
-    const signOutButton = (
-    <View>
-      <Text style= { styles.instruction }>Sign out from devemerald.com</Text>
-      <Button
-        title="Sign out"
-        onPress={() => {signOut()}}
-      />
-    </View>);
-
     return(
       <View style={ styles.container }>
-      {!this.state.cookieValid?inputField:signOutButton}
+        <Text style={ styles.instruction }>Register deployment</Text>
+        <Text style={ styles.description }>Register deployment to {this.state.nickname}</Text>
+        <Text>{this.state.home_uuid}</Text>
+        <InputTextBox
+          icon="create"
+          label="Deploy location name"
+          onChange={(loc) => this.setState({loc_nickname:loc})}
+          keyboard="default"
+          value={this.state.loc_nickname}
+          returnKey="next"
+        />
+        <InputTextBox
+          icon="create"
+          label="Device Height"
+          onChange={(height) => this.setState({height:height.toString()})}
+          keyboard="numeric"
+          value={this.state.height}
+          returnKey="done"
+        />
+        <Button
+          onPress={this.register.bind(this)}
+          title="Register"
+        />
       </View>
     );
   }
-}
-
-function signOut(){
-
-  AsyncStorage.getItem(CSRF_KEY).then((csrftoken) => {
-    fetch(LogoutURL, {
-      credentials:"include",
-      headers: {
-          'X-CSRFToken': csrftoken,
-          referer: 'https://www.devemerald.com/',
-          Accept: '*/*',
-          'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      method:'GET',
-      mode:'cors',
-    });
-    AsyncStorage.removeItem(CSRF_KEY);
-  });
-}
-
-function fetchData(csrftoken, nav){
-  let response = fetch(GetHomesURL, {
-    credentials:"include",
-    headers: {
-        'X-CSRFToken': csrftoken,
-        referer: 'https://www.devemerald.com/',
-        Accept: '*/*',
-        'Content-Type': 'application/x-www-form-urlencoded',
-    },
-    method:'POST',
-    mode:'cors',
-  }).then(function(response){
-    return response.text().then(function(text){
-      text = JSON.parse(text);
-      if (text['success'] != null){
-        return text['success'];
-      } else {
-        return false;
-      }
-    });
-  });
-  return response;
-}
-
-function requestData(email, password, nav){
-
-  fetch(LoginURL, {
-    method: 'POST',
-    headers: {
-      Accept:'*/*',
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
-    body: 'email='+email+'&password='+password,
-    credentials: "include",
-  }).then((response) => {
-    CookieManager.getAll()
-    .then((res) => {
-      let csrftoken = res['csrftoken']['value'];
-      storeItem(CSRF_KEY, csrftoken);
-      getItem(nav, fetchHomes);
-    });
-  }).catch((error) => {
-    console.log(error);
-  });
-}
-
-async function storeItem(key, item){
-  try {
-    await AsyncStorage.setItem(key, item);
-  } catch (e) {
-    console.log(e);
-  }
-}
-
-async function getItem(nav, fetchFunc){
-  var value = await AsyncStorage.getItem(CSRF_KEY).then((item) => {
-    fetchFunc(item,nav);
-  });
-}
-
-function fetchHomes(csrftoken, nav){
-  fetch(GetHomesURL, {
-    credentials:"include",
-    headers: {
-        'X-CSRFToken': csrftoken,
-        referer: 'https://www.devemerald.com/',
-        Accept: '*/*',
-        'Content-Type': 'application/x-www-form-urlencoded',
-    },
-    method:'POST',
-    mode:'cors',
-  }).then(function(response){
-    return response.text().then(function(text){
-      text = JSON.parse(text);
-      nav.navigate('Load', {
-        csrftoken: csrftoken,
-        response: JSON.stringify(text),
-      });
-    });
-  });
 }
 
 const styles = StyleSheet.create({
@@ -216,7 +115,7 @@ const styles = StyleSheet.create({
       marginBottom: 10,
     },
     description: {
-      top: 50,
+      marginTop: 20,
       fontSize: 15,
     },
 });

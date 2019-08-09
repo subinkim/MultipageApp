@@ -1,16 +1,11 @@
 import React from 'react';
-import { Button, View, Text, StyleSheet, Alert, TouchableOpacity, ScrollView } from 'react-native';
+import { Button, View, Text, StyleSheet, Alert, TouchableOpacity, ScrollView, FlatList } from 'react-native';
 
-import { createStackNavigator, createAppContainer } from 'react-navigation';
-import CookieManager from 'react-native-cookies';
 import AsyncStorage from '@react-native-community/async-storage';
 
-import PasswordTextBox from '../../CustomClass/PasswordTextBox.js';
-import InputTextBox from '../../CustomClass/InputTextBox.js';
-
-import {MainURL, GetHomesURL} from '../../CustomClass/Storage.js';
-
-const CSRF_KEY = '@csrftoken';
+const EMERALD_COLOUR1 = '#17AA9D';
+const EMERALD_COLOUR2 = '#28B674';
+const EMERALD_COLOUR3 = '#8CC641';
 
 class RegisterHome extends React.Component {
 
@@ -26,44 +21,61 @@ class RegisterHome extends React.Component {
   constructor(){
     super();
     this.state = {
-      csrftoken: '',
+      selected: null,
+      disabled: true,
     }
   }
 
-  componentWillMount(){
-    CookieManager.get(MainURL).then((res)=>{this.setState({csrftoken: res['csrftoken']['value']})});
-  }
-  //TODO: get data from getHomes
-
-  getHomes(csrftoken){
-    fetch(GetHomesURL, {
-      credentials:"include",
-      headers: {
-          'X-CSRFToken': csrftoken,
-          referer: 'https://www.devemerald.com/',
-          Accept: '*/*',
-          'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      method:'POST',
-      mode:'cors',
-    }).then(function(response){
-      return response.text().then(function(text){
-        text = JSON.parse(text);
-      });
-    });
+  _renderItem = ({item, index}) => {
+    if (!item['deregistered']){
+      return(
+        <TouchableOpacity onPress={() => {this.setState({selected:index, disabled: false})}} style={{alignItems: 'center'}}>
+          <Text key={index} style={index===this.state.selected?styles.selected:styles.listItem}>{item.nickname}</Text>
+        </TouchableOpacity>
+      );
+    } else {
+      return null;
+    }
   }
 
   render(){
-    let data = JSON.parse();
+    var data = this.props.navigation.getParam('data',null);
+    if (data != null){data = JSON.parse(data);data = data['data']}
+
+    const selectButton = (<Button title="Select" disabled = {this.state.disabled} onPress={() => {
+        let selectedData = data[this.state.selected];
+        let nickname =  selectedData['nickname'];
+        let home_uuid = selectedData['uuid'];
+        this.props.navigation.navigate('Register', {
+          nickname: nickname,
+          home_uuid: home_uuid,
+        })
+      }}
+    />);
 
     return(
-      <ScrollView style={styles.container}>
-        <FlatList
-          data={data}
-          keyExtractor={(item, index) => {item.uuid}}
-          renderItem={this._renderItem}
-        />
-      </ScrollView>
+      <View style={styles.container}>
+        <View>
+          <Text style={styles.instruction}>Add New Home</Text>
+          <Button
+            onPress={() => {this.props.navigation.navigate('AddHome')}}
+            title="Add Home"
+          />
+          <Text style={styles.description}>Or</Text>
+        </View>
+        <View style={{flex:1}}>
+          <Text style={styles.instruction}>Choose Home</Text>
+          <Text style={styles.description}>Choose from existing home</Text>
+          <ScrollView>
+            {selectButton}
+            <FlatList
+              renderItem={this._renderItem}
+              data={data}
+              keyExtractor={(item, index) => index.toString()}
+            />
+          </ScrollView>
+        </View>
+      </View>
     );
   }
 }
@@ -71,18 +83,36 @@ class RegisterHome extends React.Component {
 const styles = StyleSheet.create({
     container: {
       flex: 1,
-      marginTop: 30,
-      marginLeft: 10,
-      marginRight: 10,
+      margin: '5%',
+      width: '90%',
+      height: '90%',
     },
     instruction: {
       fontWeight: 'bold',
       fontSize: 23,
-      marginBottom: 10,
+      marginBottom: 5,
     },
     description: {
-      top: 50,
+      marginBottom: 10,
       fontSize: 15,
+    },
+    selected:{
+      width: '100%',
+      padding: 10,
+      fontSize: 17,
+      backgroundColor: 'grey',
+      color: 'white',
+      opacity: 0.8,
+      marginBottom: 2,
+    },
+    listItem: {
+      width: '100%',
+      padding: 10,
+      fontSize: 17,
+      backgroundColor: 'grey',
+      color: 'white',
+      opacity: 0.5,
+      marginBottom: 2,
     },
 });
 

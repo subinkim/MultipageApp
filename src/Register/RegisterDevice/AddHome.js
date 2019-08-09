@@ -1,133 +1,111 @@
 import React, { Component } from 'react';
-import { Button, Image, View, Text, StyleSheet, Dimensions, Alert, TouchableOpacity, Platform, PermissionsAndroid } from 'react-native';
+import { Button, View, Text, StyleSheet, Alert } from 'react-native';
+import {Picker} from 'native-base';
 
-import { createStackNavigator, createAppContainer } from 'react-navigation';
-import WifiManager from 'react-native-wifi';
-import { WebView } from 'react-native-webview';
-import Wifi from 'react-native-iot-wifi';
+import AsyncStorage from '@react-native-community/async-storage';
 
-import PasswordTextBox from '../../CustomClass/PasswordTextBox.js';
 import InputTextBox from '../../CustomClass/InputTextBox.js';
+import {RegisterHomeURL,CSRF_KEY} from '../../CustomClass/Storage.js';
+
+//MARK: Trial UUIDs - make this into an array later when API is given
+const internal_test_trial = "TRL-9d09cc43-159b-4950-b6a4-37f35f2d6136";
+const heritage_trial = 'TRL-b7380558-aba3-4457-908c-36083ed36148';
+const production_test = 'TRL-56dfdb89-1a77-4264-886c-284b8921158c';
+const novartis_internal_trialsite = 'TRL-dea43a32-f0a1-4d8a-844c-ecd2da0f3c1b';
 
 class AddHome extends Component {
   static navigationOptions = ({navigation}) => ({
-    headerTitle: "Welcome!",
-    headerRight: <Button
-        onPress={() => {navigation.navigate('Info');}}
-        title="Help"
-      />
+    headerTitle: "Register home",
   });
 
   constructor(props){
     super(props);
     this.state = {
-      ssid: '',
-      password: '',
-      initialSSID: '',
+      trial: null,
+      home: null,
+      incomplete: false,
     };
   }
 
-  componentDidMount(){
-    if (Platform.OS === 'android'){
-      requestLocationPermission();
+  addHome(){
+
+    let nickname = this.state.home;
+    let trial_uuid = this.state.trial;
+    let nav = this.props.navigation;
+
+    if (nickname == null||trial_uuid == null){this.setState({incomplete: true})}
+    else {
+
+      //TODO: Alert to get final confirmation from the user if entered info is correct
+      AsyncStorage.getItem(CSRF_KEY).then((csrftoken) => {
+
+        fetch(RegisterHomeURL, {
+          method: 'POST',
+          mode: 'cors',
+          headers: {
+            Accept:'*/*',
+            'Content-Type': 'application/x-www-form-urlencoded',
+            referer: 'https://www.devemerald.com/trialsite/register',
+            'X-CSRFToken': csrftoken,
+          },
+          body: 'nickname='+nickname+'&trial_uuid='+trial_uuid,
+          credentials: "include"
+        }).then((response) => {
+          return response.text().then(function(text){
+            text = JSON.parse(text);
+            let home_uuid = text['data']['uuid'];
+            nav.navigate('Register', {
+              home_uuid: home_uuid,
+              nickname: nickname,
+            })
+          })
+        }).catch((error) => {
+          console.log(error);
+        });
+
+      });
+
     }
+
   }
 
   render() {
-
-    if (this.state.initialSSID === ''){
-      Wifi.getSSID((initialSSID) => {
-        if (initialSSID != null){
-          this.setState({initialSSID});
-        }
-      })
-    }
-
-    const scannerButton = (<Button
-      title="Scan QR code"
-      onPress={() => {
-        this.props.navigation.navigate('Scanner',{
-          currentSSID: this.state.initialSSID,
-        });
-      }}
-    />);
-
-    const passButton =(<Button
-      title="Already connected?"
-      onPress={() => {
-        this.props.navigation.navigate('Details', {
-          currentSSID: this.state.initialSSID,
-        })
-      }}
-    />);
-
+    //TODO: make picker into a map function that maps a trial uuid list into picker items
     return (
       <View style={ styles.container }>
-        <Text style={ styles.instruction }>Connect to your device</Text>
-        <Text>Manually enter SSID and password of your device or scan QR code.</Text>
+        <Text style={styles.instruction}>Register new home</Text>
+        {this.state.incomplete?<Text style={{color: 'red', marginBottom: 20, fontSize: 17}}>Please complete ALL the fields</Text>:null}
+        <Text style={styles.description}>Enter home nickname</Text>
         <InputTextBox
-          icon="wifi"
-          label='Device SSID'
-          onChange={(ssid) => {this.setState({ssid})}}
-          keyboard='default'
-          returnKey='next'
-          value={this.state.ssid}
+          icon="home"
+          label="Home Nickname"
+          onChange={(home) => this.setState({home:home})}
+          keyboard="default"
+          value={this.state.home}
+          returnKey="done"
         />
-        <PasswordTextBox
-          icon='lock'
-          label=' Device password'
-          onChange={(password) => {this.setState({password})}}
-          value={this.state.password}
-        />
+        <Text style={{fontSize: 15, marginTop: 20}}>Select trial type</Text>
+        <Picker
+          mode="dropdown"
+          selectedValue = {this.state.trial}
+          onValueChange = {(trial)=>this.setState({trial:trial})}
+          placeholder = 'Select trial'
+          style={{borderWidth: 1, borderRadius: 3, borderColor: 'grey', marginVertical: 20, width: '100%'}}>
+           <Picker.Item label = "Internal Test Trial" value = {internal_test_trial} />
+           <Picker.Item label = "Heritage Trial" value = {heritage_trial} />
+           <Picker.Item label = "Production Test" value = {production_test} />
+           <Picker.Item label = "Novartis Internal Trialsite" value = {novartis_internal_trialsite} />
+        </Picker>
         <Button
-          title="Connect"
-          onPress={() => connectToDevice(this.state.ssid, this.state.password, this.props.navigation, this.state.initialSSID)}
+          onPress={this.addHome.bind(this)}
+          title="Register new Home"
         />
-        { scannerButton }
-        { this.state.initialSSID.includes('emerald')?passButton:null }
       </View>
     );
   }
 }
 
-function connectToDevice(ssid, pwd, nav, currentSSID){
 
-  if (ssid === '' || pwd === ''){
-    Alert.alert('Incomplete','Please complete both fields');
-  } else {
-    if (ssid === currentSSID){
-      Alert.alert('You are already connected to this network');
-      nav.navigate('Details', {
-        ssid: ssid,
-      });
-    } else {
-      WifiManager.connectToProtectedSSID(ssid,pwd,false).then(() => {
-        Alert.alert("Connected");
-        nav.navigate('Details', {
-            ssid: ssid,
-            initialSSID: currentSSID,
-        });
-      }, () => {
-        Alert.alert('Cannot connect');
-        nav.navigate('Home');
-      })
-    }
-  }
-}
-
-async function requestLocationPermission(){
-  try {
-    const granted = await PermissionsAndroid.request(
-      PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-      {
-        'title': 'Location Permission',
-        'message': 'This app needs access to your location',
-      }
-    );
-  } catch (err) {
-    console.warn(err);
-  }
-}
 
 const styles = StyleSheet.create({
     container: {
@@ -139,10 +117,9 @@ const styles = StyleSheet.create({
     instruction: {
       fontWeight: 'bold',
       fontSize: 23,
-      marginBottom: 10,
+      marginBottom: 20,
     },
     description: {
-      top: 50,
       fontSize: 15,
     },
 });

@@ -70,6 +70,7 @@ class Instructions extends React.Component {
       <ScrollView style={ styles.container }>
         <Text style={ styles.instruction }>Install your device</Text>
         <Text style={ styles.description }>Swipe to the left for instructions</Text>
+        {this.state.lastPage?doneButton:null}
         <Pagination
           dotsLength={ENTRIES1.length}
           activeDotIndex={this.state.sliderActiveSlide}
@@ -96,7 +97,6 @@ class Instructions extends React.Component {
           layout={'default'}
           onSnapToItem={(index) => {this.setState({ sliderActiveSlide: index })}}
         />
-        {this.state.lastPage?doneButton:null}
       </ScrollView>
     );
   }
@@ -120,9 +120,9 @@ const styles = StyleSheet.create({
       top: 5,
     },
     paginationDot: {
-      width: 8,
-      height: 8,
-      borderRadius: 4,
+      width: 12,
+      height: 12,
+      borderRadius: 6,
       marginHorizontal: 8,
     },
     itemTitle:{

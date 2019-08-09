@@ -6,6 +6,7 @@ import {Icon} from 'native-base';
 
 import RegisterStack from './src/Register';
 import ManageStack from './src/Manage/TabNavigator.js';
+import SettingStack from './src/Settings';
 
 const MyDrawerNavigator = createDrawerNavigator({
   Register:{
@@ -20,6 +21,13 @@ const MyDrawerNavigator = createDrawerNavigator({
     navigationOptions: {
       drawerLabel: 'Manage',
       drawerIcon: ({ tintColor }) => <Icon name={"list"} size={17}/>
+    }
+  },
+  Setting:{
+    screen: SettingStack,
+    navigationOptions: {
+      drawerLabel: 'Settings',
+      drawerIcon:({ tintColor }) => <Icon name={"settings"} size={17}/>
     }
   }
 });

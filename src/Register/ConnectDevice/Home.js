@@ -30,54 +30,15 @@ class ConnectHome extends Component {
   }
 
   componentDidMount(){
-    //Sleep for 30 sec
-
-    //Activity Indicator running for max 2 mins while attempting to connect to the wifi
-
-
-    if (Platform.OS === 'android'){
-      requestLocationPermission();
-    }
-    if (this.state.initialSSID === ''){
-      Wifi.getSSID((initialSSID) => {
-        if (initialSSID != null){
-          this.setState({initialSSID});
-        }
-        if (initialSSID.includes('emerald')){
-          this.props.navigation.navigate('Details', {
-            initialSSID: initialSSID,
-          })
-        }
-      })
-    }
-    let nav = this.props.navigation;
-    let initial = this.state.initialSSID;
-    AsyncStorage.getAllKeys().then((keys)=>{
-      if (keys.includes(DEVICE_SSID_KEY) && keys.includes(DEVICE_PWD_KEY)){
-        AsyncStorage.getItem(DEVICE_SSID_KEY).then((ssid) => {
-          AsyncStorage.getItem(DEVICE_PWD_KEY).then((pwd) => {
-            connectToDevice(ssid,pwd, nav, initial);
-          });
-        });
-      }
-    });
+    let initial = this.props.navigation.getParam('initialSSID');
+    if(initial != null){this.setState({initialSSID: initial})}
   }
 
   render() {
-
-    const passButton =(<Button
-      title="Already connected?"
-      onPress={() => {
-        this.props.navigation.navigate('Details', {
-          currentSSID: this.state.initialSSID,
-        })
-      }}
-    />);
-
     return (
       <View style={ styles.container }>
         <Text style={ styles.instruction }>Connect to your device</Text>
-        <Text>Manually enter credentials for device network.</Text>
+        <Text>Enter credentials to manually connect to your device.</Text>
         <InputTextBox
           icon="wifi"
           label='Device SSID'
@@ -100,9 +61,9 @@ class ConnectHome extends Component {
           title="Skip to Register"
           onPress={() => {this.props.navigation.navigate('RegisterHome')}}
         />
-        { this.state.initialSSID.includes('emerald')?passButton:null }
       </View>
     );
+    //MARK: Get rid of skip button later
   }
 }
 
@@ -111,14 +72,14 @@ function connectToDevice(ssid, pwd, nav, initial){
   if (ssid === '' || pwd === ''){
     Alert.alert('Incomplete','Please complete both fields');
   } else {
-    if (ssid === currentSSID){
+    if (ssid === initial){
       Alert.alert('You are already connected to this network');
       nav.navigate('Details', {
         ssid: ssid,
         initialSSID: ssid,
       });
     } else {
-      WifiManager.connectToProtectedSSID(ssid,pwd,false).then(() => {
+      Wifi.connectSecure(ssid,pwd,false).then(() => {
         Alert.alert("Connected");
         nav.navigate('Details', {
           ssid: ssid,
