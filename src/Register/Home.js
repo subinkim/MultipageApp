@@ -4,12 +4,10 @@ import { Button, View, Text, StyleSheet, Alert, TouchableOpacity } from 'react-n
 import PasswordTextBox from '../CustomClass/PasswordTextBox.js';
 import InputTextBox from '../CustomClass/InputTextBox.js';
 import {CSRF_KEY} from '../CustomClass/Storage';
-import {MainURL, LoginURL, LogoutURL, GetHomesURL} from '../CustomClass/Storage';
+import {MainURL, LoginURL, LogoutURL, GetHomesURL, COOKIE_KEY} from '../CustomClass/Storage';
 
 import AsyncStorage from '@react-native-community/async-storage';
 import CookieManager from 'react-native-cookies';
-
-const COOKIE_KEY = '@cookieValid';
 
 class Home extends React.Component {
 
@@ -66,6 +64,7 @@ class Home extends React.Component {
         })
       }
     }
+
   }
 
   signIn(email, password, nav){
