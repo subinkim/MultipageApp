@@ -1,8 +1,6 @@
 import React from 'react';
 import { Button, Image, View, Text, StyleSheet, Dimensions, Alert, TouchableOpacity } from 'react-native';
 
-import { createStackNavigator, createAppContainer } from 'react-navigation';
-
 class Info extends React.Component {
   static navigationOptions = {
     title: 'Help',

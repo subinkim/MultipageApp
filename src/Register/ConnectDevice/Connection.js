@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Button, Image, View, Text, StyleSheet, Dimensions, Alert, TouchableOpacity, Platform, PermissionsAndroid, ActivityIndicator } from 'react-native';
+import { Button, Image, View, Text, StyleSheet, Alert, TouchableOpacity, Platform, PermissionsAndroid, ActivityIndicator } from 'react-native';
 
 import WifiManager from 'react-native-wifi';
 import { WebView } from 'react-native-webview';

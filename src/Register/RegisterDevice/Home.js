@@ -40,7 +40,9 @@ class RegisterHome extends React.Component {
 
   render(){
     var data = this.props.navigation.getParam('data',null);
+    var list = this.props.navigation.getParam('list', null);
     if (data != null){data = JSON.parse(data);data = data['data']}
+    if (list != null){list = JSON.parse(list)}
 
     const selectButton = (<Button title="Select" disabled = {this.state.disabled} onPress={() => {
         let selectedData = data[this.state.selected];
@@ -58,7 +60,9 @@ class RegisterHome extends React.Component {
         <View>
           <Text style={styles.instruction}>Add New Home</Text>
           <Button
-            onPress={() => {this.props.navigation.navigate('AddHome')}}
+            onPress={() => {this.props.navigation.navigate('AddHome', {
+              list: JSON.stringify(list),
+            })}}
             title="Add Home"
           />
           <Text style={styles.description}>Or</Text>

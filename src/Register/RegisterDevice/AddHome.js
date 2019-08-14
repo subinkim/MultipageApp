@@ -5,13 +5,8 @@ import {Picker} from 'native-base';
 import AsyncStorage from '@react-native-community/async-storage';
 
 import InputTextBox from '../../CustomClass/InputTextBox.js';
-import {RegisterHomeURL,CSRF_KEY} from '../../CustomClass/Storage.js';
-
-//MARK: Trial UUIDs - make this into an array later when API is given
-const internal_test_trial = "TRL-9d09cc43-159b-4950-b6a4-37f35f2d6136";
-const heritage_trial = 'TRL-b7380558-aba3-4457-908c-36083ed36148';
-const production_test = 'TRL-56dfdb89-1a77-4264-886c-284b8921158c';
-const novartis_internal_trialsite = 'TRL-dea43a32-f0a1-4d8a-844c-ecd2da0f3c1b';
+import {FetchURL} from '../../CustomClass/Fetch.js';
+import {CSRF_KEY, SERVER_KEY} from '../../CustomClass/Storage.js';
 
 class AddHome extends Component {
   static navigationOptions = ({navigation}) => ({
@@ -24,7 +19,23 @@ class AddHome extends Component {
       trial: null,
       home: null,
       incomplete: false,
+      trialList:null,
+      id: 0,
+      fetchInstance: null,
     };
+  }
+
+  componentWillMount(){
+    let trialList = this.props.navigation.getParam('list', null);
+    this.setState({trialList: trialList});
+    AsyncStorage.getItem(SERVER_KEY).then((server) => {
+      if (server === null){
+        server = 'www.devemerald.com';
+        AsyncStorage.setItem(SERVER_KEY, server);
+      }
+      let fetchInstance = new FetchURL(server)
+      this.setState({server: server, fetchInstance: fetchInstance});
+    });
   }
 
   addHome(){
@@ -39,7 +50,7 @@ class AddHome extends Component {
       //TODO: Alert to get final confirmation from the user if entered info is correct
       AsyncStorage.getItem(CSRF_KEY).then((csrftoken) => {
 
-        fetch(RegisterHomeURL, {
+        fetch(this.state.fetchInstance.RegisterHomeURL, {
           method: 'POST',
           mode: 'cors',
           headers: {
@@ -70,7 +81,12 @@ class AddHome extends Component {
   }
 
   render() {
-    //TODO: make picker into a map function that maps a trial uuid list into picker items
+
+    let trialList = JSON.parse(this.state.trialList)['data'].map((item) => {
+      return (<Picker.Item label={item.nickname} value={item.uuid} key={this.state.id}/>);
+      id++;
+    });
+
     return (
       <View style={ styles.container }>
         <Text style={styles.instruction}>Register new home</Text>
@@ -91,10 +107,7 @@ class AddHome extends Component {
           onValueChange = {(trial)=>this.setState({trial:trial})}
           placeholder = 'Select trial'
           style={{borderWidth: 1, borderRadius: 3, borderColor: 'grey', marginVertical: 20, width: '100%'}}>
-           <Picker.Item label = "Internal Test Trial" value = {internal_test_trial} />
-           <Picker.Item label = "Heritage Trial" value = {heritage_trial} />
-           <Picker.Item label = "Production Test" value = {production_test} />
-           <Picker.Item label = "Novartis Internal Trialsite" value = {novartis_internal_trialsite} />
+        {this.state.trialList!=null?trialList:null}
         </Picker>
         <Button
           onPress={this.addHome.bind(this)}

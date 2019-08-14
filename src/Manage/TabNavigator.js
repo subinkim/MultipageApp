@@ -13,7 +13,7 @@ const navigatorTab = createBottomTabNavigator(
         title: "Manage",
         tabBarIcon: ({ focused, tintColor }) => (
           <Icon
-            name="wifi" //TODO: change this
+            name="clipboard" //TODO: change this
             size={11}
             active={focused?true:false}
           />

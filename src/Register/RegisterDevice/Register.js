@@ -4,10 +4,8 @@ import { Button, View, Text, StyleSheet, Alert, TouchableOpacity } from 'react-n
 import AsyncStorage from '@react-native-community/async-storage';
 
 import InputTextBox from '../../CustomClass/InputTextBox.js';
-import {CSRF_KEY,DEVICE_UUID_KEY, RegisterURL, ModifyDeploymentURL} from '../../CustomClass/Storage.js';
-
-//MARK: for test trials
-const example_home_uuid = 'HOM-194da41f-6f80-4e0b-832f-b6ac7a5469c7';
+import {CSRF_KEY,DEVICE_UUID_KEY, SERVER_KEY} from '../../CustomClass/Storage.js';
+import {FetchURL} from '../../CustomClass/Fetch.js';
 
 class Register extends React.Component {
 
@@ -24,11 +22,29 @@ class Register extends React.Component {
     super(props);
     this.state = {
       nickname:null,
+
+      //Required for register
       home_uuid:null,
       device_uuid:null,
       height: '1.15',
       loc_nickname:null,
+      fetchInstance: null,
+
+      //Error message conditions
+      deviceRegistered: false,
+      completed: true,
     };
+  }
+
+  componentWillMount(){
+    AsyncStorage.getItem(SERVER_KEY).then((server) => {
+      if (server === null){
+        server = 'www.devemerald.com';
+        AsyncStorage.setItem(SERVER_KEY, server);
+      }
+      let fetchInstance = new FetchURL(server)
+      this.setState({server: server, fetchInstance: fetchInstance});
+    });
   }
 
   componentDidMount(){
@@ -40,43 +56,71 @@ class Register extends React.Component {
     });
 
     AsyncStorage.getItem(DEVICE_UUID_KEY).then((uuid)=>{
-      uuid = 'EMR-31d2dc94-ceba-4a4d-8f25-bd5efda1cbb1';//For test purpose
+      uuid = 'EMR-31d2dc94-ceba-4a4d-8f25-bd5efda1cbb1';//MARK: For test purpose - get rid of this later
       this.setState({device_uuid: uuid});
     });
   }
 
   register(){
-    let data = new FormData();
-    data.append("home_uuid", this.state.home_uuid);
-    data.append("nickname", this.state.loc_nickname);
-    data.append("register_id", this.state.device_uuid);
 
-    AsyncStorage.getItem(CSRF_KEY).then((csrftoken) => {
+    let home_uuid = this.state.home_uuid;
+    let loc_nickname = this.state.loc_nickname;
+    let device_uuid = this.state.device_uuid;
+    let height = this.state.height;
 
-      fetch(RegisterURL, {
-        method: 'POST',
-        mode: 'cors',
-        headers: {
-          Accept:'*/*',
-          'Content-Type': 'multipart/form-data',
-          referer: 'https://www.devemerald.com/trialsite/edit/'+this.state.home_uuid,
-          'X-CSRFToken': csrftoken,
-        },
-        body: data,
-        credentials: "include"
-      }).catch((error) => {
-        console.log(error);
+    if (home_uuid===null||loc_nickname===null||device_uuid===null||height===null){
+      this.setState({completed: false});
+    } else {
+
+      let data = new FormData();
+      data.append("home_uuid", home_uuid);
+      data.append("nickname", loc_nickname);
+      data.append("register_id", device_uuid);
+
+      AsyncStorage.getItem(CSRF_KEY).then((csrftoken) => {
+
+        fetch(this.state.fetchInstance.RegisterURL, {
+          method: 'POST',
+          mode: 'cors',
+          headers: {
+            Accept:'*/*',
+            'Content-Type': 'multipart/form-data',
+            referer: 'https://www.devemerald.com/trialsite/edit/'+this.state.home_uuid,
+            'X-CSRFToken': csrftoken,
+          },
+          body: data,
+          credentials: "include"
+        }).then((response) => {
+          if (response['status'] ===500){
+            this.setState({deviceRegistered: true});
+          } else if (response['status'] === 200){
+            Alert.alert("Successfully registered!");
+            this.props.navigation.navigate('Home');
+          }
+        }).catch((error) => {
+          console.log(error);
+        });
+
       });
+    }
 
-    });
   }
 
   render(){
     return(
       <View style={ styles.container }>
+
+        {/*INSTRUCTIONS*/}
         <Text style={ styles.instruction }>Register deployment</Text>
         <Text style={ styles.description }>Register deployment to {this.state.nickname}</Text>
-        <Text>{this.state.home_uuid}</Text>
+        <Text>HOME uuid:{this.state.home_uuid}</Text>
+        <Text>Device uuid:{this.state.device_uuid}</Text>
+
+        {/*ERROR MESSAGES depending on type of error*/}
+        {this.state.completed?null:<Text style={{color:'red', fontSize: 15}}>Complete all the fields.</Text>}
+        {this.state.deviceRegistered?<Text style={{color: 'red', fontSize: 17}}>"ERROR: This Device has already been registered."</Text>:null}
+
+        {/*INPUT FIELDS*/}
         <InputTextBox
           icon="create"
           label="Deploy location name"

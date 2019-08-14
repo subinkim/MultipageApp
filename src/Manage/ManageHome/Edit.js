@@ -1,14 +1,13 @@
 import React from 'react';
 import { Button, View, Text, StyleSheet, Alert, TouchableOpacity, FlatList, ScrollView } from 'react-native';
 
-import { createStackNavigator, createAppContainer, HeaderBackButton } from 'react-navigation';
+import { HeaderBackButton } from 'react-navigation';
 import AsyncStorage from '@react-native-community/async-storage';
 import CookieManager from 'react-native-cookies';
 import Swipeout from 'react-native-swipeout';
 
-const CSRF_KEY = '@csrftoken';
-const VALID_KEY =  '@cookieValid';
-const LogoutURL = 'https://www.devemerald.com/logout';
+import {CSRF_KEY, COOKIE_KEY} from '../../CustomClass/Storage.js';
+import {LogoutURL} from '../../CustomClass/Fetch.js';
 
 class Edit extends React.Component {
 

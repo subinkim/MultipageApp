@@ -1,11 +1,6 @@
 import React from 'react';
-import { Button, Image, View, Text, StyleSheet, Dimensions, Alert, TouchableOpacity, ScrollView } from 'react-native';
+import { Button, Image, View, Text, StyleSheet, Dimensions, ScrollView } from 'react-native';
 
-import { createStackNavigator, createAppContainer } from 'react-navigation';
-import WifiManager from 'react-native-wifi';
-import { WebView } from 'react-native-webview';
-import Wifi from 'react-native-iot-wifi';
-import QRCodeScanner from 'react-native-qrcode-scanner';
 import Carousel, {Pagination} from 'react-native-snap-carousel';
 import { ENTRIES1 } from './data/entries.js';
 

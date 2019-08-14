@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Button, Image, View, Text, StyleSheet, Dimensions, Alert, TouchableOpacity, Platform, PermissionsAndroid } from 'react-native';
+import { Button, Image, View, Text, StyleSheet, Alert, TouchableOpacity } from 'react-native';
 
 import WifiManager from 'react-native-wifi';
 import { WebView } from 'react-native-webview';
@@ -89,20 +89,6 @@ function connectToDevice(ssid, pwd, nav, initial){
         Alert.alert('Cannot connect');
       })
     }
-  }
-}
-
-async function requestLocationPermission(){
-  try {
-    const granted = await PermissionsAndroid.request(
-      PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-      {
-        'title': 'Location Permission',
-        'message': 'This app needs access to your location',
-      }
-    );
-  } catch (err) {
-    console.warn(err);
   }
 }
 
