@@ -1,26 +1,31 @@
 import React from 'react';
 import { Button, View, Text, StyleSheet, Alert, TouchableOpacity, FlatList, ScrollView } from 'react-native';
+import { Icon } from 'native-base';
+import { Button as RNButton } from 'react-native-elements';
 
 import { HeaderBackButton } from 'react-navigation';
 import AsyncStorage from '@react-native-community/async-storage';
 import Swipeout from 'react-native-swipeout';
+import Modal from "react-native-modal";
 
-import {CSRF_KEY, COOKIE_KEY} from '../../CustomClass/Storage.js';
-import {LogoutURL} from '../../CustomClass/Fetch.js';
+import {CSRF_KEY, COOKIE_KEY, SERVER_KEY} from '../../CustomClass/Storage.js';
+import {FetchURL} from '../../CustomClass/Fetch.js';
+
+const EMERALD_COLOUR1 = '#17AA9D';
+const EMERALD_COLOUR2 = '#28B674';
+const EMERALD_COLOUR3 = '#8CC641';
 
 class Load extends React.Component {
 
   static navigationOptions = ({navigation, navigationOptions}) => {
 
     return {
-      headerLeft:(
-        <HeaderBackButton
-          title="Back"
-          onPress={() => {
-            navigation.navigate('Register', {
-              cookieValid: true,
-            })
-          }}
+      title: 'Homes',
+      headerRight: (
+        <RNButton
+          icon={<Icon name="add"/>}
+          type="clear"
+          onPress={() => {addHome(navigation)}}
         />
       )
     };
@@ -30,89 +35,296 @@ class Load extends React.Component {
     super();
     this.state = {
       rowID: null,
-      uuid: null,
+      json: null,
+      selectedItem: null,
+      fetchInstance: null,
+      updated: true,
+      paramUpdated: true,
+
+      //Modal
+      modalIsVisible: false,
+      modalDevices: null,
+      modalHomeUUID: null,
+      modalNickname: null,
+      modalTrialName: null,
     }
   }
 
-  render(){
-    const csrftoken = this.props.navigation.getParam('csrftoken',null);
-    const response = this.props.navigation.getParam('response', null);
+  componentWillMount(){
+    //Check the server - if none exists, set it to default servdr
+    AsyncStorage.getItem(SERVER_KEY).then((server) => {
+      if (server === null){
+        server = 'www.devemerald.com';
+        AsyncStorage.setItem(SERVER_KEY, server);
+      }
+      let fetchInstance = new FetchURL(server)
+      this.setState({fetchInstance: fetchInstance});
 
-    let json = JSON.parse(response);
+      //GetHomes
+      AsyncStorage.getItem(CSRF_KEY).then((csrftoken) => {
+        fetch(fetchInstance.GetHomesURL, {
+          credentials: "include",
+          headers: {
+            'X-CSRFToken': csrftoken,
+            referer: 'https://www.devemerald.com/',
+            Accept: '*/*',
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          method: 'POST',
+          mode: 'cors',
+        }).then((response) => {
+          return response.text().then((res) => {
+            if (res != null){this.setState({json: JSON.parse(res)})}
+          });
+        });
+      });
+
+    });
+  }
+
+  componentWillUpdate(){
+    let updated = this.props.navigation.getParam('updated', null)?true:false;
+    console.log("updated = ", updated);
+    if (this.state.paramUpdated !== updated){this.setState({paramUpdated: updated})}
+
+  }
+
+  componentDidUpdate(){
+    console.log("param updated?",this.state.paramUpdated);
+
+    let paramPassed = this.props.navigation.getParam('updated',null)?true:false;
+
+    console.log("getParam:", this.state.paramUpdated);
+    console.log("state:", this.state.updated);
+
+    if (this.state.updated !== this.state.paramUpdated){
+      this.setState({updated: this.state.paramUpdated}, this.loadNewData());
+      console.log("Yes this is true");
+    } else {
+      console.log("No this is not true");
+    }
+
+  }
+
+  loadNewData(){
+    let data = this.props.navigation.getParam('json', null);
+    if (data !== null){this.setState({json: data}), this.render()}
+    else {
+      AsyncStorage.getItem(CSRF_KEY).then((csrftoken) => {
+        fetch(this.state.fetchInstance.GetHomesURL, {
+          credentials: "include",
+          headers: {
+            'X-CSRFToken': csrftoken,
+            referer: 'https://www.devemerald.com/',
+            Accept: '*/*',
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          method: 'POST',
+          mode: 'cors',
+        }).then((response) => {
+          return response.text().then((res) => {
+            if (res != null && res !== this.state.json){
+              this.setState({json: JSON.parse(res), updated: true});
+              console.log("Yes this is called");
+            }
+          });
+        });
+      });
+    }
+  }
+
+  toggleModal = () => {
+    this.setState({ modalIsVisible: !this.state.modalIsVisible });
+  };
+
+  editItem = () => {
+    this.props.navigation.navigate('Edit', {
+      data: this.state.selectedItem,
+    });
+  }
+
+  confirmDelete = () => {
+    Alert.alert(
+      'Deregister Home',
+      'Are you sure you want to deregister '+this.state.selectedItem.nickname+'? You will be signed out automatically.',
+      [
+        {
+          text: 'Cancel',
+          onPress: () => {},
+          style: 'cancel',
+        },
+        {
+          text: 'Confirm',
+          onPress: () => {this.deleteItem()},
+        },
+      ],
+      {cancelable: false},
+    );
+  }
+
+  deleteItem = () => {
+    AsyncStorage.getItem(CSRF_KEY).then((csrftoken) => {
+      fetch(this.state.fetchInstance.DeregisterHomeURL,{
+        credentials: "include",
+        headers:{
+          'X-CSRFToken': csrftoken,
+          referer: 'https://www.devemerald.com/trialsite/edit/'+this.state.selectedItem.uuid,
+          Accept: '*/*',
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: 'uuid='+this.state.selectedItem.uuid,
+        method: 'POST',
+        mode: 'cors'
+      }).then((response) => {
+        this.setState({updated: false});
+      }).catch((error) => {
+        console.log(error);
+      })
+    });
+
+  }
+
+  render(){
 
     var swipeoutBtns = [
       {
         text: 'Edit',
         type: 'primary',
-        onPress: function(){editItem()},
+        onPress: () => this.editItem(),
       },
       {
-        text: 'Delete',
+        text: 'Deregister',
         type: 'delete',
-        onPress: function(){deleteItem()},
+        onPress: () => this.confirmDelete(),
       }
     ]
 
-    const items = json.data.map((item) => {
-      return (
-        <Swipeout
-          right={swipeoutBtns}
-          key={item.uuid}
-          style={styles.swipeout}
-          autoClose={true}
-          onOpen={(sectionID, rowID) => {
-            this.setState({
-              rowID,
-            })
-          }}
-          >
-          <TouchableOpacity onPress={() => {}}>
-            <View>
-              <Text style={styles.item}>{item.nickname}</Text>
-            </View>
-          </TouchableOpacity>
-        </Swipeout>
-    )});
+
+    let items = null;
+    if(this.state.json != null){
+      items = this.state.json.data.map((item, i) => {
+
+        if (!item['deregistered']){
+          return (
+            <Swipeout
+              right={swipeoutBtns}
+              key={i}
+              style={styles.swipeout}
+              autoClose={true}
+              onOpen={(sectionID, rowID) => {
+                this.setState({
+                  rowID: rowID,
+                  selectedItem: item,
+                });
+              }}
+              >
+              <TouchableOpacity onPress={() => {
+                this.setState({
+                  modalIsVisible: true,
+                  modalDevices: item.devices,
+                  modalHomeUUID: item.uuid,
+                  modalNickname: item.nickname,
+                  modalTrialName: item.trialname,
+                })
+              }}>
+                <View style={{flexDirection: 'row', flexWrap: 'wrap'}}>
+                  <Icon name="home" style={{fontSize: 20, paddingVertical: 11, paddingRight: 7}}/>
+                  <Text style={styles.item}>{item.nickname}</Text>
+                </View>
+              </TouchableOpacity>
+            </Swipeout>
+          );
+        }
+
+      });
+
+    }
 
     return(
       <ScrollView style={styles.container}>
-        <Button
-          title="Sign out"
-          onPress={()=> {
-            signOut(csrftoken);
-            this.props.navigation.navigate('Register',{
-              cookieValid: false,
-            })
-          }}
-        />
-        <Text style={styles.instruction}>Manage Home/Device</Text>
+        <Text style={styles.instruction}>Manage Home</Text>
+
+        <Modal
+          isVisible={this.state.modalIsVisible}
+          animationInTiming={400} animationOutTiming={400}
+          backdropOpacity={0.5}
+          style={ styles.modalWrapper }
+          onBackdropPress={() => {this.setState({ modalIsVisible: !this.state.modalIsVisible })}}
+        >
+
+          <ScrollView style={{ flex: 1 }}>
+
+            <View style={{flexDirection: 'row', flexWrap: 'wrap'}}>
+              <Icon name="home" style={{fontSize: 23, marginRight: 5}}/>
+              <Text style={{fontWeight: 'bold', fontSize: 20}}>{this.state.modalNickname}</Text>
+            </View>
+
+            <Text style={ styles.modalSubtitle }>Home uuid</Text>
+            <Text>{this.state.modalHomeUUID}</Text>
+
+            <Text style={ styles.modalSubtitle }>Trial</Text>
+            <Text>{this.state.modalTrialName}</Text>
+
+            <Text style={ styles.modalSubtitle }>Devices</Text>
+            {this.state.modalDevices!==null?this.state.modalDevices.map((item, i) => {
+              if (!item['deregistered']){
+                return(
+                  <View style={{marginBottom: 20}} key={i}>
+                    <Text style={ styles.deviceSubtitle }>Deployment Location</Text>
+                    <Text>{item.nickname}</Text>
+
+                    <Text style={ styles.deviceSubtitle }>Deployment uuid</Text>
+                    <Text>{item.uuid}</Text>
+
+                    <Text style={ styles.deviceSubtitle }>Device uuid</Text>
+                    <Text>{item.physical_device.uuid}</Text>
+                  </View>
+                );
+              }
+            }):null}
+
+          </ScrollView>
+
+        </Modal>
+
         { items }
       </ScrollView>
     );
   }
 }
 
-function signOut(csrftoken){
-  fetch(LogoutURL, {
-    credentials:"include",
-    headers: {
-        'X-CSRFToken': csrftoken,
-        referer: 'https://www.devemerald.com/',
-        Accept: '*/*',
-        'Content-Type': 'application/x-www-form-urlencoded',
-    },
-    method:'GET',
-    mode:'cors',
-  });
-  AsyncStorage.removeItem(CSRF_KEY);
-}
+function addHome(navigation){
+  AsyncStorage.getItem(SERVER_KEY).then((server) => {
 
-function editItem(){
-  console.log("EDIT");
-}
+    let fetchInstance = new FetchURL(server);
 
-function deleteItem(){
-  console.log("DELETE");
+    AsyncStorage.getItem(CSRF_KEY).then((csrftoken) => {
+
+      fetch(fetchInstance.GetTrialsURL, {
+        method: 'POST',
+        mode: 'cors',
+        headers: {
+          Accept:'*/*',
+          'Content-Type': 'application/x-www-form-urlencoded',
+          referer: 'https://www.devemerald.com/',
+          'X-CSRFToken': csrftoken,
+        },
+        credentials: "include"
+      }).then((response) => {
+        return response.text().then(function(txt){
+          navigation.navigate('AddHome', {
+            list: txt,
+          })
+        })
+      }).catch((error) => {
+        console.log(error);
+      });
+
+    })
+
+
+  })
+
 }
 
 const styles = StyleSheet.create({
@@ -125,22 +337,45 @@ const styles = StyleSheet.create({
     instruction: {
       fontWeight: 'bold',
       fontSize: 23,
-      marginBottom: 10,
+      marginBottom: 20,
     },
     description: {
       top: 50,
       fontSize: 15,
     },
     item:{
-      fontSize: 18,
-      padding:10,
+      fontSize: 16,
+      paddingVertical:12,
     },
     swipeout:{
-      backgroundColor: '#ffffff',
-      borderColor: 'gray',
-      borderWidth: 0.5,
+      backgroundColor: 'white',
+      borderColor: '#cecece',
       marginBottom: 2,
-      borderRadius: 5,
+      borderTopWidth: 0.5,
+      borderBottomWidth: 0.5
+    },
+    modalWrapper:{
+      backgroundColor: 'white',
+      margin:0,
+      borderRadius: 10,
+      marginHorizontal: '5%',
+      paddingTop: '5%',
+      paddingHorizontal: '5%',
+      flex: 0,
+      height: '60%',
+      top: '20%',
+    },
+    modalSubtitle:{
+      fontSize: 12,
+      color: EMERALD_COLOUR1,
+      marginTop: 8,
+      fontWeight: 'bold'
+    },
+    deviceSubtitle: {
+      fontSize: 10,
+      color: 'grey',
+      marginTop: 3,
+      fontWeight: 'bold'
     }
 });
 

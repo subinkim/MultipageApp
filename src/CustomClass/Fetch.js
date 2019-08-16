@@ -1,21 +1,20 @@
-// /*URLs*/
-// export const MainURL = 'www.devemerald.com';
-// export const LoginURL = 'https://www.devemerald.com/login';
-// export const GetHomesURL = "https://www.devemerald.com/api/v1/ops/get-homes";
-// export const LogoutURL = 'https://www.devemerald.com/logout';
-// export const GetTrialsURL = 'https://www.devemerald.com/api/v1/ops/get-trials';
-// export const RegisterHomeURL = 'https://www.devemerald.com/api/v1/ops/register-home';
-// export const RegisterURL = 'https://www.devemerald.com/api/v1/ops/register-deployment';
-// export const ModifyDeploymentURL = 'https://www.devemerald.com/api/v1/ops/modify-deployment';
-
 const Prot = 'https://';
+
 const Login = '/login';
-const GetHomes = "/api/v1/ops/get-homes";
 const Logout = '/logout';
+
+const GetHomes = "/api/v1/ops/get-homes";
 const GetTrials = '/api/v1/ops/get-trials';
+const GetPhysicalDevices = '/api/v1/ops/get-available-physical-devices';
+const GetHomeByUUID = '/api/v1/ops/get-home-by-uuid';
+
 const RegisterHome = '/api/v1/ops/register-home';
 const Register = '/api/v1/ops/register-deployment';
+
 const ModifyDeployment = '/api/v1/ops/modify-deployment';
+
+const DeregisterHome = '/api/v1/ops/deregister-home';
+const DeregisterDeployment = '/api/v1/ops/deregister-deployment';
 
 export class FetchURL {
   constructor(server){
@@ -30,16 +29,24 @@ export class FetchURL {
     return Prot+this.server+Login;
   }
 
-  get GetHomesURL(){
-    return Prot+this.server+GetHomes;
-  }
-
   get LogoutURL(){
     return Prot+this.server+Logout;
   }
 
+  get GetHomesURL(){
+    return Prot+this.server+GetHomes;
+  }
+
   get GetTrialsURL(){
     return Prot+this.server+GetTrials;
+  }
+
+  get GetPhysicalDevicesURL(){
+    return Prot+this.server+GetPhysicalDevices;
+  }
+
+  get GetHomeByUUIDURL(){
+    return Prot+this.server+GetHomeByUUID;
   }
 
   get RegisterHomeURL(){
@@ -52,6 +59,14 @@ export class FetchURL {
 
   get ModifyDeploymentURL(){
     return Prot+this.server+ModifyDeployment;
+  }
+
+  get DeregisterHomeURL(){
+    return Prot+this.server+DeregisterHome;
+  }
+
+  get DeregisterDeploymentURL(){
+    return Prot+this.server+DeregisterDeployment;
   }
 
 }

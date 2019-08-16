@@ -32,6 +32,7 @@ class Home extends React.Component {
       cookieValid: false,
       fetchInstance: null,
       invalid: false,
+      server: null
     };
   }
 
@@ -177,7 +178,7 @@ class Home extends React.Component {
 
     const inputs = (
       <View>
-        <Text style={ styles.instruction }>Sign in to devemerald.com</Text>
+        <Text style={ styles.instruction }>Sign in to {this.state.server}</Text>
         <View style={{marginHorizontal:10}}>
         <Text>Enter your crendentials for devemerald.com</Text>
         {this.state.invalid?<Text style={{color: 'red', fontSize: 16}}>Invalid credentials.</Text>:null}
@@ -206,7 +207,7 @@ class Home extends React.Component {
     const bgColours = [EMERALD_COLOUR1, EMERALD_COLOUR2, EMERALD_COLOUR3];
     const menu = (
     <View>
-      <Text style= { styles.instruction }>Devemerald</Text>
+      <Text style= { styles.instruction }>{this.state.server}</Text>
       <Text style={ styles.description }>Select an action.</Text>
       <View style={ styles.wrapper }>
 
@@ -240,6 +241,16 @@ class Home extends React.Component {
             onPress={()=>{this.props.navigation.navigate('Setting')}}
             style={[styles.MenuStyle, {backgroundColor: EMERALD_COLOUR2}]}>
             <Text style={styles.buttonText} adjustsFontSizeToFit numberOfLines={1}>Settings</Text>
+          </TouchableOpacity>
+
+        </View>
+
+        <View style={{flexDirection:'row'}}>
+
+          <TouchableOpacity
+            onPress={() => {this.props.navigation.navigate('Manage')}}
+            style={[styles.MenuStyle, {backgroundColor: EMERALD_COLOUR2}]}>
+            <Text style={styles.buttonText} adjustsFontSizeToFit numberOfLines={3}>Manage Home</Text>
           </TouchableOpacity>
 
         </View>

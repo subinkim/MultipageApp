@@ -25,27 +25,27 @@ class AddHome extends Component {
   }
 
   componentWillMount(){
-    let trialList = this.props.navigation.getParam('list', null);
-    this.setState({trialList: trialList});
     AsyncStorage.getItem(SERVER_KEY).then((server) => {
       if (server === null){
         server = 'www.devemerald.com';
         AsyncStorage.setItem(SERVER_KEY, server);
       }
-      let fetchInstance = new FetchURL(server)
-      this.setState({server: server, fetchInstance: fetchInstance});
+      let fetchInstance = new FetchURL(server);
+      this.setState({fetchInstance: fetchInstance});
     });
+    let trialList = this.props.navigation.getParam('list', null);
+    if (trialList !== null){this.setState({trialList: trialList})}
   }
 
   addHome(){
 
     let nickname = this.state.home;
     let trial_uuid = this.state.trial;
-    let nav = this.props.navigation;
 
     if (nickname == null||trial_uuid == null){this.setState({incomplete: true})}
     else {
 
+      //TODO: Alert to get final confirmation from the user if entered info is correct
       AsyncStorage.getItem(CSRF_KEY).then((csrftoken) => {
 
         fetch(this.state.fetchInstance.RegisterHomeURL, {
@@ -60,22 +60,40 @@ class AddHome extends Component {
           body: 'nickname='+nickname+'&trial_uuid='+trial_uuid,
           credentials: "include"
         }).then((response) => {
-          return response.text().then(function(text){
-            text = JSON.parse(text);
-            let home_uuid = text['data']['uuid'];
-            nav.navigate('Register', {
-              home_uuid: home_uuid,
-              nickname: nickname,
-            })
-          })
+          if (response['status'] === 200){this.reload()}
+          else {Alert.alert("Failed to add new home.")}
         }).catch((error) => {
-          Alert.alert("Could not register home successfully.");
+          Alert.alert("Failed to add new home. Error:"+error);
         });
 
       });
 
     }
+  }
 
+  reload(){
+    AsyncStorage.getItem(CSRF_KEY).then((csrftoken) => {
+
+      fetch(this.state.fetchInstance.GetHomesURL, {
+        method: 'POST',
+        mode: 'cors',
+        headers: {
+          Accept: '*/*',
+          'Content-Type': 'application/x-www-form-urlencoded',
+          referer: 'https://www.devemerald.com/',
+          'X-CSRFToken': csrftoken,
+        },
+        credentials: 'include'
+      }).then((response) => {
+        return response.text().then((text) => {
+          this.props.navigation.navigate('Load', {
+            json: text,
+            updated: 'false',
+          });
+        })
+      })
+
+    })
   }
 
   render() {

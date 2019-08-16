@@ -1,7 +1,6 @@
 import React from 'react';
-import { Button, Image, View, Text, StyleSheet, Dimensions, Alert, TouchableOpacity } from 'react-native';
+import { Button, View, Text, StyleSheet, Dimensions, Alert } from 'react-native';
 
-import { createStackNavigator, createAppContainer } from 'react-navigation';
 import WifiManager from 'react-native-wifi';
 import { WebView } from 'react-native-webview';
 import Wifi from 'react-native-iot-wifi';

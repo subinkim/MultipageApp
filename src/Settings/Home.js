@@ -48,7 +48,7 @@ class Home extends Component {
           onPress: () => console.log('Cancel Pressed'),
           style: 'cancel',
         },
-        {text: 'Confirm', onPress: () => {AsyncStorage.removeItem(CSRF_KEY);AsyncStorage.setItem(COOKIE_KEY,'false')}},
+        {text: 'Confirm', onPress: () => {AsyncStorage.removeItem(CSRF_KEY);AsyncStorage.setItem(COOKIE_KEY,'false');AsyncStorage.removeItem(EMAIL_KEY)}},
       ],
       {cancelable: false},
     );

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Image, View, Text, StyleSheet, Dimensions, Alert, TouchableOpacity } from 'react-native';
+import { Button, View, Text, StyleSheet, Dimensions, Alert } from 'react-native';
 
 import { HeaderBackButton } from 'react-navigation';
 import WifiManager from 'react-native-wifi';

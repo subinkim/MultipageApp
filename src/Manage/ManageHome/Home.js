@@ -20,7 +20,7 @@ class Home extends React.Component {
     const { params } = navigation.state;
 
     return {
-      title: 'Sign in',
+      title: params ? params.title : 'Sign in',
     }
   };
 
@@ -32,17 +32,22 @@ class Home extends React.Component {
       cookieValid: false,
       fetchInstance: null,
       invalid: false,
+      server: null,
     };
   }
 
   componentWillMount(){
+    //Check if there's cookie stored on app
     AsyncStorage.getAllKeys().then((res) => {
       if (res.includes(CSRF_KEY)){
+        //Check if cookie is valid
         AsyncStorage.getItem(CSRF_KEY).then((csrftoken) => {
           this.checkToken(csrftoken);
+          this.props.navigation.setParams({title: 'Home'});
         });
       }
     });
+    //Check the server - if none exists, set it to default servdr
     AsyncStorage.getItem(SERVER_KEY).then((server) => {
       if (server === null){
         server = 'www.devemerald.com';
@@ -53,6 +58,7 @@ class Home extends React.Component {
     });
   }
 
+  //Change view based on cookie validity
   componentDidMount(){
     AsyncStorage.getItem(COOKIE_KEY).then((cookieValid) => {
       if (cookieValid === 'true'){this.setState({cookieValid:true})}
@@ -67,9 +73,6 @@ class Home extends React.Component {
   componentWillUpdate(){
     var cookie = this.props.navigation.getParam('cookieValid', null);
     if (cookie!=null){
-      if (cookie){cookie = 'true'}
-      else {cookie = 'false'}
-      AsyncStorage.setItem(COOKIE_KEY, cookie);
       if (cookie != this.state.cookieValid){
         this.setState({
           cookieValid: cookie,
@@ -77,7 +80,10 @@ class Home extends React.Component {
           password: '',
         })
       }
-    }  else {
+      if (cookie){cookie = 'true'}
+      else {cookie = 'false'}
+      AsyncStorage.setItem(COOKIE_KEY, cookie);
+    } else {
       AsyncStorage.getItem(COOKIE_KEY).then((cookie) => {
         if (cookie!=null){
           if (cookie==='true'){cookie = true}
@@ -114,6 +120,7 @@ class Home extends React.Component {
           AsyncStorage.setItem(EMAIL_KEY, email);
           AsyncStorage.setItem(COOKIE_KEY, 'true');
           AsyncStorage.setItem(CSRF_KEY, csrftoken);
+          this.props.navigation.setParams({title: 'Home'});
           this.props.navigation.navigate('Scanner');
         }
       });
@@ -164,14 +171,14 @@ class Home extends React.Component {
     });
     AsyncStorage.setItem(COOKIE_KEY, 'false');
     this.setState({cookieValid: false});
-
+    this.props.navigation.setParams({title: 'Sign in'});
   }
 
   render(){
 
     const inputs = (
       <View>
-        <Text style={ styles.instruction }>Sign in to devemerald.com</Text>
+        <Text style={ styles.instruction }>Sign in to {this.state.server}</Text>
         <View style={{marginHorizontal:10}}>
         <Text>Enter your crendentials for devemerald.com</Text>
         {this.state.invalid?<Text style={{color: 'red', fontSize: 16}}>Invalid credentials.</Text>:null}
@@ -200,7 +207,7 @@ class Home extends React.Component {
     const bgColours = [EMERALD_COLOUR1, EMERALD_COLOUR2, EMERALD_COLOUR3];
     const menu = (
     <View>
-      <Text style= { styles.instruction }>Devemerald</Text>
+      <Text style= { styles.instruction }>{this.state.server}</Text>
       <Text style={ styles.description }>Select an action.</Text>
       <View style={ styles.wrapper }>
 
@@ -209,15 +216,15 @@ class Home extends React.Component {
           <TouchableOpacity
             onPress={() => {this.signOut()}}
             style={[styles.MenuStyle, {backgroundColor: EMERALD_COLOUR2}]}
-            accessibilityLabel="Sign out from your devemerald account">
+            accessibilityLabel="Sign out from your account">
             <Text style={styles.buttonText} adjustsFontSizeToFit numberOfLines={3}>Sign out from your account</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
-            onPress={() => {this.props.navigation.navigate('Scanner')}}
+            onPress={() => {this.props.navigation.navigate('Load')}}
             style={[styles.MenuStyle, {backgroundColor: EMERALD_COLOUR1}]}
-            accessibilityLabel="Add a new deployment">
-            <Text style={styles.buttonText} adjustsFontSizeToFit numberOfLines={2}>New deployment</Text>
+            accessibilityLabel="Manage Home">
+            <Text style={styles.buttonText} adjustsFontSizeToFit numberOfLines={2}>Manage Home</Text>
           </TouchableOpacity>
 
         </View>
@@ -225,9 +232,9 @@ class Home extends React.Component {
         <View style={{flexDirection:'row'}}>
 
           <TouchableOpacity
-            onPress={()=>{this.props.navigation.navigate('Details')}}
+            onPress={()=>{this.props.navigation.navigate('Register')}}
             style={[styles.MenuStyle, {backgroundColor: EMERALD_COLOUR3}]}>
-            <Text style={styles.buttonText} adjustsFontSizeToFit numberOfLines={2}>Skip to connection</Text>
+            <Text style={styles.buttonText} adjustsFontSizeToFit numberOfLines={2}>Register new deployment</Text>
           </TouchableOpacity>
 
           <TouchableOpacity

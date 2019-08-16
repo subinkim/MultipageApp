@@ -1,147 +1,323 @@
 import React from 'react';
-import { Button, View, Text, StyleSheet, Alert, TouchableOpacity, FlatList, ScrollView } from 'react-native';
+import { Button, View, Text, StyleSheet, Alert, TouchableOpacity, ScrollView, TextInput } from 'react-native';
+import Modal from "react-native-modal";
+import { Icon, Picker } from 'native-base';
 
-import { HeaderBackButton } from 'react-navigation';
 import AsyncStorage from '@react-native-community/async-storage';
-import CookieManager from 'react-native-cookies';
-import Swipeout from 'react-native-swipeout';
 
-import {CSRF_KEY, COOKIE_KEY} from '../../CustomClass/Storage.js';
-import {LogoutURL} from '../../CustomClass/Fetch.js';
+import {CSRF_KEY, COOKIE_KEY, SERVER_KEY} from '../../CustomClass/Storage.js';
+import {FetchURL} from '../../CustomClass/Fetch.js';
+
+const EMERALD_COLOUR1 = '#17AA9D';
+const EMERALD_COLOUR2 = '#28B674';
+const EMERALD_COLOUR3 = '#8CC641';
 
 class Edit extends React.Component {
 
   static navigationOptions = ({navigation, navigationOptions}) => {
 
     return {
-      headerLeft:(
-        <HeaderBackButton
-          title="Back"
-          onPress={() => {
-            navigation.navigate('Register', {
-              cookieValid: true,
-            })
-          }}
-        />
-      )
+      title: "Edit",
+      modalIsVisible: false,
     };
   }
 
   constructor(){
     super();
     this.state = {
-      rowID: null,
-      uuid: null,
+      data: null,
+      fetchInstance: null,
+      availableDevices:null,
+      selectedItem: null,
+
+      //For making edits
+      deviceID: null,
+      height: 1.15,
+      deployLoc: null,
+      deployID: null,
+
+      //text inputs
+      isFocusedOne: false,
+      isFocusedTwo: false,
     }
   }
 
+  //Get server and data
+  componentWillMount(){
+    let data = this.props.navigation.getParam('data',null);
+    this.setState({data:data});
+    //Check the server - if none exists, set it to default servdr
+    AsyncStorage.getItem(SERVER_KEY).then((server) => {
+      let fetchInstance = new FetchURL(server);
+      this.setState({fetchInstance: fetchInstance});
+    });
+  }
+
+  //Get available physical devices
+  componentDidMount(){
+    AsyncStorage.getItem(CSRF_KEY).then((csrftoken) => {
+      fetch(this.state.fetchInstance.GetPhysicalDevicesURL, {
+        credentials:"include",
+        headers: {
+            'X-CSRFToken': csrftoken,
+            referer: 'https://www.devemerald.com/trialsite/edit/'+this.state.data.uuid,
+            Accept: '*/*',
+            'Content-Type': 'application/json',
+        },
+        method:'POST',
+        mode:'cors',
+      }).then((response) => {
+        return response.text().then((text) => {
+          if (text != null){
+            text = JSON.parse(text);
+            this.setState({availableDevices: text['data']});
+          }
+        });
+      });
+    })
+  }
+
+  modalOnSubmit(){
+
+    let deployID = this.state.deployID;
+    let deviceID = this.state.deviceID;
+    let deployLoc = this.state.deployLoc;
+    let height = this.state.height;
+
+    if (deviceID == null || deployLoc == null || height == null){
+      Alert.alert("Please complete all fields.");
+    } else {
+      let data = new FormData();
+      data.append('home_uuid', this.state.data.uuid);
+      data.append('resource_uuid', deployID);
+      data.append('modified_id', deviceID);
+      data.append('nickname', deployLoc);
+      data.append('height', height);
+
+      AsyncStorage.getItem(CSRF_KEY).then((csrftoken) => {
+        fetch(this.state.fetchInstance.ModifyDeploymentURL, {
+          credentials: "include",
+          headers: {
+            'X-CSRFToken': csrftoken,
+            referer: 'https://www.devemerald.com/trialsite/edit/'+this.state.data.uuid,
+            Accept: '*/*',
+            'Content-Type': 'application/json',
+          },
+          method:'POST',
+          mode: 'cors',
+          body: data,
+        }).then((response) => {
+          this.setState({modalIsVisible: !this.state.modalIsVisible});
+          this.reloadData();
+        }).catch((error) => {
+          console.log(error);
+        })
+      });
+    }
+
+  }
+
+  reloadData(){
+
+    let data = new FormData();
+    data.append('home_uuid', this.state.data.uuid);
+    data.append('only_registered', true);
+
+    AsyncStorage.getItem(CSRF_KEY).then((csrftoken) => {
+      fetch(this.state.fetchInstance.GetHomeByUUIDURL, {
+        credentials: "include",
+        headers: {
+          'X-CSRFToken': csrftoken,
+          referer: 'https://www.devemerald.com/trialsite/edit/'+this.state.data.uuid,
+          Accept: '*/*',
+          'Content-Type': 'application/json',
+        },
+        method: 'POST',
+        mode: 'cors',
+        body: data,
+      }).then((response) => {
+        return response.text().then((text) => {
+          text = JSON.parse(text);
+          this.setState({data: text}, function(){this.render()}.bind(this)); //TODO: doesn't work
+        });
+      });
+    });
+  }
+
   render(){
-    const csrftoken = this.props.navigation.getParam('csrftoken',null);
-    const response = this.props.navigation.getParam('response', null);
+    let deviceList = null;
+    if (this.state.selectedItem != null){
 
-    let json = JSON.parse(response);
-
-    var swipeoutBtns = [
-      {
-        text: 'Edit',
-        type: 'primary',
-        onPress: function(){editItem()},
-      },
-      {
-        text: 'Delete',
-        type: 'delete',
-        onPress: function(){deleteItem()},
+      //Add currently selected device to the available devices array
+      let availableDevices = this.state.availableDevices;
+      let currentDeviceUUID = this.state.selectedItem.physical_device.uuid;
+      if (!availableDevices.some(e => e.uuid == currentDeviceUUID)){
+        availableDevices.push({"uuid":currentDeviceUUID});
       }
-    ]
+      if (this.state.availableDevices !== availableDevices){this.setState({availableDevices: availableDevices})}
 
-    const items = json.data.map((item) => {
-      return (
-        <Swipeout
-          right={swipeoutBtns}
-          key={item.uuid}
-          style={styles.swipeout}
-          autoClose={true}
-          onOpen={(sectionID, rowID) => {
-            this.setState({
-              rowID,
-            })
-          }}
-          >
-          <TouchableOpacity onPress={() => {}}>
-            <View>
-              <Text style={styles.item}>{item.nickname}</Text>
+      //Map available devices list to create picker item
+      deviceList = this.state.availableDevices.map((item, i) => {
+        //Current device marked with (Current) label
+        if (i === this.state.availableDevices.length - 1){
+          return (<Picker.Item label={item.uuid+ " (Current)"} value={item.uuid} key={i}/>);
+        }
+        return (<Picker.Item label={item.uuid} value={item.uuid} key={i}/>);
+      });
+
+    }
+    let modal = null;
+    //Modal for making edits
+    if (this.state.deviceID != null){
+      modal = (
+        <Modal
+          isVisible={this.state.modalIsVisible}
+          animationInTiming={400} animationOutTiming={400}
+          backdropOpacity={0.5}
+          style={ styles.modalWrapper }
+          onBackdropPress={() => {this.setState({ modalIsVisible: !this.state.modalIsVisible })}}
+        >
+          <View style={{height: '100%'}}>
+            <Text style={{ fontWeight: 'bold', marginBottom: 5, fontSize: 16 }}>Edit deployment</Text>
+
+            <Text style={ styles.modalSubtitle }>Deployment uuid</Text>
+            <Text style={ styles.description }>{this.state.deployID}</Text>
+
+            <Text style={ styles.modalSubtitle }>Deployment Location</Text>
+            <TextInput
+              style={[{height: 20, borderBottomWidth: 1},this.state.isFocusedOne?{borderColor: EMERALD_COLOUR1}:{borderColor: 'grey'}]}
+              onChangeText={(deployLoc) => this.setState({deployLoc})}
+              value={this.state.deployLoc}
+              onFocus={() => {this.setState({isFocusedOne: true})}}
+              onBlur={() => {this.setState({isFocusedOne: false})}}
+              placeholder="Deployment location nickname"
+            />
+
+            <Text style={ styles.modalSubtitle }>Device</Text>
+            <Picker
+              mode="dropdown" placeholder={this.state.deviceID} selectedValue = {this.state.deviceID}
+              onValueChange = {(deviceID)=>this.setState({deviceID:deviceID})} adjustsFontSizeToFit={true}
+              textStyle={{maxWidth: '100%'}}
+              style={{borderWidth: 1, borderRadius: 3, borderColor: 'grey', width: '100%'}}>
+              {this.state.availableDevices!=null?deviceList:null}
+            </Picker>
+
+            <Text style={ styles.modalSubtitle }>Deployment height</Text>
+            <TextInput
+              style={[{height: 20, borderBottomWidth: 1},this.state.isFocusedTwo?{borderColor: EMERALD_COLOUR1}:{borderColor: 'grey'}]}
+              onChangeText={(height) => this.setState({height})}
+              onFocus={() => {this.setState({isFocusedTwo: true})}}
+              onBlur={() => {this.setState({isFocusedTwo: false})}}
+              value={this.state.height.toString()}
+              placeholder="Enter deployment height"
+              keyboardType="numeric"
+            />
+            <View style={{flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center'}}>
+            <Button
+              onPress={() => {this.setState({modalIsVisible: !this.state.modalIsVisible})}}
+              title="Cancel"
+            />
+            <Button
+              onPress={() => {this.modalOnSubmit()}}
+              title="Done"
+            />
             </View>
-          </TouchableOpacity>
-        </Swipeout>
-    )});
+          </View>
+
+        </Modal>
+      );
+    }
 
     return(
-      <ScrollView style={styles.container}>
-        <Button
-          title="Sign out"
-          onPress={()=> {
-            signOut(csrftoken);
-            this.props.navigation.navigate('Register',{
-              cookieValid: false,
-            })
-          }}
-        />
-        <Text style={styles.instruction}>Manage Home/Device</Text>
-        { items }
-      </ScrollView>
+      <View style={ styles.container }>
+        <Text style={ styles.instruction }>{this.state.data.nickname}</Text>
+
+        <Text style={ styles.descriptionSubtitle }>Home uuid</Text>
+        <Text style={ styles.description }>{this.state.data.uuid}</Text>
+
+        <Text style={ styles.descriptionSubtitle }>Deployments</Text>
+        {this.state.data.devices?this.state.data.devices.map((item, i) => {
+          if (!item['deregistered']){
+            return(
+              <TouchableOpacity style={{marginBottom: 20}} key={i}
+                onPress={() => this.setState({
+                    modalIsVisible: !this.state.modalIsVisible,
+                    deviceID: item.physical_device.uuid,
+                    height: item.height,
+                    deployLoc: item.nickname,
+                    deployID: item.uuid,
+                    selectedItem: item,
+              })}>
+                <View>
+                  <Text style={ styles.deviceSubtitle }>Deployment Location</Text>
+                  <Text>{item.nickname}</Text>
+
+                  <Text style={ styles.deviceSubtitle }>Deployment uuid</Text>
+                  <Text>{item.uuid}</Text>
+
+                  <Text style={ styles.deviceSubtitle }>Device uuid</Text>
+                  <Text>{item.physical_device.uuid}</Text>
+
+                  <Text style={ styles.deviceSubtitle }>Deployment Height</Text>
+                  <Text>{item.height}</Text>
+                </View>
+              </TouchableOpacity>
+            );
+          }
+        }):null}
+
+        {modal}
+
+      </View>
     );
   }
 }
 
-function signOut(csrftoken){
-  fetch(LogoutURL, {
-    credentials:"include",
-    headers: {
-        'X-CSRFToken': csrftoken,
-        referer: 'https://www.devemerald.com/',
-        Accept: '*/*',
-        'Content-Type': 'application/x-www-form-urlencoded',
-    },
-    method:'GET',
-    mode:'cors',
-  });
-  AsyncStorage.removeItem(CSRF_KEY);
-}
-
-function editItem(){
-  console.log("EDIT");
-}
-
-function deleteItem(){
-  console.log("DELETE");
-}
 
 const styles = StyleSheet.create({
     container: {
       flex: 1,
       marginTop: 30,
-      marginLeft: 10,
-      marginRight: 10,
+      marginLeft: 20,
+      marginRight: 20,
     },
     instruction: {
       fontWeight: 'bold',
       fontSize: 23,
-      marginBottom: 10,
+      marginBottom: 5,
     },
     description: {
-      top: 50,
+      marginTop: 5,
       fontSize: 15,
     },
-    item:{
-      fontSize: 18,
-      padding:10,
+    descriptionSubtitle: {
+      fontSize: 13,
+      color: EMERALD_COLOUR1,
+      fontWeight: 'bold',
+      marginTop: 10,
     },
-    swipeout:{
-      backgroundColor: '#ffffff',
-      borderColor: 'gray',
-      borderWidth: 0.5,
-      marginBottom: 2,
-      borderRadius: 5,
+    deviceSubtitle: {
+      fontSize: 12,
+      color: 'grey',
+      marginTop: 3,
+      fontWeight: 'bold'
+    },
+    modalWrapper:{
+      backgroundColor: 'white',
+      margin:0,
+      borderRadius: 10,
+      marginHorizontal: '5%',
+      paddingTop: '5%',
+      paddingHorizontal: '5%',
+      flex: 0,
+      height: '60%',
+      top: '20%',
+    },
+    modalSubtitle:{
+      fontSize: 12,
+      color: EMERALD_COLOUR1,
+      marginVertical: 5,
+      fontWeight: 'bold'
     }
 });
 

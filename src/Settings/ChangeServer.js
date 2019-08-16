@@ -35,7 +35,24 @@ class ChangeServer extends Component {
       AsyncStorage.removeItem(CSRF_KEY);
       AsyncStorage.setItem(COOKIE_KEY, false);
       AsyncStorage.removeItem(EMAIL_KEY);
+      this.props.navigation.navigate('Home');
     }
+  }
+
+  confirmChange(){
+    Alert.alert(
+      'Change server',
+      'Are you sure you want to change server? You will be signed out automatically.',
+      [
+        {
+          text: 'Cancel',
+          onPress: () => console.log('Cancel Pressed'),
+          style: 'cancel',
+        },
+        {text: 'Confirm', onPress: () => {this.changeServer()}},
+      ],
+      {cancelable: false},
+    );
   }
 
   changeServer(){
@@ -54,7 +71,6 @@ class ChangeServer extends Component {
     }).then((response)=>{
       Alert.alert("Server successfully changed! You will be signed out.");
       this.setState({serverChanged: true});
-      this.props.navigation.navigate('Home');
     }).catch((error) => {
       Alert.alert("Invalid server!");
       this.setState({serverInvalid: true});
@@ -71,7 +87,7 @@ class ChangeServer extends Component {
 
         {/*ERROR MESSAGE*/}
         {this.state.serverInvalid?<Text style={{color: 'red'}}>ERROR: Invalid server. Please check your entry once again.</Text>:null}
-        
+
         <InputTextBox
           icon="desktop"
           label="New server"
@@ -81,7 +97,7 @@ class ChangeServer extends Component {
           value={ this.state.server }
         />
         <Button
-          onPress={() => this.changeServer()}
+          onPress={() => this.confirmChange()}
           title="Submit"
         />
       </View>

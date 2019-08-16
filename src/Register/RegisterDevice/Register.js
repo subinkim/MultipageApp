@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, View, Text, StyleSheet, Alert, TouchableOpacity } from 'react-native';
+import { Button, View, Text, StyleSheet, Alert, TouchableOpacity, Keyboard } from 'react-native';
 
 import AsyncStorage from '@react-native-community/async-storage';
 
@@ -76,6 +76,7 @@ class Register extends React.Component {
       data.append("home_uuid", home_uuid);
       data.append("nickname", loc_nickname);
       data.append("register_id", device_uuid);
+      data.append("height", height);
 
       AsyncStorage.getItem(CSRF_KEY).then((csrftoken) => {
 
@@ -91,9 +92,11 @@ class Register extends React.Component {
           body: data,
           credentials: "include"
         }).then((response) => {
+          //if register failed
           if (response['status'] ===500){
             this.setState({deviceRegistered: true});
-          } else if (response['status'] === 200){
+            Alert.alert("Device already registered.");
+          } else if (response['status'] === 200){ //if succeeded - returns deployment uuid
             Alert.alert("Successfully registered!");
             this.props.navigation.navigate('Home');
           }
@@ -128,14 +131,16 @@ class Register extends React.Component {
           keyboard="default"
           value={this.state.loc_nickname}
           returnKey="next"
+          onEndEditing={Keyboard.dismiss}
         />
         <InputTextBox
           icon="create"
           label="Device Height"
-          onChange={(height) => this.setState({height:height.toString()})}
+          onChange={(height) => this.setState({height:height})}
           keyboard="numeric"
-          value={this.state.height}
+          value={this.state.height.toString()}
           returnKey="done"
+          onEndEditing={Keyboard.dismiss}
         />
         <Button
           onPress={this.register.bind(this)}
