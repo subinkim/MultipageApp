@@ -30,6 +30,8 @@ class Home extends React.Component {
       email: '',
       password: '',
       cookieValid: false,
+      csrftoken: null,
+
       fetchInstance: null,
       invalid: false,
       server: null,
@@ -37,16 +39,6 @@ class Home extends React.Component {
   }
 
   componentWillMount(){
-    //Check if there's cookie stored on app
-    AsyncStorage.getAllKeys().then((res) => {
-      if (res.includes(CSRF_KEY)){
-        //Check if cookie is valid
-        AsyncStorage.getItem(CSRF_KEY).then((csrftoken) => {
-          this.checkToken(csrftoken);
-          this.props.navigation.setParams({title: 'Home'});
-        });
-      }
-    });
     //Check the server - if none exists, set it to default servdr
     AsyncStorage.getItem(SERVER_KEY).then((server) => {
       if (server === null){
@@ -54,7 +46,19 @@ class Home extends React.Component {
         AsyncStorage.setItem(SERVER_KEY, server);
       }
       let fetchInstance = new FetchURL(server)
-      this.setState({server: server, fetchInstance: fetchInstance});
+      this.setState({server: server, fetchInstance: fetchInstance}, () => {
+        //Check if there's cookie stored on app
+        //Use callback to make sure setState happens before this
+        AsyncStorage.getAllKeys().then((res) => {
+          if (res.includes(CSRF_KEY)){
+            //Check if cookie is valid
+            AsyncStorage.getItem(CSRF_KEY).then((csrftoken) => {
+              this.setState({csrftoken: csrftoken});
+              this.checkToken(csrftoken);
+            });
+          }
+        });
+      });
     });
   }
 
@@ -64,46 +68,30 @@ class Home extends React.Component {
       if (cookieValid === 'true'){this.setState({cookieValid:true})}
       else {this.setState({cookieValid:false})}
     });
-
-    if (this.state.cookieValid){
-      this.props.navigation.navigate('Scanner');
-    }
   }
 
   componentWillUpdate(){
-    var cookie = this.props.navigation.getParam('cookieValid', null);
-    if (cookie!=null){
-      if (cookie != this.state.cookieValid){
-        this.setState({
-          cookieValid: cookie,
-          email: '',
-          password: '',
-        })
-      }
-      if (cookie){cookie = 'true'}
-      else {cookie = 'false'}
-      AsyncStorage.setItem(COOKIE_KEY, cookie);
-    } else {
-      AsyncStorage.getItem(COOKIE_KEY).then((cookie) => {
-        if (cookie!=null){
-          if (cookie==='true'){cookie = true}
-          else {cookie = false}
-          if (cookie!=this.state.cookieValid){
-            this.setState({cookieValid: cookie});
-          }
+
+    AsyncStorage.getItem(COOKIE_KEY).then((cookie) => {
+      if (cookie!=null){
+        if (cookie==='true'){cookie = true}
+        else {cookie = false}
+        if (cookie!=this.state.cookieValid){
+          this.setState({cookieValid: cookie});
         }
-      })
-    }
+      }
+    });
+
   }
 
-  signIn(email, password, nav){
+  signIn(){
     fetch(this.state.fetchInstance.LoginURL, {
       method: 'POST',
       headers: {
         Accept:'*/*',
         'Content-Type': 'application/x-www-form-urlencoded',
       },
-      body: 'email='+email+'&password='+password,
+      body: 'email='+this.state.email+'&password='+this.state.password,
       credentials: "include",
     }).then((response) => {
       CookieManager.getAll() //TODO: This doesn't work for Android
@@ -117,15 +105,16 @@ class Home extends React.Component {
           });
         }
         else {
-          AsyncStorage.setItem(EMAIL_KEY, email);
+          this.setState({csrftoken: csrftoken});
+          this.props.navigation.setParams({title: 'Home'});
+          AsyncStorage.setItem(EMAIL_KEY, this.state.email);
           AsyncStorage.setItem(COOKIE_KEY, 'true');
           AsyncStorage.setItem(CSRF_KEY, csrftoken);
-          this.props.navigation.setParams({title: 'Home'});
-          this.props.navigation.navigate('Scanner');
+
         }
       });
     }).catch((error) => {
-      console.log(error);
+      Alert.alert("Sign in failed! ERROR: "+ error);
     });
   }
 
@@ -140,8 +129,8 @@ class Home extends React.Component {
       },
       method:'POST',
       mode:'cors',
-    }).then(function(response){
-      return response.text().then(function(text){
+    }).then((response) => {
+      return response.text().then((text) => {
         text = JSON.parse(text);
         if (text['success'] != null){
           if (text['success']){AsyncStorage.setItem(COOKIE_KEY, 'true');}
@@ -155,20 +144,18 @@ class Home extends React.Component {
   }
 
   signOut(){
-    AsyncStorage.getItem(CSRF_KEY).then((csrftoken) => {
-      fetch(this.state.fetchInstance.LogoutURL, {
-        credentials:"include",
-        headers: {
-            'X-CSRFToken': csrftoken,
-            referer: 'https://www.devemerald.com/',
-            Accept: '*/*',
-            'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        method:'GET',
-        mode:'cors',
-      });
-      AsyncStorage.removeItem(CSRF_KEY);
+    fetch(this.state.fetchInstance.LogoutURL, {
+      credentials:"include",
+      headers: {
+          'X-CSRFToken': this.state.csrftoken,
+          referer: 'https://www.devemerald.com/',
+          Accept: '*/*',
+          'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      method:'GET',
+      mode:'cors',
     });
+    AsyncStorage.removeItem(CSRF_KEY);
     AsyncStorage.setItem(COOKIE_KEY, 'false');
     this.setState({cookieValid: false});
     this.props.navigation.setParams({title: 'Sign in'});
@@ -198,13 +185,12 @@ class Home extends React.Component {
           />
           <Button
             title="Sign in"
-            onPress={() => {this.signIn(this.state.email, this.state.password, this.props.navigation);}}
+            onPress={() => {this.signIn();}}
           />
           </View>
       </View>
     );
 
-    const bgColours = [EMERALD_COLOUR1, EMERALD_COLOUR2, EMERALD_COLOUR3];
     const menu = (
     <View>
       <Text style= { styles.instruction }>{this.state.server}</Text>

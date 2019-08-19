@@ -39,7 +39,6 @@ class Load extends React.Component {
       selectedItem: null,
       fetchInstance: null,
       updated: true,
-      paramUpdated: true,
 
       //Modal
       modalIsVisible: false,
@@ -83,54 +82,23 @@ class Load extends React.Component {
   }
 
   componentWillUpdate(){
-    let updated = this.props.navigation.getParam('updated', null)?true:false;
-    console.log("updated = ", updated);
-    if (this.state.paramUpdated !== updated){this.setState({paramUpdated: updated})}
-
-  }
-
-  componentDidUpdate(){
-    console.log("param updated?",this.state.paramUpdated);
-
-    let paramPassed = this.props.navigation.getParam('updated',null)?true:false;
-
-    console.log("getParam:", this.state.paramUpdated);
-    console.log("state:", this.state.updated);
-
-    if (this.state.updated !== this.state.paramUpdated){
-      this.setState({updated: this.state.paramUpdated}, this.loadNewData());
-      console.log("Yes this is true");
-    } else {
-      console.log("No this is not true");
-    }
-
-  }
-
-  loadNewData(){
-    let data = this.props.navigation.getParam('json', null);
-    if (data !== null){this.setState({json: data}), this.render()}
-    else {
-      AsyncStorage.getItem(CSRF_KEY).then((csrftoken) => {
-        fetch(this.state.fetchInstance.GetHomesURL, {
-          credentials: "include",
-          headers: {
-            'X-CSRFToken': csrftoken,
-            referer: 'https://www.devemerald.com/',
-            Accept: '*/*',
-            'Content-Type': 'application/x-www-form-urlencoded',
-          },
-          method: 'POST',
-          mode: 'cors',
-        }).then((response) => {
-          return response.text().then((res) => {
-            if (res != null && res !== this.state.json){
-              this.setState({json: JSON.parse(res), updated: true});
-              console.log("Yes this is called");
-            }
-          });
+    AsyncStorage.getItem(CSRF_KEY).then((csrftoken) => {
+      fetch(this.state.fetchInstance.GetHomesURL, {
+        credentials: "include",
+        headers: {
+          'X-CSRFToken': csrftoken,
+          referer: 'https://www.devemerald.com/',
+          Accept: '*/*',
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        method: 'POST',
+        mode: 'cors',
+      }).then((response) => {
+        return response.text().then((res) => {
+          if (res!=null){res = JSON.parse(res);this.setState({json: res});}
         });
       });
-    }
+    });
   }
 
   toggleModal = () => {

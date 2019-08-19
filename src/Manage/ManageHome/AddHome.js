@@ -60,7 +60,7 @@ class AddHome extends Component {
           body: 'nickname='+nickname+'&trial_uuid='+trial_uuid,
           credentials: "include"
         }).then((response) => {
-          if (response['status'] === 200){this.reload()}
+          if (response['status'] === 200){this.props.navigation.navigate('Load')}
           else {Alert.alert("Failed to add new home.")}
         }).catch((error) => {
           Alert.alert("Failed to add new home. Error:"+error);
@@ -69,31 +69,6 @@ class AddHome extends Component {
       });
 
     }
-  }
-
-  reload(){
-    AsyncStorage.getItem(CSRF_KEY).then((csrftoken) => {
-
-      fetch(this.state.fetchInstance.GetHomesURL, {
-        method: 'POST',
-        mode: 'cors',
-        headers: {
-          Accept: '*/*',
-          'Content-Type': 'application/x-www-form-urlencoded',
-          referer: 'https://www.devemerald.com/',
-          'X-CSRFToken': csrftoken,
-        },
-        credentials: 'include'
-      }).then((response) => {
-        return response.text().then((text) => {
-          this.props.navigation.navigate('Load', {
-            json: text,
-            updated: 'false',
-          });
-        })
-      })
-
-    })
   }
 
   render() {

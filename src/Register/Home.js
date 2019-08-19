@@ -121,6 +121,7 @@ class Home extends React.Component {
           AsyncStorage.setItem(COOKIE_KEY, 'true');
           AsyncStorage.setItem(CSRF_KEY, csrftoken);
           this.props.navigation.setParams({title: 'Home'});
+          this.setState({cookieValid: true});
           this.props.navigation.navigate('Scanner');
         }
       });
@@ -204,7 +205,6 @@ class Home extends React.Component {
       </View>
     );
 
-    const bgColours = [EMERALD_COLOUR1, EMERALD_COLOUR2, EMERALD_COLOUR3];
     const menu = (
     <View>
       <Text style= { styles.instruction }>{this.state.server}</Text>
