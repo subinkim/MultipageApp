@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Button, Image, View, Text, StyleSheet, Dimensions, Alert, TouchableOpacity, Platform, PermissionsAndroid } from 'react-native';
+import { Button, View, Text, StyleSheet, Alert, Platform, PermissionsAndroid } from 'react-native';
 
 import WifiManager from 'react-native-wifi';
 import { WebView } from 'react-native-webview';
@@ -10,7 +10,7 @@ import InputTextBox from '../../CustomClass/InputTextBox.js';
 
 class Home extends Component {
   static navigationOptions = ({navigation}) => ({
-    headerTitle: "Welcome!",
+    headerTitle: "Connect Device",
     headerRight: <Button
         onPress={() => {navigation.navigate('Info');}}
         title="Help"
@@ -22,7 +22,7 @@ class Home extends Component {
     this.state = {
       ssid: '',
       password: '',
-      initialSSID: '',
+      initialSSID: null,
     };
   }
 
@@ -30,17 +30,46 @@ class Home extends Component {
     if (Platform.OS === 'android'){
       requestLocationPermission();
     }
-  }
 
-  render() {
-
-    if (this.state.initialSSID === ''){
+    if (this.state.initialSSID === null){
       Wifi.getSSID((initialSSID) => {
         if (initialSSID != null){
           this.setState({initialSSID});
         }
       })
     }
+  }
+
+  connectToDevice(){
+
+    if (this.state.ssid === '' || this.state.password === ''){
+      Alert.alert('Incomplete','Please complete both fields');
+    } else {
+      //If already connected to the device
+      if (this.state.ssid === this.state.initialSSID){
+        Alert.alert('You are already connected to this network');
+        this.props.navigation.navigate('Details', {
+          ssid: this.state.ssid,
+        });
+      } else {
+
+        //Connect to the deivce
+        WifiManager.connectToProtectedSSID(this.state.ssid,this.state.password,false).then(() => {
+          Alert.alert("Connected!");
+          nav.navigate('Details', {
+              ssid: this.state.ssid,
+              initialSSID: this.state.currentSSID,
+          });
+        }, () => {
+          Alert.alert('Failed to connect to the device.');
+        });
+
+      }
+    }
+
+  }
+
+  render() {
 
     const scannerButton = (<Button
       title="Scan QR code"
@@ -51,19 +80,10 @@ class Home extends Component {
       }}
     />);
 
-    const passButton =(<Button
-      title="Already connected?"
-      onPress={() => {
-        this.props.navigation.navigate('Details', {
-          currentSSID: this.state.initialSSID,
-        })
-      }}
-    />);
-
     return (
       <View style={ styles.container }>
         <Text style={ styles.instruction }>Connect to your device</Text>
-        <Text>Manually enter SSID and password of your device or scan QR code.</Text>
+        <Text>Manually enter SSID and password of your device or scan QR code attached to the bottom of the device.</Text>
         <InputTextBox
           icon="wifi"
           label='Device SSID'
@@ -80,40 +100,14 @@ class Home extends Component {
         />
         <Button
           title="Connect"
-          onPress={() => connectToDevice(this.state.ssid, this.state.password, this.props.navigation, this.state.initialSSID)}
+          onPress={() => {this.connectToDevice()}}
         />
         { scannerButton }
-        { this.state.initialSSID.includes('emerald')?passButton:null }
       </View>
     );
   }
 }
-
-function connectToDevice(ssid, pwd, nav, currentSSID){
-
-  if (ssid === '' || pwd === ''){
-    Alert.alert('Incomplete','Please complete both fields');
-  } else {
-    if (ssid === currentSSID){
-      Alert.alert('You are already connected to this network');
-      nav.navigate('Details', {
-        ssid: ssid,
-      });
-    } else {
-      WifiManager.connectToProtectedSSID(ssid,pwd,false).then(() => {
-        Alert.alert("Connected");
-        nav.navigate('Details', {
-            ssid: ssid,
-            initialSSID: currentSSID,
-        });
-      }, () => {
-        Alert.alert('Cannot connect');
-        nav.navigate('Home');
-      })
-    }
-  }
-}
-
+//TODO: change 'this app' to app name
 async function requestLocationPermission(){
   try {
     const granted = await PermissionsAndroid.request(

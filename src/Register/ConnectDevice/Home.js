@@ -79,7 +79,7 @@ function connectToDevice(ssid, pwd, nav, initial){
         initialSSID: ssid,
       });
     } else {
-      Wifi.connectSecure(ssid,pwd,false).then(() => {
+      WifiManager.connectToProtectedSSID(ssid,pwd,false).then(() => {
         Alert.alert("Connected");
         nav.navigate('Details', {
           ssid: ssid,

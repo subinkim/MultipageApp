@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Image, View, Text, StyleSheet, Dimensions, Alert } from 'react-native';
+import { Button, View, Text, StyleSheet, Dimensions, Alert } from 'react-native';
 
 import WifiManager from 'react-native-wifi';
 import { WebView } from 'react-native-webview';
@@ -8,11 +8,9 @@ import CookieManager from 'react-native-cookies';
 import AsyncStorage from '@react-native-community/async-storage';
 
 import {FetchURL} from '../../CustomClass/Fetch.js';
-import {SERVER_KEY} from '../../CustomClass/Storage.js';
+import {SERVER_KEY, CSRF_KEY} from '../../CustomClass/Storage.js';
 
 const URI = 'http://wireless.devemerald.com';
-
-let urls =[];
 
 class Details extends React.Component {
   static navigationOptions = ({ navigation, navigationOptions }) => {
@@ -20,19 +18,20 @@ class Details extends React.Component {
 
     return {
       title: params ? params.ssid : 'Connect',
-      // MARK: uncomment this after debugging and get rid of the other headerRight button
-      // headerRight: (
-      //   <Button
-      //     title="Done"
-      //     onPress={() => {disconnectFromDevice(params.ssid, params.initialSSID, navigation);}}
-      //   />
-      // ),
-      headerRight:(
+      // MARK: comment this if testing with virtual device
+      headerRight: (
         <Button
           title="Done"
-          onPress={()=> {disconnectFromDevice('','',navigation, urls)}}
+          onPress={() => {disconnectFromDevice(params.ssid, params.initialSSID, navigation);}}
         />
       ),
+      //MARK: uncomment this if testing with virtual device
+      // headerRight:(
+      //   <Button
+      //     title="Done"
+      //     onPress={()=> {disconnectFromDevice('','',navigation, urls)}}
+      //   />
+      // ),
       headerLeft:(
         <Button
           title="Back"
@@ -55,13 +54,9 @@ class Details extends React.Component {
         server = 'www.devemerald.com';
         AsyncStorage.setItem(SERVER_KEY, server);
       }
-      let fetchInstance = new FetchURL(server)
-      this.setState({server: server, fetchInstance: fetchInstance});
+      let fetchInstance = new FetchURL(server);
+      this.setState({fetchInstance: fetchInstance});
     });
-  }
-
-  componentDidUpdate(){
-    if (this.state.fetchInstance!=null){urls = [this.state.fetchInstance.GetHomesURL, this.state.fetchInstance.GetTrialsURL];}
   }
 
   render() {
@@ -72,7 +67,7 @@ class Details extends React.Component {
     let windowWidth = width * 0.9;
 
     let botMargin = height * 0.1;
-    let leftMargin = width * 0.05;
+    let horMargin = width * 0.05;
     let rightMargin = width * 0.05;
 
     return (
@@ -80,10 +75,16 @@ class Details extends React.Component {
         <WebView
           ref={WEBVIEW_REF => (WebViewRef = WEBVIEW_REF)}
           source={{ uri: URI }}
-          style={{ width: windowWidth, height: windowHeight, flex: 1 , marginBottom: botMargin, marginLeft: leftMargin, marginRight: rightMargin }}
+          style={{ width: windowWidth, height: windowHeight, flex: 1 , marginBottom: botMargin, marginHorizontal: horMargin }}
+          renderError={(error) => {<View><Text style={{fontSize: 17, color: 'red'}}>Error while loading page. Please try reloading by clicking on the button below. If it still doesn't work, please check your wifi connection and make sure your device is connected to Emerald device. Your device should be connected to 'emerald-XXXXXX' network.</Text><Text>Error details: {error}</Text></View>}}
+          renderLoading={() => {}}
+          startInLoadingState={true}
+          onLoadEnd={() => {}}
+          onLoadStart={() => {}}
+          onLoadProgress={() => {}}
         />
         <Button
-          title="Reload"
+          title="Reload page"
           onPress={() => {WebViewRef && WebViewRef.reload();}}
         />
       </View>
@@ -91,25 +92,25 @@ class Details extends React.Component {
   }
 }
 
-function disconnectFromDevice(ssid, initialSSID, nav, urls) {
+function disconnectFromDevice(ssid, initialSSID, nav, fetch) {
 
-  // MARK: uncomment this later
-  // if (initialSSID != null){
-  //   if (initialSSID !== 'Cannot detect SSID' && !(initialSSID.includes('emerald'))){
-  //     WifiManager.connectToSSID(initialSSID);
-  //   } else {
-  //     WifiManager.disconnectFromSSID(ssid);
-  //     Alert.alert("Manually disconnect from emerald wifi in your device Settings.")
-  //   }
-  // } else {
-  //   WifiManager.disconnectFromSSID(ssid);
-  //   Alert.alert("Manually disconnect from emerald wifi in your device Settings.")
-  // }
+  // MARK: comment out the whole if statement if testing with virtual device
+  if (initialSSID != null){
+    if (initialSSID !== 'Cannot detect SSID' && !(initialSSID.includes('emerald'))){
+      WifiManager.connectToSSID(initialSSID);
+    } else {
+      WifiManager.disconnectFromSSID(ssid);
+      Alert.alert("Manually disconnect from emerald wifi in your device Settings.")
+    }
+  } else {
+    WifiManager.disconnectFromSSID(ssid);
+    Alert.alert("Manually disconnect from emerald wifi in your device Settings.")
+  }
 
-  CookieManager.getAll().then((res)=>{
-    let csrftoken = res['csrftoken']['value'];
+  AsyncStorage.getItem(CSRF_KEY).then((csrftoken)=>{
 
-    fetch(urls[0], {
+    //Get list of homes
+    fetch(fetch.GetHomesURL, {
       credentials:"include",
       headers: {
           'X-CSRFToken': csrftoken,
@@ -122,7 +123,8 @@ function disconnectFromDevice(ssid, initialSSID, nav, urls) {
     }).then(function(response){
       return response.text().then(function(text){
 
-        fetch(urls[1], {
+        //Get Trial uuids
+        fetch(fetch.GetTrialsURL, {
           method: 'POST',
           mode: 'cors',
           headers: {
@@ -139,15 +141,13 @@ function disconnectFromDevice(ssid, initialSSID, nav, urls) {
               list: txt,
             });
           })
-        }).catch((error) => {
-          console.log(error);
         });
-
+        //END
       });
     });
-
+    //END
   });
-
+  //END
 }
 
 const styles = StyleSheet.create({

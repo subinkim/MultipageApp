@@ -23,8 +23,6 @@ class Connection extends Component {
   constructor(props){
     super(props);
     this.state = {
-      ssid: '',
-      password: '',
       initialSSID: '',
       indicatorText: 'Finishing to set up the device...',
       indicatorColour: EMERALD_COLOUR1,
@@ -73,13 +71,16 @@ class Connection extends Component {
 
         AsyncStorage.getItem(DEVICE_SSID_KEY).then((ssid) => {
           AsyncStorage.getItem(DEVICE_PWD_KEY).then((pwd) => {
+
+            console.log("ssid", ssid);
+            console.log("pwd", pwd);
             let count = Date.now();
             let interval = setInterval(() => {
               //TODO: check if this works
-              //IF less than 2 mins spent on attempting to connect
+              //IF in total less than 2 mins spent on attempting to connect
               if (Date.now() - count < 75000 ){
                 if (connectToDevice(ssid,pwd)){
-                  clearInterval(interval);
+                  clearInterval(interval); //TODO: not quitting instantly - two hypotheses: 1) connectToDevice calls already in queue 2) clearInterval is not working as expected
                   this.props.navigation.navigate('Details',{
                     ssid:ssid,
                     initialSSID:initial,
@@ -121,7 +122,7 @@ class Connection extends Component {
 }
 
 function connectToDevice(ssid, pwd){
-    Wifi.connectSecure(ssid,pwd,false).then(() => {
+    WifiManager.connectToProtectedSSID(ssid,pwd,false).then(() => {
       console.log("connected");
       Alert.alert("Connected!");
       return true;

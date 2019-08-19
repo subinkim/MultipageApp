@@ -133,7 +133,7 @@ class Home extends React.Component {
       return response.text().then((text) => {
         text = JSON.parse(text);
         if (text['success'] != null){
-          if (text['success']){AsyncStorage.setItem(COOKIE_KEY, 'true');}
+          if (text['success']){AsyncStorage.setItem(COOKIE_KEY, 'true')}
           else{AsyncStorage.setItem(COOKIE_KEY, 'false'); AsyncStorage.removeItem(CSRF_KEY)}
         } else {
           AsyncStorage.setItem(COOKIE_KEY, 'false');

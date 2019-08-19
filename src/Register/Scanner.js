@@ -42,7 +42,7 @@ class Scanner extends React.Component {
     let password = data.password;
     let uuid = data.uuid;
     if (ssid == null || password == null || uuid == null){
-      Alert.alert("Not a valid QR code.");
+      Alert.alert("Invalid QR code","Not a valid QR code.");
       this.scanner.reactivate();
     }
     AsyncStorage.setItem(DEVICE_SSID_KEY, ssid);
@@ -55,8 +55,6 @@ class Scanner extends React.Component {
 
     const { navigation } = this.props;
     const currentSSID = navigation.getParam('currentSSID', null);
-
-    let {height, width} = Dimensions.get('window');
 
     return (
       <QRCodeScanner

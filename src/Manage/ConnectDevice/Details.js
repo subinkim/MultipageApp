@@ -49,7 +49,7 @@ class Details extends React.Component {
         />
         <Button
           title="Reload"
-          onPress={() => {WebViewRef && WebViewRef.reload();}}
+          onPress={() => {WebViewRef && WebViewRef.reload()}}
         />
       </View>
     );

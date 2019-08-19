@@ -16,18 +16,48 @@ class Scanner extends React.Component {
     };
   };
 
-  loadOnSuccess = (initial, nav) => {
+  loadOnSuccess = (initial) => {
     function onSuccess(e){
       let data = JSON.parse(e.data);
       let ssid = data.ssid;
       let password = data.password;
-      if (ssid == null || password == null){
-        Alert.alert("Not a valid QR code.");
-        this.props.navigation.navigate('Home');
+      let uuid = data.uuid;
+      if (ssid == null || password == null || uuid == null){
+        Alert.alert("Invalid QR code", "This is not a valid QR code.");
+        this.scanner.reactivate();
       }
-      connectToDevice(ssid, password, nav, initial);
+      connectToDevice(ssid, password, initial);
     }
     return onSuccess;
+  }
+
+  componentDidMount(){
+    AsyncStorage.removeItem(DEVICE_UUID_KEY);
+    AsyncStorage.removeItem(DEVICE_SSID_KEY);
+    AsyncStorage.removeItem(DEVICE_PWD_KEY);
+  }
+
+  connectToDevice(ssid, pwd, initial){
+
+    if (ssid === initial){
+      Alert.alert('You are already connected to this network');
+      this.props.navigation.navigate('Details', {
+        ssid: ssid,
+      });
+    } else {
+
+      WifiManager.connectToProtectedSSID(ssid,pwd,false).then(() => {
+        Alert.alert("Connected!");
+        this.props.navigation.navigate('Details', {
+            ssid: ssid,
+            initialSSID: initial,
+        });
+      }, () => {
+        Alert.alert('Cannot connect');
+        this.scanner.reactivate();
+      });
+
+    }
   }
 
   render() {
@@ -35,11 +65,10 @@ class Scanner extends React.Component {
     const { navigation } = this.props;
     const currentSSID = navigation.getParam('currentSSID', null);
 
-    let {height, width} = Dimensions.get('window');
-
     return (
       <QRCodeScanner
-        onRead={this.loadOnSuccess(currentSSID, this.props.navigation)}
+        ref={(node) => { this.scanner = node }}
+        onRead={this.loadOnSuccess(currentSSID)}
         topContent={
           <Text>
               Scan the QR code attached to the bottom of device.
@@ -49,34 +78,6 @@ class Scanner extends React.Component {
         permissionDialogMessage="This app would like to access your camera."
       />
     );
-  }
-}
-
-function connectToDevice(ssid, pwd, nav, currentSSID){
-
-  console.log("ssid=>", ssid);
-  console.log("pwd=>", pwd);
-
-  if (ssid === '' || pwd === ''){
-    Alert.alert('Incomplete','Please complete both fields');
-  } else {
-    if (ssid === currentSSID){
-      Alert.alert('You are already connected to this network');
-      nav.navigate('Details', {
-        ssid: ssid,
-      });
-    } else {
-      WifiManager.connectToProtectedSSID(ssid,pwd,false).then(() => {
-        Alert.alert("Connected");
-        nav.navigate('Details', {
-            ssid: ssid,
-            initialSSID: currentSSID,
-        });
-      }, () => {
-        Alert.alert('Cannot connect');
-        nav.navigate('Home');
-      })
-    }
   }
 }
 
