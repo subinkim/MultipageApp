@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, View, Text, StyleSheet, Alert, TouchableOpacity, Dimensions, PixelRatio } from 'react-native';
+import { Button, View, Text, StyleSheet, Alert, TouchableOpacity, Dimensions } from 'react-native';
 
 import PasswordTextBox from '../../CustomClass/PasswordTextBox.js';
 import InputTextBox from '../../CustomClass/InputTextBox.js';
