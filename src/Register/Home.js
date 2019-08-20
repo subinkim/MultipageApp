@@ -78,7 +78,7 @@ class Home extends React.Component {
           cookieValid: cookie,
           email: '',
           password: '',
-        })
+        });
       }
       if (cookie){cookie = 'true'}
       else {cookie = 'false'}
@@ -121,7 +121,7 @@ class Home extends React.Component {
           AsyncStorage.setItem(COOKIE_KEY, 'true');
           AsyncStorage.setItem(CSRF_KEY, csrftoken);
           this.props.navigation.setParams({title: 'Home'});
-          this.setState({cookieValid: true});
+          this.setState({cookieValid: true, invalid: false});
           this.props.navigation.navigate('Scanner');
         }
       });
@@ -171,6 +171,7 @@ class Home extends React.Component {
       AsyncStorage.removeItem(CSRF_KEY);
     });
     AsyncStorage.setItem(COOKIE_KEY, 'false');
+    AsyncStorage.removeItem(EMAIL_KEY);
     this.setState({cookieValid: false});
 
   }

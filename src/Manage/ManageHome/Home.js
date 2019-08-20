@@ -157,6 +157,7 @@ class Home extends React.Component {
     });
     AsyncStorage.removeItem(CSRF_KEY);
     AsyncStorage.setItem(COOKIE_KEY, 'false');
+    AsycnStorage.removeItem(EMAIL_KEY);
     this.setState({cookieValid: false});
     this.props.navigation.setParams({title: 'Sign in'});
   }

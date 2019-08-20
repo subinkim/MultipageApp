@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
-import { Button, Image, View, Text, StyleSheet, Alert, SectionList, TouchableOpacity } from 'react-native';
+import { Button, View, Text, StyleSheet, Alert, SectionList, TouchableOpacity } from 'react-native';
 import {Icon} from 'native-base';
+import { withNavigation } from "react-navigation";
 
 import {CSRF_KEY,COOKIE_KEY, EMAIL_KEY} from '../CustomClass/Storage';
 
@@ -34,6 +35,22 @@ class Home extends Component {
     })
   }
 
+  componentDidMount() {
+    const { navigation } = this.props;
+    this.focusListener = navigation.addListener("didFocus", () => {
+      AsyncStorage.getItem(EMAIL_KEY).then((email) => {
+        if (email != null){
+          this.setState({email: email});
+        }
+      });
+    });
+  }
+
+  componentWillUnmount() {
+    // Remove the event listener
+    this.focusListener.remove();
+  }
+
   changeServer = () => {
     this.props.navigation.navigate('ChangeServer');
   }
@@ -48,7 +65,14 @@ class Home extends Component {
           onPress: () => console.log('Cancel Pressed'),
           style: 'cancel',
         },
-        {text: 'Confirm', onPress: () => {AsyncStorage.removeItem(CSRF_KEY);AsyncStorage.setItem(COOKIE_KEY,'false');AsyncStorage.removeItem(EMAIL_KEY)}},
+        {text: 'Confirm', onPress: () =>
+          {
+            AsyncStorage.removeItem(CSRF_KEY);
+            AsyncStorage.setItem(COOKIE_KEY,'false');
+            AsyncStorage.removeItem(EMAIL_KEY);
+            this.setState({email: null});
+          }
+        },
       ],
       {cancelable: false},
     );
@@ -83,7 +107,7 @@ class Home extends Component {
         <Text style={ styles.instruction }>App Settings</Text>
 
         {/*Checking if the user is signed in*/}
-        {this.state.email == null?
+        {this.state.email !== null?
           <View style={ styles.account }>
             <Icon active name="contact" style={{fontSize: 50, marginRight: '5%'}}/>
             <View>
@@ -92,14 +116,12 @@ class Home extends Component {
             </View>
           </View>
           :
-          <View style={ styles.account }>
-            <Icon active name="contact" style={{fontSize: 50, marginRight: '5%'}}/>
-            <View>
-              <TouchableOpacity onPress={() => {this.props.navigation.navigate('Register')}}>
+          <TouchableOpacity onPress={() => {this.props.navigation.navigate('Register', {cookieValid: false})}}>
+            <View style={ styles.account }>
+              <Icon active name="contact" style={{fontSize: 50, marginRight: '5%'}}/>
                 <Text style={{fontSize: 20}}>Sign in</Text>
-              </TouchableOpacity>
             </View>
-          </View>
+          </TouchableOpacity>
         }
 
         {/*Settings functionality*/}

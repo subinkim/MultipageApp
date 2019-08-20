@@ -32,6 +32,10 @@
 		<dict>
 			<key>wireless.devemerald.com</key>
 			<dict>
+				<key>NSTemporaryThirdPartyExceptionAllowsInsecureHTTPLoads</key>
+				<true/>
+				<key>NSExceptionRequiresForwardSecrecy</key>
+				<false/>
 				<key>NSIncludesSubdomains</key>
 				<true/>
 				<key>NSExceptionAllowsInsecureHTTPLoads</key>

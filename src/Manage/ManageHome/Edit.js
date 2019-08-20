@@ -138,7 +138,7 @@ class Edit extends React.Component {
       }).then((response) => {
         return response.text().then((text) => {
           text = JSON.parse(text);
-          this.setState({data: text}, function(){this.render()}.bind(this)); //TODO: doesn't work
+          this.setState({data: text.data});
         });
       });
     });
@@ -186,17 +186,15 @@ class Edit extends React.Component {
             <Text style={ styles.modalSubtitle }>Deployment Location</Text>
             <TextInput
               style={[{height: 20, borderBottomWidth: 1},this.state.isFocusedOne?{borderColor: EMERALD_COLOUR1}:{borderColor: 'grey'}]}
-              onChangeText={(deployLoc) => this.setState({deployLoc})}
-              value={this.state.deployLoc}
-              onFocus={() => {this.setState({isFocusedOne: true})}}
-              onBlur={() => {this.setState({isFocusedOne: false})}}
+              onChangeText={(deployLoc) => this.setState({deployLoc})} value={this.state.deployLoc}
+              onFocus={() => {this.setState({isFocusedOne: true})}} onBlur={() => {this.setState({isFocusedOne: false})}}
               placeholder="Deployment location nickname"
             />
 
             <Text style={ styles.modalSubtitle }>Device</Text>
             <Picker
               mode="dropdown" placeholder={this.state.deviceID} selectedValue = {this.state.deviceID}
-              onValueChange = {(deviceID)=>this.setState({deviceID:deviceID})} adjustsFontSizeToFit={true}
+              onValueChange = {(deviceID)=>this.setState({deviceID:deviceID})}
               textStyle={{maxWidth: '100%'}}
               style={{borderWidth: 1, borderRadius: 3, borderColor: 'grey', width: '100%'}}>
               {this.state.availableDevices!=null?deviceList:null}
@@ -205,12 +203,9 @@ class Edit extends React.Component {
             <Text style={ styles.modalSubtitle }>Deployment height</Text>
             <TextInput
               style={[{height: 20, borderBottomWidth: 1},this.state.isFocusedTwo?{borderColor: EMERALD_COLOUR1}:{borderColor: 'grey'}]}
-              onChangeText={(height) => this.setState({height})}
-              onFocus={() => {this.setState({isFocusedTwo: true})}}
-              onBlur={() => {this.setState({isFocusedTwo: false})}}
-              value={this.state.height.toString()}
-              placeholder="Enter deployment height"
-              keyboardType="numeric"
+              onChangeText={(height) => this.setState({height})} value={this.state.height.toString()}
+              onFocus={() => {this.setState({isFocusedTwo: true})}} onBlur={() => {this.setState({isFocusedTwo: false})}}
+              placeholder="Enter deployment height" keyboardType="numeric"
             />
             <View style={{flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center'}}>
             <Button
@@ -228,6 +223,39 @@ class Edit extends React.Component {
       );
     }
 
+    let devices = null;
+    if (this.state.data.devices != null){
+      devices = this.state.data.devices.map((item, i) => {
+        if (!item['deregistered']){
+          return(
+            <TouchableOpacity style={{marginBottom: 20}} key={i}
+              onPress={() => this.setState({
+                  modalIsVisible: !this.state.modalIsVisible,
+                  deviceID: item.physical_device.uuid,
+                  height: item.height,
+                  deployLoc: item.nickname,
+                  deployID: item.uuid,
+                  selectedItem: item,
+            })}>
+              <View>
+                <Text style={ styles.deviceSubtitle }>Deployment Location</Text>
+                <Text>{item.nickname}</Text>
+
+                <Text style={ styles.deviceSubtitle }>Deployment uuid</Text>
+                <Text>{item.uuid}</Text>
+
+                <Text style={ styles.deviceSubtitle }>Device uuid</Text>
+                <Text>{item.physical_device.uuid}</Text>
+
+                <Text style={ styles.deviceSubtitle }>Deployment Height</Text>
+                <Text>{item.height}</Text>
+              </View>
+            </TouchableOpacity>
+          );
+        }
+      });
+    }
+
     return(
       <View style={ styles.container }>
         <Text style={ styles.instruction }>{this.state.data.nickname}</Text>
@@ -236,38 +264,9 @@ class Edit extends React.Component {
         <Text style={ styles.description }>{this.state.data.uuid}</Text>
 
         <Text style={ styles.descriptionSubtitle }>Deployments</Text>
-        {this.state.data.devices?this.state.data.devices.map((item, i) => {
-          if (!item['deregistered']){
-            return(
-              <TouchableOpacity style={{marginBottom: 20}} key={i}
-                onPress={() => this.setState({
-                    modalIsVisible: !this.state.modalIsVisible,
-                    deviceID: item.physical_device.uuid,
-                    height: item.height,
-                    deployLoc: item.nickname,
-                    deployID: item.uuid,
-                    selectedItem: item,
-              })}>
-                <View>
-                  <Text style={ styles.deviceSubtitle }>Deployment Location</Text>
-                  <Text>{item.nickname}</Text>
-
-                  <Text style={ styles.deviceSubtitle }>Deployment uuid</Text>
-                  <Text>{item.uuid}</Text>
-
-                  <Text style={ styles.deviceSubtitle }>Device uuid</Text>
-                  <Text>{item.physical_device.uuid}</Text>
-
-                  <Text style={ styles.deviceSubtitle }>Deployment Height</Text>
-                  <Text>{item.height}</Text>
-                </View>
-              </TouchableOpacity>
-            );
-          }
-        }):null}
-
+        {devices}
+        
         {modal}
-
       </View>
     );
   }

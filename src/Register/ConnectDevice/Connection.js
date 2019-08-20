@@ -26,6 +26,11 @@ class Connection extends Component {
       initialSSID: '',
       indicatorText: 'Finishing to set up the device...',
       indicatorColour: EMERALD_COLOUR1,
+
+      ssid: null,
+      pwd: null,
+
+      modalIsVisible: false.
     };
   }
 
@@ -48,7 +53,7 @@ class Connection extends Component {
         if (initialSSID.includes('emerald')){
           this.props.navigation.navigate('Details', {
             initialSSID: initialSSID,
-          })
+          });
         }
       });
 
@@ -62,6 +67,15 @@ class Connection extends Component {
     }
   }
 
+  connectToDevice(){
+    let ssid = this.state.ssid;
+    let pwd = this.state.pwd;
+    WifiManager.connectToProtectedSSID(ssid,pwd,false).then(() => {
+      return true;
+    }, () => {
+    });
+  }
+
   connect(){
 
     let initial = this.state.initialSSID;
@@ -72,41 +86,36 @@ class Connection extends Component {
         AsyncStorage.getItem(DEVICE_SSID_KEY).then((ssid) => {
           AsyncStorage.getItem(DEVICE_PWD_KEY).then((pwd) => {
 
-            console.log("ssid", ssid);
-            console.log("pwd", pwd);
-            let count = Date.now();
-            let interval = setInterval(() => {
-              //TODO: check if this works
-              //IF in total less than 2 mins spent on attempting to connect
-              if (Date.now() - count < 75000 ){
-                if (connectToDevice(ssid,pwd)){
-                  clearInterval(interval); //TODO: not quitting instantly - two hypotheses: 1) connectToDevice calls already in queue 2) clearInterval is not working as expected
-                  this.props.navigation.navigate('Details',{
-                    ssid:ssid,
-                    initialSSID:initial,
-                  });
-                }
-                count++;
-              } else {
-                clearInterval(interval);
-                Alert.alert("Failed to connect to device.");
-                this.props.navigation.navigate('ConnectHome', {
-                  initialSSID: initial,
-                });
-              }
+            this.setState({ssid: ssid, pwd: pwd});
 
-            },15000);
           });
         });
 
-
       } else{
-        Alert.alert("Failed to connect to the device.");
+        //TODO: need different scenarios
+        this.setState({modalIsVisible: true});
         this.props.navigation.navigate('ConnectHome', {
           initialSSID: initial,
         });
       }
     });
+
+    let count = Date.now();
+    //IF in total less than 2 mins spent on attempting to connect
+    if (Date.now() - count < 75000 ){
+      if (this.connectToDevice()){
+        count = 0;
+        this.props.navigation.navigate('Details',{
+          ssid:ssid,
+          initialSSID:initial,
+        });
+      }
+    } else {
+      Alert.alert("Failed to connect to device.");
+      this.props.navigation.navigate('ConnectHome', {
+        initialSSID: initial,
+      });
+    }
   }
 
   render() {
@@ -119,16 +128,6 @@ class Connection extends Component {
       </View>
     );
   }
-}
-
-function connectToDevice(ssid, pwd){
-    WifiManager.connectToProtectedSSID(ssid,pwd,false).then(() => {
-      console.log("connected");
-      Alert.alert("Connected!");
-      return true;
-    }, () => {
-      console.log("error");
-    });
 }
 
 async function requestLocationPermission(){

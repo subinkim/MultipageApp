@@ -12,6 +12,8 @@ import {SERVER_KEY, CSRF_KEY} from '../../CustomClass/Storage.js';
 
 const URI = 'http://wireless.devemerald.com';
 
+let urls = null;
+
 class Details extends React.Component {
   static navigationOptions = ({ navigation, navigationOptions }) => {
     const { params } = navigation.state;
@@ -19,19 +21,19 @@ class Details extends React.Component {
     return {
       title: params ? params.ssid : 'Connect',
       // MARK: comment this if testing with virtual device
-      headerRight: (
-        <Button
-          title="Done"
-          onPress={() => {disconnectFromDevice(params.ssid, params.initialSSID, navigation);}}
-        />
-      ),
-      //MARK: uncomment this if testing with virtual device
-      // headerRight:(
+      // headerRight: (
       //   <Button
       //     title="Done"
-      //     onPress={()=> {disconnectFromDevice('','',navigation, urls)}}
+      //     onPress={() => {disconnectFromDevice(params.ssid, params.initialSSID, navigation);}}
       //   />
       // ),
+      //MARK: uncomment this if testing with virtual device
+      headerRight:(
+        <Button
+          title="Done"
+          onPress={()=> {disconnectFromDevice('','',navigation, urls)}}
+        />
+      ),
       headerLeft:(
         <Button
           title="Back"
@@ -56,6 +58,7 @@ class Details extends React.Component {
       }
       let fetchInstance = new FetchURL(server);
       this.setState({fetchInstance: fetchInstance});
+      urls = [fetchInstance.GetHomesURL, fetchInstance.GetTrialsURL];
     });
   }
 
@@ -76,7 +79,7 @@ class Details extends React.Component {
           ref={WEBVIEW_REF => (WebViewRef = WEBVIEW_REF)}
           source={{ uri: URI }}
           style={{ width: windowWidth, height: windowHeight, flex: 1 , marginBottom: botMargin, marginHorizontal: horMargin }}
-          renderError={(error) => {<View><Text style={{fontSize: 17, color: 'red'}}>Error while loading page. Please try reloading by clicking on the button below. If it still doesn't work, please check your wifi connection and make sure your device is connected to Emerald device. Your device should be connected to 'emerald-XXXXXX' network.</Text><Text>Error details: {error}</Text></View>}}
+          renderError={(error) => {return(<Text style={{justifyContent: 'center', alignItems: 'center'}}>Error while loading page. Please try reloading by clicking on the button below. If it still doesn't work, please check your wifi connection and make sure your device is connected to Emerald device. Your device should be connected to 'emerald-XXXXXX' network.</Text>);}}
           renderLoading={() => {}}
           startInLoadingState={true}
           onLoadEnd={() => {}}
@@ -92,25 +95,25 @@ class Details extends React.Component {
   }
 }
 
-function disconnectFromDevice(ssid, initialSSID, nav, fetch) {
+function disconnectFromDevice(ssid, initialSSID, nav, urls) {
 
   // MARK: comment out the whole if statement if testing with virtual device
-  if (initialSSID != null){
-    if (initialSSID !== 'Cannot detect SSID' && !(initialSSID.includes('emerald'))){
-      WifiManager.connectToSSID(initialSSID);
-    } else {
-      WifiManager.disconnectFromSSID(ssid);
-      Alert.alert("Manually disconnect from emerald wifi in your device Settings.")
-    }
-  } else {
-    WifiManager.disconnectFromSSID(ssid);
-    Alert.alert("Manually disconnect from emerald wifi in your device Settings.")
-  }
+  // if (initialSSID != null){
+  //   if (initialSSID !== 'Cannot detect SSID' && !(initialSSID.includes('emerald'))){
+  //     WifiManager.connectToSSID(initialSSID);
+  //   } else {
+  //     WifiManager.disconnectFromSSID(ssid);
+  //     Alert.alert("Manually disconnect from emerald wifi in your device Settings.")
+  //   }
+  // } else {
+  //   WifiManager.disconnectFromSSID(ssid);
+  //   Alert.alert("Manually disconnect from emerald wifi in your device Settings.")
+  // }
 
   AsyncStorage.getItem(CSRF_KEY).then((csrftoken)=>{
 
     //Get list of homes
-    fetch(fetch.GetHomesURL, {
+    fetch(urls[0], {
       credentials:"include",
       headers: {
           'X-CSRFToken': csrftoken,
@@ -124,7 +127,7 @@ function disconnectFromDevice(ssid, initialSSID, nav, fetch) {
       return response.text().then(function(text){
 
         //Get Trial uuids
-        fetch(fetch.GetTrialsURL, {
+        fetch(urls[1], {
           method: 'POST',
           mode: 'cors',
           headers: {
