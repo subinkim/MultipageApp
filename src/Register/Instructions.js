@@ -16,6 +16,7 @@ class Instructions extends React.Component {
 
     return {
       title: 'Install Device',
+      headerRight: (navigation.getParam('lastPage', false) ? <Button title="Done" onPress={() => {navigation.navigate('Connection')}}/> : null),
     };
   };
 
@@ -23,13 +24,15 @@ class Instructions extends React.Component {
     super(props);
     this.state = {
       sliderActiveSlide: SLIDER_1_FIRST_ITEM,
-      lastPage: false,
     };
   }
 
   componentDidUpdate(){
-    if (!this.state.lastPage && this.state.sliderActiveSlide === ENTRIES1.length-1){
-      this.setState({lastPage:true});
+    let lastPage = this.props.navigation.getParam('lastPage', false);
+    if (this.state.sliderActiveSlide === ENTRIES1.length-1 && !lastPage){
+      this.props.navigation.setParams({lastPage: true});
+    } else if (this.state.sliderActiveSlide !== ENTRIES1.length-1 && lastPage){
+      this.props.navigation.setParams({lastPage: false});
     }
   }
 
@@ -52,20 +55,10 @@ class Instructions extends React.Component {
 
     const {height, width} = Dimensions.get('window');
 
-    const doneButton = (
-      <View>
-        <Button
-          title="Done"
-          onPress={() => {this.props.navigation.navigate('Connection')}}
-        />
-      </View>
-    );
-
     return (
       <ScrollView style={ styles.container }>
         <Text style={ styles.instruction }>Install your device</Text>
         <Text style={ styles.description }>Swipe to the left for instructions</Text>
-        {this.state.lastPage?doneButton:null}
         <Pagination
           dotsLength={ENTRIES1.length}
           activeDotIndex={this.state.sliderActiveSlide}
@@ -115,9 +108,9 @@ const styles = StyleSheet.create({
       top: 5,
     },
     paginationDot: {
-      width: 12,
-      height: 12,
-      borderRadius: 6,
+      width: 8,
+      height: 8,
+      borderRadius: 4,
       marginHorizontal: 8,
     },
     itemTitle:{

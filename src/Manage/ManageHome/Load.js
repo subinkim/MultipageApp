@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button, View, Text, StyleSheet, Alert, TouchableOpacity, FlatList, ScrollView } from 'react-native';
 import { Icon } from 'native-base';
-import { Button as RNButton } from 'react-native-elements';
+import { Button as ElementsButton } from 'react-native-elements';
 
 import { HeaderBackButton } from 'react-navigation';
 import AsyncStorage from '@react-native-community/async-storage';
@@ -22,7 +22,7 @@ class Load extends React.Component {
     return {
       title: 'Homes',
       headerRight: (
-        <RNButton
+        <ElementsButton
           icon={<Icon name="add"/>}
           type="clear"
           onPress={() => {addHome(navigation)}}
@@ -145,9 +145,7 @@ class Load extends React.Component {
         mode: 'cors'
       }).then((response) => {
         this.setState({updated: false});
-      }).catch((error) => {
-        console.log(error);
-      })
+      });
     });
 
   }
@@ -166,7 +164,6 @@ class Load extends React.Component {
         onPress: () => this.confirmDelete(),
       }
     ]
-
 
     let items = null;
     if(this.state.json != null){
@@ -196,8 +193,11 @@ class Load extends React.Component {
                 })
               }}>
                 <View style={{flexDirection: 'row', flexWrap: 'wrap'}}>
-                  <Icon name="home" style={{fontSize: 20, paddingVertical: 11, paddingRight: 7}}/>
-                  <Text style={styles.item}>{item.nickname}</Text>
+                  <Icon name="home" style={{fontSize: 28, paddingVertical: 11, paddingRight: 7}}/>
+                  <View>
+                    <Text style={styles.item}>{item.nickname}</Text>
+                    <Text style={{fontSize: 12, paddingBottom: 12}}>{item.trialname}</Text>
+                  </View>
                 </View>
               </TouchableOpacity>
             </Swipeout>
@@ -209,53 +209,56 @@ class Load extends React.Component {
     }
 
     return(
-      <ScrollView style={styles.container}>
-        <Text style={styles.instruction}>Manage Home</Text>
+      <ScrollView>
+        <View style={styles.container}>
+          <Text style={styles.instruction}>Manage Home</Text>
 
-        <Modal
-          isVisible={this.state.modalIsVisible}
-          animationInTiming={400} animationOutTiming={400}
-          backdropOpacity={0.5}
-          style={ styles.modalWrapper }
-          onBackdropPress={() => {this.setState({ modalIsVisible: !this.state.modalIsVisible })}}
-        >
+          <Modal
+            isVisible={this.state.modalIsVisible}
+            animationInTiming={400} animationOutTiming={400}
+            backdropOpacity={0.5}
+            style={ styles.modalWrapper }
+            onBackdropPress={() => {this.toggleModal()}}
+          >
 
-          <ScrollView style={{ flex: 1 }}>
+            <ScrollView style={{ flex: 1 }}>
 
-            <View style={{flexDirection: 'row', flexWrap: 'wrap'}}>
-              <Icon name="home" style={{fontSize: 23, marginRight: 5}}/>
-              <Text style={{fontWeight: 'bold', fontSize: 20}}>{this.state.modalNickname}</Text>
-            </View>
+              <View style={{flexDirection: 'row', flexWrap: 'wrap'}}>
+                <Icon name="home" style={{fontSize: 23, marginRight: 5}}/>
+                <Text style={{fontWeight: 'bold', fontSize: 20}}>{this.state.modalNickname}</Text>
+              </View>
 
-            <Text style={ styles.modalSubtitle }>Home uuid</Text>
-            <Text>{this.state.modalHomeUUID}</Text>
+              <Text style={ styles.modalSubtitle }>Home uuid</Text>
+              <Text>{this.state.modalHomeUUID}</Text>
 
-            <Text style={ styles.modalSubtitle }>Trial</Text>
-            <Text>{this.state.modalTrialName}</Text>
+              <Text style={ styles.modalSubtitle }>Trial</Text>
+              <Text>{this.state.modalTrialName}</Text>
 
-            <Text style={ styles.modalSubtitle }>Devices</Text>
-            {this.state.modalDevices!==null?this.state.modalDevices.map((item, i) => {
-              if (!item['deregistered']){
-                return(
-                  <View style={{marginBottom: 20}} key={i}>
-                    <Text style={ styles.deviceSubtitle }>Deployment Location</Text>
-                    <Text>{item.nickname}</Text>
+              <Text style={ styles.modalSubtitle }>Devices</Text>
+              {this.state.modalDevices!==null?this.state.modalDevices.map((item, i) => {
+                if (!item['deregistered']){
+                  return(
+                    <View style={{marginBottom: 20}} key={i}>
+                      <Text style={ styles.deviceSubtitle }>Deployment Location</Text>
+                      <Text>{item.nickname}</Text>
 
-                    <Text style={ styles.deviceSubtitle }>Deployment uuid</Text>
-                    <Text>{item.uuid}</Text>
+                      <Text style={ styles.deviceSubtitle }>Deployment uuid</Text>
+                      <Text>{item.uuid}</Text>
 
-                    <Text style={ styles.deviceSubtitle }>Device uuid</Text>
-                    <Text>{item.physical_device.uuid}</Text>
-                  </View>
-                );
-              }
-            }):null}
+                      <Text style={ styles.deviceSubtitle }>Device uuid</Text>
+                      <Text>{item.physical_device.uuid}</Text>
+                    </View>
+                  );
+                }
+              }):null}
 
-          </ScrollView>
+            </ScrollView>
 
-        </Modal>
-
+          </Modal>
+        </View>
+        <View style={{backgroundColor: '#dfdfdf', paddingHorizontal: 7, paddingVertical: 5}}>
         { items }
+        </View>
       </ScrollView>
     );
   }
@@ -313,14 +316,16 @@ const styles = StyleSheet.create({
     },
     item:{
       fontSize: 16,
-      paddingVertical:12,
+      paddingTop:12,
     },
     swipeout:{
       backgroundColor: 'white',
-      borderColor: '#cecece',
-      marginBottom: 2,
-      borderTopWidth: 0.5,
-      borderBottomWidth: 0.5
+      marginBottom: 5,
+      paddingHorizontal: '3%',
+      borderBottomWidth: 1.5,
+      borderBottomColor: '#bcbcbc',
+      borderRightWidth: 1,
+      borderRightColor: '#bcbcbc',
     },
     modalWrapper:{
       backgroundColor: 'white',

@@ -58,8 +58,11 @@ class Home extends React.Component {
             });
           }
         });
+
       });
+      
     });
+
   }
 
   //Change view based on cookie validity
@@ -115,6 +118,7 @@ class Home extends React.Component {
       });
     }).catch((error) => {
       Alert.alert("Sign in failed! ERROR: "+ error);
+      this.setState({invalid: true, email:'', password: ''});
     });
   }
 
