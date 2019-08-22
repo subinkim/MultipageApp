@@ -39,6 +39,7 @@ class Home extends React.Component {
   }
 
   componentWillMount(){
+
     //Check the server - if none exists, set it to default servdr
     AsyncStorage.getItem(SERVER_KEY).then((server) => {
       if (server === null){
@@ -60,13 +61,14 @@ class Home extends React.Component {
         });
 
       });
-      
+
     });
 
   }
 
   //Change view based on cookie validity
   componentDidMount(){
+
     AsyncStorage.getItem(COOKIE_KEY).then((cookieValid) => {
       if (cookieValid === 'true'){this.setState({cookieValid:true})}
       else {this.setState({cookieValid:false})}
@@ -97,10 +99,9 @@ class Home extends React.Component {
       body: 'email='+this.state.email+'&password='+this.state.password,
       credentials: "include",
     }).then((response) => {
-      CookieManager.getAll() //TODO: This doesn't work for Android
-      .then((res) => {
-        let csrftoken = res['csrftoken']['value'];
-        if (res['sessionid'] == null){
+      CookieManager.get(this.state.fetchInstance.LoginURL).then((res) => {
+        let csrftoken = res.csrftoken;
+        if (res.sessionid == null){
           this.setState({
             invalid: true,
             email: '',
@@ -108,12 +109,11 @@ class Home extends React.Component {
           });
         }
         else {
-          this.setState({csrftoken: csrftoken});
-          this.props.navigation.setParams({title: 'Home'});
           AsyncStorage.setItem(EMAIL_KEY, this.state.email);
           AsyncStorage.setItem(COOKIE_KEY, 'true');
           AsyncStorage.setItem(CSRF_KEY, csrftoken);
-
+          this.setState({csrftoken: csrftoken});
+          this.props.navigation.setParams({title: 'Home'});
         }
       });
     }).catch((error) => {
@@ -127,7 +127,7 @@ class Home extends React.Component {
       credentials:"include",
       headers: {
           'X-CSRFToken': csrftoken,
-          referer: 'https://www.devemerald.com/',
+          referer: this.state.fetchInstance.MainURL+'/',
           Accept: '*/*',
           'Content-Type': 'application/x-www-form-urlencoded',
       },
@@ -137,7 +137,7 @@ class Home extends React.Component {
       return response.text().then((text) => {
         text = JSON.parse(text);
         if (text['success'] != null){
-          if (text['success']){AsyncStorage.setItem(COOKIE_KEY, 'true')}
+          if (text['success']){AsyncStorage.setItem(COOKIE_KEY, 'true'); this.props.navigation.setParams({title: 'Home'})}
           else{AsyncStorage.setItem(COOKIE_KEY, 'false'); AsyncStorage.removeItem(CSRF_KEY)}
         } else {
           AsyncStorage.setItem(COOKIE_KEY, 'false');
@@ -152,7 +152,7 @@ class Home extends React.Component {
       credentials:"include",
       headers: {
           'X-CSRFToken': this.state.csrftoken,
-          referer: 'https://www.devemerald.com/',
+          referer: this.state.fetchInstance.MainURL+'/',
           Accept: '*/*',
           'Content-Type': 'application/x-www-form-urlencoded',
       },
@@ -161,8 +161,9 @@ class Home extends React.Component {
     });
     AsyncStorage.removeItem(CSRF_KEY);
     AsyncStorage.setItem(COOKIE_KEY, 'false');
-    AsycnStorage.removeItem(EMAIL_KEY);
+    AsyncStorage.removeItem(EMAIL_KEY);
     this.setState({cookieValid: false});
+    this.setState({email: '', password: ''})
     this.props.navigation.setParams({title: 'Sign in'});
   }
 

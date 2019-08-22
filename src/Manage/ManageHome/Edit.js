@@ -60,7 +60,7 @@ class Edit extends React.Component {
         credentials:"include",
         headers: {
             'X-CSRFToken': csrftoken,
-            referer: 'https://www.devemerald.com/trialsite/edit/'+this.state.data.uuid,
+            referer: this.state.fetchInstance.MainURL+'/edit/'+this.state.data.uuid,
             Accept: '*/*',
             'Content-Type': 'application/json',
         },
@@ -99,7 +99,7 @@ class Edit extends React.Component {
           credentials: "include",
           headers: {
             'X-CSRFToken': csrftoken,
-            referer: 'https://www.devemerald.com/trialsite/edit/'+this.state.data.uuid,
+            referer: this.state.fetchInstance.MainURL+'/edit/'+this.state.data.uuid,
             Accept: '*/*',
             'Content-Type': 'application/json',
           },
@@ -107,7 +107,7 @@ class Edit extends React.Component {
           mode: 'cors',
           body: data,
         }).then((response) => {
-          this.setState({modalIsVisible: !this.state.modalIsVisible});
+          this.toggleModal();
           this.reloadData();
         }).catch((error) => {
           console.log(error);
@@ -115,6 +115,10 @@ class Edit extends React.Component {
       });
     }
 
+  }
+
+  toggleModal = () => {
+    this.setState({modalIsVisible: !this.state.modalIsVisible});
   }
 
   reloadData(){
@@ -128,7 +132,7 @@ class Edit extends React.Component {
         credentials: "include",
         headers: {
           'X-CSRFToken': csrftoken,
-          referer: 'https://www.devemerald.com/trialsite/edit/'+this.state.data.uuid,
+          referer: this.state.fetchInstance.MainURL+'/edit/'+this.state.data.uuid,
           Accept: '*/*',
           'Content-Type': 'application/json',
         },
@@ -175,7 +179,7 @@ class Edit extends React.Component {
           animationInTiming={400} animationOutTiming={400}
           backdropOpacity={0.5}
           style={ styles.modalWrapper }
-          onBackdropPress={() => {this.setState({ modalIsVisible: !this.state.modalIsVisible })}}
+          onBackdropPress={() => {this.toggleModal()}}
         >
           <View style={{height: '100%'}}>
             <Text style={{ fontWeight: 'bold', marginBottom: 5, fontSize: 16 }}>Edit deployment</Text>
@@ -209,7 +213,7 @@ class Edit extends React.Component {
             />
             <View style={{flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center'}}>
             <Button
-              onPress={() => {this.setState({modalIsVisible: !this.state.modalIsVisible})}}
+              onPress={() => {this.toggleModal()}}
               title="Cancel"
             />
             <Button
@@ -265,7 +269,7 @@ class Edit extends React.Component {
 
         <Text style={ styles.descriptionSubtitle }>Deployments</Text>
         {devices}
-        
+
         {modal}
       </View>
     );

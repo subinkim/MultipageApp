@@ -8,6 +8,7 @@ import {FetchURL} from '../CustomClass/Fetch.js';
 
 import AsyncStorage from '@react-native-community/async-storage';
 import CookieManager from 'react-native-cookies';
+import { NavigationEvents } from 'react-navigation';
 
 const EMERALD_COLOUR1 = '#17AA9D';
 const EMERALD_COLOUR2 = '#28B674';
@@ -20,7 +21,7 @@ class Home extends React.Component {
     const { params } = navigation.state;
 
     return {
-      title: params ? params.title : 'Sign in',
+      header: null,
     }
   };
 
@@ -43,7 +44,6 @@ class Home extends React.Component {
         //Check if cookie is valid
         AsyncStorage.getItem(CSRF_KEY).then((csrftoken) => {
           this.checkToken(csrftoken);
-          this.props.navigation.setParams({title: 'Home'});
         });
       }
     });
@@ -60,40 +60,59 @@ class Home extends React.Component {
 
   //Change view based on cookie validity
   componentDidMount(){
-    AsyncStorage.getItem(COOKIE_KEY).then((cookieValid) => {
-      if (cookieValid === 'true'){this.setState({cookieValid:true})}
-      else {this.setState({cookieValid:false})}
+    const { navigation } = this.props;
+    this.focusListener = navigation.addListener("didFocus", () => {
+      AsyncStorage.getItem(COOKIE_KEY).then((cookieValid) => {
+        if (cookieValid === 'true'){this.setState({cookieValid:true})}
+        else {this.setState({cookieValid:false})}
+      });
     });
-
-    if (this.state.cookieValid){
-      this.props.navigation.navigate('Scanner');
-    }
   }
 
   componentWillUpdate(){
-    var cookie = this.props.navigation.getParam('cookieValid', null);
-    if (cookie!=null){
-      if (cookie != this.state.cookieValid){
-        this.setState({
-          cookieValid: cookie,
-          email: '',
-          password: '',
-        });
-      }
-      if (cookie){cookie = 'true'}
-      else {cookie = 'false'}
-      AsyncStorage.setItem(COOKIE_KEY, cookie);
-    } else {
-      AsyncStorage.getItem(COOKIE_KEY).then((cookie) => {
-        if (cookie!=null){
-          if (cookie==='true'){cookie = true}
-          else {cookie = false}
-          if (cookie!=this.state.cookieValid){
-            this.setState({cookieValid: cookie});
-          }
+    AsyncStorage.getItem(COOKIE_KEY).then((cookie) => {
+      if (cookie!=null){
+        if (cookie==='true'){cookie = true}
+        else {cookie = false}
+        if (cookie!=this.state.cookieValid){
+          this.setState({cookieValid: cookie});
         }
-      })
-    }
+      }
+    })
+  }
+
+  componentWillUnmount() {
+    this.focusListener.remove();
+  }
+
+  checkToken(csrftoken){
+    fetch(this.state.fetchInstance.GetHomesURL, {
+      credentials:"include",
+      headers: {
+          'X-CSRFToken': csrftoken,
+          referer: this.state.fetchInstance.MainURL+'/',
+          Accept: '*/*',
+          'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      method:'POST',
+      mode:'cors',
+    }).then(function(response){
+      return response.text().then(function(text){
+        text = JSON.parse(text);
+        if (text['success'] != null){
+          if (text['success']){AsyncStorage.setItem(COOKIE_KEY, 'true')}
+          else{AsyncStorage.setItem(COOKIE_KEY, 'false'); AsyncStorage.removeItem(CSRF_KEY);AsyncStorage.removeItem(EMAIL_KEY)}
+        } else {
+          AsyncStorage.setItem(COOKIE_KEY, 'false');
+          AsyncStorage.removeItem(CSRF_KEY);
+          AsyncStorage.removeItem(EMAIL_KEY);
+        }
+      });
+    }).catch((error) => {
+      AsyncStorage.setItem(COOKIE_KEY, 'false');
+      AsyncStorage.removeItem(CSRF_KEY);
+      AsyncStorage.removeItem(EMAIL_KEY);
+    });
   }
 
   signIn(email, password, nav){
@@ -106,10 +125,10 @@ class Home extends React.Component {
       body: 'email='+email+'&password='+password,
       credentials: "include",
     }).then((response) => {
-      CookieManager.getAll() //TODO: This doesn't work for Android
-      .then((res) => {
-        let csrftoken = res['csrftoken']['value'];
-        if (res['sessionid'] == null){
+
+      CookieManager.get(this.state.fetchInstance.LoginURL).then((res) => {
+        let csrftoken = res.csrftoken
+        if (res.sessionid == null){
           this.setState({
             invalid: true,
             email: '',
@@ -120,38 +139,12 @@ class Home extends React.Component {
           AsyncStorage.setItem(EMAIL_KEY, email);
           AsyncStorage.setItem(COOKIE_KEY, 'true');
           AsyncStorage.setItem(CSRF_KEY, csrftoken);
-          this.props.navigation.setParams({title: 'Home'});
-          this.setState({cookieValid: true, invalid: false});
-          this.props.navigation.navigate('Scanner');
+          this.setState({cookieValid: true, invalid: false}, () => this.props.navigation.navigate('Scanner'));
         }
       });
-    }).catch((error) => {
-      console.log(error);
-    });
-  }
 
-  checkToken(csrftoken){
-    fetch(this.state.fetchInstance.GetHomesURL, {
-      credentials:"include",
-      headers: {
-          'X-CSRFToken': csrftoken,
-          referer: 'https://www.devemerald.com/',
-          Accept: '*/*',
-          'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      method:'POST',
-      mode:'cors',
-    }).then(function(response){
-      return response.text().then(function(text){
-        text = JSON.parse(text);
-        if (text['success'] != null){
-          if (text['success']){AsyncStorage.setItem(COOKIE_KEY, 'true');}
-          else{AsyncStorage.setItem(COOKIE_KEY, 'false'); AsyncStorage.removeItem(CSRF_KEY)}
-        } else {
-          AsyncStorage.setItem(COOKIE_KEY, 'false');
-          AsyncStorage.removeItem(CSRF_KEY);
-        }
-      });
+    }).catch((error) => {
+      Alert.alert("ERROR! Please make sure you have a valid server. \nDetails: "+error);
     });
   }
 
@@ -161,7 +154,7 @@ class Home extends React.Component {
         credentials:"include",
         headers: {
             'X-CSRFToken': csrftoken,
-            referer: 'https://www.devemerald.com/',
+            referer: this.state.fetchInstance.MainURL+'/',
             Accept: '*/*',
             'Content-Type': 'application/x-www-form-urlencoded',
         },
@@ -173,7 +166,6 @@ class Home extends React.Component {
     AsyncStorage.setItem(COOKIE_KEY, 'false');
     AsyncStorage.removeItem(EMAIL_KEY);
     this.setState({cookieValid: false});
-
   }
 
   render(){
@@ -182,7 +174,7 @@ class Home extends React.Component {
       <View>
         <Text style={ styles.instruction }>Sign in to {this.state.server}</Text>
         <View style={{marginHorizontal:10}}>
-        <Text>Enter your crendentials for devemerald.com</Text>
+        <Text>Enter your crendentials for {this.state.server}</Text>
         {this.state.invalid?<Text style={{color: 'red', fontSize: 16}}>Invalid credentials.</Text>:null}
           <InputTextBox
             icon="at"
@@ -208,22 +200,21 @@ class Home extends React.Component {
 
     const menu = (
     <View>
-      <Text style= { styles.instruction }>{this.state.server}</Text>
-      <Text style={ styles.description }>Select an action.</Text>
+      <Text style= { styles.instruction }>Emerald</Text>
       <View style={ styles.wrapper }>
 
         <View style={{flexDirection:'row'}}>
 
           <TouchableOpacity
             onPress={() => {this.signOut()}}
-            style={[styles.MenuStyle, {backgroundColor: EMERALD_COLOUR2}]}
+            style={styles.MenuStyle}
             accessibilityLabel="Sign out from your devemerald account">
             <Text style={styles.buttonText} adjustsFontSizeToFit numberOfLines={3}>Sign out from your account</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             onPress={() => {this.props.navigation.navigate('Scanner')}}
-            style={[styles.MenuStyle, {backgroundColor: EMERALD_COLOUR1}]}
+            style={styles.MenuStyle}
             accessibilityLabel="Add a new deployment">
             <Text style={styles.buttonText} adjustsFontSizeToFit numberOfLines={2}>New deployment</Text>
           </TouchableOpacity>
@@ -234,13 +225,13 @@ class Home extends React.Component {
 
           <TouchableOpacity
             onPress={()=>{this.props.navigation.navigate('Details')}}
-            style={[styles.MenuStyle, {backgroundColor: EMERALD_COLOUR3}]}>
+            style={styles.MenuStyle}>
             <Text style={styles.buttonText} adjustsFontSizeToFit numberOfLines={2}>Skip to connection</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             onPress={()=>{this.props.navigation.navigate('Setting')}}
-            style={[styles.MenuStyle, {backgroundColor: EMERALD_COLOUR2}]}>
+            style={styles.MenuStyle}>
             <Text style={styles.buttonText} adjustsFontSizeToFit numberOfLines={1}>Settings</Text>
           </TouchableOpacity>
 
@@ -250,7 +241,7 @@ class Home extends React.Component {
 
           <TouchableOpacity
             onPress={() => {this.props.navigation.navigate('Manage')}}
-            style={[styles.MenuStyle, {backgroundColor: EMERALD_COLOUR2}]}>
+            style={styles.MenuStyle}>
             <Text style={styles.buttonText} adjustsFontSizeToFit numberOfLines={3}>Manage Home</Text>
           </TouchableOpacity>
 
@@ -260,8 +251,10 @@ class Home extends React.Component {
     </View>);
     //MARK:get rid of skip button later
     return(
-      <View style={ styles.container }>
-      {!this.state.cookieValid?inputs:menu}
+      <View style = {styles.background}>
+        <View style={ styles.container }>
+          {!this.state.cookieValid?inputs:menu}
+        </View>
       </View>
     );
   }
@@ -270,9 +263,14 @@ class Home extends React.Component {
 const {height,width} = Dimensions.get('window');
 
 const styles = StyleSheet.create({
+    background:{
+      flex: 1,
+    },
     container: {
       flex: 1,
       marginTop: 30,
+      height: '100%',
+      width: '100%'
     },
     instruction: {
       fontWeight: 'bold',
@@ -291,16 +289,16 @@ const styles = StyleSheet.create({
       width: '90%',
     },
     MenuStyle:{
-      borderRadius: 15,
-      width: width*0.9*0.4,
-      height: width*0.9*0.4,
+      width: width*0.42,
+      height: width*0.42,
       paddingHorizontal: 20,
       paddingVertical: 20,
-      marginLeft: width*0.9*0.1,
-      marginBottom: width*0.9*0.1,
+      marginLeft: width*0.05,
+      marginBottom: width*0.08,
+      backgroundColor: EMERALD_COLOUR1,
     },
     buttonText:{
-      color: 'white',
+      color: 'black',
       textAlignVertical: "center",
       textAlign: "center",
       fontSize: 17,

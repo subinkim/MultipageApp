@@ -17,6 +17,8 @@ const EMERALD_COLOUR3 = '#8CC641';
 
 class Load extends React.Component {
 
+  _isMounted = false;
+
   static navigationOptions = ({navigation, navigationOptions}) => {
 
     return {
@@ -65,7 +67,7 @@ class Load extends React.Component {
           credentials: "include",
           headers: {
             'X-CSRFToken': csrftoken,
-            referer: 'https://www.devemerald.com/',
+            referer: this.state.fetchInstance.MainURL+'/',
             Accept: '*/*',
             'Content-Type': 'application/x-www-form-urlencoded',
           },
@@ -81,13 +83,17 @@ class Load extends React.Component {
     });
   }
 
+  componentDidMount(){
+    this._isMounted = true;
+  }
+
   componentWillUpdate(){
     AsyncStorage.getItem(CSRF_KEY).then((csrftoken) => {
       fetch(this.state.fetchInstance.GetHomesURL, {
         credentials: "include",
         headers: {
           'X-CSRFToken': csrftoken,
-          referer: 'https://www.devemerald.com/',
+          referer: this.state.fetchInstance.MainURL+'/',
           Accept: '*/*',
           'Content-Type': 'application/x-www-form-urlencoded',
         },
@@ -95,14 +101,18 @@ class Load extends React.Component {
         mode: 'cors',
       }).then((response) => {
         return response.text().then((res) => {
-          if (res!=null){res = JSON.parse(res);this.setState({json: res});}
+          if (res!=null && this._isMounted){res = JSON.parse(res);this.setState({json: res})}
         });
       });
     });
   }
 
+  componentWillUnmount(){
+    this._isMounted = false;
+  }
+
   toggleModal = () => {
-    this.setState({ modalIsVisible: !this.state.modalIsVisible });
+    if (this._isMounted){this.setState({ modalIsVisible: !this.state.modalIsVisible })}
   };
 
   editItem = () => {
@@ -136,7 +146,7 @@ class Load extends React.Component {
         credentials: "include",
         headers:{
           'X-CSRFToken': csrftoken,
-          referer: 'https://www.devemerald.com/trialsite/edit/'+this.state.selectedItem.uuid,
+          referer: this.state.fetchInstance.MainURL+'/edit/'+this.state.selectedItem.uuid,
           Accept: '*/*',
           'Content-Type': 'application/x-www-form-urlencoded',
         },
@@ -144,7 +154,7 @@ class Load extends React.Component {
         method: 'POST',
         mode: 'cors'
       }).then((response) => {
-        this.setState({updated: false});
+        if (this._isMounted){this.setState({updated: false})}
       });
     });
 
@@ -177,20 +187,24 @@ class Load extends React.Component {
               style={styles.swipeout}
               autoClose={true}
               onOpen={(sectionID, rowID) => {
-                this.setState({
-                  rowID: rowID,
-                  selectedItem: item,
-                });
+                if (this._isMounted){
+                  this.setState({
+                    rowID: rowID,
+                    selectedItem: item,
+                  });
+                }
               }}
               >
               <TouchableOpacity onPress={() => {
-                this.setState({
-                  modalIsVisible: true,
-                  modalDevices: item.devices,
-                  modalHomeUUID: item.uuid,
-                  modalNickname: item.nickname,
-                  modalTrialName: item.trialname,
-                })
+                if (this._isMounted){
+                  this.setState({
+                    modalIsVisible: true,
+                    modalDevices: item.devices,
+                    modalHomeUUID: item.uuid,
+                    modalNickname: item.nickname,
+                    modalTrialName: item.trialname,
+                  });
+                }
               }}>
                 <View style={{flexDirection: 'row', flexWrap: 'wrap'}}>
                   <Icon name="home" style={{fontSize: 28, paddingVertical: 11, paddingRight: 7}}/>
@@ -277,7 +291,7 @@ function addHome(navigation){
         headers: {
           Accept:'*/*',
           'Content-Type': 'application/x-www-form-urlencoded',
-          referer: 'https://www.devemerald.com/',
+          referer: fetchInstance.MainURL+'/',
           'X-CSRFToken': csrftoken,
         },
         credentials: "include"

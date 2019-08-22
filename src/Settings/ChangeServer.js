@@ -65,7 +65,7 @@ class ChangeServer extends Component {
       headers: {
         Accept:'*/*',
         'Content-Type': 'application/x-www-form-urlencoded',
-        referer: 'https://www.devemerald.com/trialsite/register',
+        referer: this.state.fetchInstance.MainURL+'/register',
       },
       credentials: "include"
     }).then((response)=>{

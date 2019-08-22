@@ -57,13 +57,8 @@ class ConnectHome extends Component {
           title="Connect"
           onPress={() => connectToDevice(this.state.ssid, this.state.password, this.props.navigation, this.state.initialSSID)}
         />
-        <Button
-          title="Skip to Register"
-          onPress={() => {this.props.navigation.navigate('RegisterHome')}}
-        />
       </View>
     );
-    //MARK: Get rid of skip button later
   }
 }
 

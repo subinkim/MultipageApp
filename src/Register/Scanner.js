@@ -17,16 +17,6 @@ class Scanner extends React.Component {
 
     return {
       title: 'Scan QR code',
-      headerLeft:(
-        <HeaderBackButton
-          title="Back"
-          onPress={() => {
-            navigation.navigate('Home', {
-              cookieValid: 'true',//TODO: this doesn't work
-            })
-          }}
-        />
-      )
     };
   };
 
