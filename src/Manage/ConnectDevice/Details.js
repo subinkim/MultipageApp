@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Image, View, Text, StyleSheet, Dimensions, Alert, TouchableOpacity } from 'react-native';
+import { Button, View, Text, Dimensions } from 'react-native';
 
 import WifiManager from 'react-native-wifi';
 import { WebView } from 'react-native-webview';
@@ -7,6 +7,8 @@ import Wifi from 'react-native-iot-wifi';
 import CookieManager from 'react-native-cookies';
 
 const URI = 'http://wireless.devemerald.com';
+
+import {basicStyles as styles} from './styles';
 
 class Details extends React.Component {
   static navigationOptions = ({ navigation, navigationOptions }) => {
@@ -72,23 +74,5 @@ function disconnectFromDevice(ssid, initialSSID, nav){
   }
 
 }
-
-const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      marginTop: 30,
-      marginLeft: 10,
-      marginRight: 10,
-    },
-    instruction: {
-      fontWeight: 'bold',
-      fontSize: 23,
-      marginBottom: 10,
-    },
-    description: {
-      top: 50,
-      fontSize: 15,
-    },
-});
 
 export default Details;

@@ -1,10 +1,12 @@
 import React, { Component } from 'react';
-import { Button, Image, View, Text, StyleSheet, Alert } from 'react-native';
+import { Button, View, Text, Alert } from 'react-native';
 
-import InputTextBox from '../CustomClass/InputTextBox.js';
-import {SERVER_KEY, COOKIE_KEY, CSRF_KEY, EMAIL_KEY} from '../CustomClass/Storage.js';
+import InputTextBox from '../CustomClass/InputTextBox';
 
-import {FetchURL} from '../CustomClass/Fetch.js';
+import {SERVER_KEY, COOKIE_KEY, CSRF_KEY, EMAIL_KEY} from '../CustomClass/Storage';
+import {FetchURL} from '../CustomClass/Fetch';
+
+import {serverStyles as styles} from './styles';
 
 import AsyncStorage from '@react-native-community/async-storage';
 
@@ -104,27 +106,5 @@ class ChangeServer extends Component {
     );
   }
 }
-
-
-
-const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      marginHorizontal: '5%',
-      marginTop: 30,
-    },
-    instruction: {
-      fontWeight: 'bold',
-      fontSize: 23,
-      marginBottom: 10,
-    },
-    description: {
-      fontSize: 15,
-    },
-    header: {
-      fontSize: 13,
-    },
-
-});
 
 export default ChangeServer;

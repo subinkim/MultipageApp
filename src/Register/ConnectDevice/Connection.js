@@ -7,10 +7,11 @@ import Wifi from 'react-native-iot-wifi';
 import AsyncStorage from '@react-native-community/async-storage';
 import Modal from "react-native-modal";
 
-import { DEVICE_SSID_KEY, DEVICE_PWD_KEY, INITIAL_SSID_KEY } from '../../CustomClass/Storage.js';
+import { DEVICE_SSID_KEY, DEVICE_PWD_KEY, INITIAL_SSID_KEY } from '../../CustomClass/Storage';
+import { connectionStyles as styles } from '../styles';
 
-import PasswordTextBox from '../../CustomClass/PasswordTextBox.js';
-import InputTextBox from '../../CustomClass/InputTextBox.js';
+import PasswordTextBox from '../../CustomClass/PasswordTextBox';
+import InputTextBox from '../../CustomClass/InputTextBox';
 
 const EMERALD_COLOUR1 = '#17AA9D';
 const EMERALD_COLOUR2 = '#28B674';
@@ -204,46 +205,5 @@ async function requestLocationPermission(){
     Alert.alert("Cannot use this app.");
   }
 }
-
-const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      justifyContent: 'center',
-      alignItems: 'center',
-    },
-    instruction: {
-      fontWeight: 'bold',
-      fontSize: 23,
-      marginBottom: 10,
-    },
-    description: {
-      top: 50,
-      fontSize: 15,
-    },
-    modalWrapper:{
-      backgroundColor: 'white',
-      margin:0,
-      borderRadius: 10,
-      marginHorizontal: '5%',
-      paddingTop: '5%',
-      paddingHorizontal: '5%',
-      flex: 0,
-      height: '60%',
-      top: '20%',
-    },
-    header: {
-      fontWeight: 'bold',
-      fontSize: 15,
-    },
-    subheader: {
-      fontWeight: 'bold',
-      fontSize: 13,
-      color: 'grey',
-      marginTop: 5,
-    },
-    text: {
-      fontSize: 12
-    }
-});
 
 export default Connection;

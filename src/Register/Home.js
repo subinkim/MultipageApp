@@ -1,18 +1,17 @@
 import React from 'react';
-import { Button, View, Text, StyleSheet, Alert, TouchableOpacity, Dimensions, PixelRatio } from 'react-native';
-
-import PasswordTextBox from '../CustomClass/PasswordTextBox.js';
-import InputTextBox from '../CustomClass/InputTextBox.js';
-import {CSRF_KEY,COOKIE_KEY, EMAIL_KEY, SERVER_KEY} from '../CustomClass/Storage.js';
-import {FetchURL} from '../CustomClass/Fetch.js';
+import { Button, View, Text, Alert, TouchableOpacity, Dimensions, Image } from 'react-native';
+import {Icon} from 'native-base';
 
 import AsyncStorage from '@react-native-community/async-storage';
 import CookieManager from 'react-native-cookies';
-import { NavigationEvents } from 'react-navigation';
 
-const EMERALD_COLOUR1 = '#17AA9D';
-const EMERALD_COLOUR2 = '#28B674';
-const EMERALD_COLOUR3 = '#8CC641';
+import PasswordTextBox from '../CustomClass/PasswordTextBox';
+import InputTextBox from '../CustomClass/InputTextBox';
+
+import {CSRF_KEY,COOKIE_KEY, EMAIL_KEY, SERVER_KEY} from '../CustomClass/Storage';
+import {FetchURL} from '../CustomClass/Fetch';
+
+import {homeStyles as styles} from './styles';
 
 class Home extends React.Component {
 
@@ -23,6 +22,7 @@ class Home extends React.Component {
     return {
       header: null,
     }
+
   };
 
   constructor(props){
@@ -33,7 +33,8 @@ class Home extends React.Component {
       cookieValid: false,
       fetchInstance: null,
       invalid: false,
-      server: null
+      server: null,
+      email: null,
     };
   }
 
@@ -47,6 +48,7 @@ class Home extends React.Component {
         });
       }
     });
+    AsyncStorage.getItem(EMAIL_KEY).then((email) => {this.setState({email})})
     //Check the server - if none exists, set it to default servdr
     AsyncStorage.getItem(SERVER_KEY).then((server) => {
       if (server === null){
@@ -78,7 +80,7 @@ class Home extends React.Component {
           this.setState({cookieValid: cookie});
         }
       }
-    })
+    });
   }
 
   componentWillUnmount() {
@@ -200,58 +202,36 @@ class Home extends React.Component {
 
     const menu = (
     <View>
-      <Text style= { styles.instruction }>Emerald</Text>
-      <View style={ styles.wrapper }>
+      <Text style= { styles.instructionMenu }>Emerald</Text>
 
-        <View style={{flexDirection:'row'}}>
+      <Text style = { styles.descriptionMenu }>Welcome back, {this.state.email}!</Text>
+
+      <Image source={require('../logos/only-icon.png')} style={{width: '30%', height: '30%', marginLeft: '35%'}}/>
+
+      <View style={ styles.wrapper }>
 
           <TouchableOpacity
             onPress={() => {this.signOut()}}
             style={styles.MenuStyle}
             accessibilityLabel="Sign out from your devemerald account">
-            <Text style={styles.buttonText} adjustsFontSizeToFit numberOfLines={3}>Sign out from your account</Text>
+              <Icon name="log-out" style={styles.menuIcon}/>
+              <Text style={styles.buttonText} adjustsFontSizeToFit numberOfLines={3}>Sign out from your account</Text>
           </TouchableOpacity>
+
 
           <TouchableOpacity
             onPress={() => {this.props.navigation.navigate('Scanner')}}
             style={styles.MenuStyle}
             accessibilityLabel="Add a new deployment">
-            <Text style={styles.buttonText} adjustsFontSizeToFit numberOfLines={2}>New deployment</Text>
+            <Icon name="add" style={styles.menuIcon}/>
+            <Text style={styles.buttonText} adjustsFontSizeToFit numberOfLines={2}>Register New deployment</Text>
           </TouchableOpacity>
 
-        </View>
-
-        <View style={{flexDirection:'row'}}>
-
-          <TouchableOpacity
-            onPress={()=>{this.props.navigation.navigate('Details')}}
-            style={styles.MenuStyle}>
-            <Text style={styles.buttonText} adjustsFontSizeToFit numberOfLines={2}>Skip to connection</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            onPress={()=>{this.props.navigation.navigate('Setting')}}
-            style={styles.MenuStyle}>
-            <Text style={styles.buttonText} adjustsFontSizeToFit numberOfLines={1}>Settings</Text>
-          </TouchableOpacity>
-
-        </View>
-
-        <View style={{flexDirection:'row'}}>
-
-          <TouchableOpacity
-            onPress={() => {this.props.navigation.navigate('Manage')}}
-            style={styles.MenuStyle}>
-            <Text style={styles.buttonText} adjustsFontSizeToFit numberOfLines={3}>Manage Home</Text>
-          </TouchableOpacity>
-
-        </View>
 
       </View>
     </View>);
-    //MARK:get rid of skip button later
     return(
-      <View style = {styles.background}>
+      <View style = { styles.background }>
         <View style={ styles.container }>
           {!this.state.cookieValid?inputs:menu}
         </View>
@@ -259,51 +239,5 @@ class Home extends React.Component {
     );
   }
 }
-
-const {height,width} = Dimensions.get('window');
-
-const styles = StyleSheet.create({
-    background:{
-      flex: 1,
-    },
-    container: {
-      flex: 1,
-      marginTop: 30,
-      height: '100%',
-      width: '100%'
-    },
-    instruction: {
-      fontWeight: 'bold',
-      fontSize: 23,
-      marginBottom: 10,
-      marginLeft: 10,
-      marginRight: 10,
-    },
-    description: {
-      fontSize: 15,
-      marginLeft: 10,
-      marginRight: 10,
-    },
-    wrapper:{
-      marginTop: 10,
-      width: '90%',
-    },
-    MenuStyle:{
-      width: width*0.42,
-      height: width*0.42,
-      paddingHorizontal: 20,
-      paddingVertical: 20,
-      marginLeft: width*0.05,
-      marginBottom: width*0.08,
-      backgroundColor: EMERALD_COLOUR1,
-    },
-    buttonText:{
-      color: 'black',
-      textAlignVertical: "center",
-      textAlign: "center",
-      fontSize: 17,
-      fontWeight: 'bold'
-    }
-});
 
 export default Home;

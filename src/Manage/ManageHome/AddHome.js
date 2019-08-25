@@ -4,9 +4,10 @@ import {Picker} from 'native-base';
 
 import AsyncStorage from '@react-native-community/async-storage';
 
-import InputTextBox from '../../CustomClass/InputTextBox.js';
-import {FetchURL} from '../../CustomClass/Fetch.js';
-import {CSRF_KEY, SERVER_KEY} from '../../CustomClass/Storage.js';
+import InputTextBox from '../../CustomClass/InputTextBox';
+import {FetchURL} from '../../CustomClass/Fetch';
+import {CSRF_KEY, SERVER_KEY} from '../../CustomClass/Storage';
+import {addHomeStyles as styles} from './styles';
 
 class AddHome extends Component {
   static navigationOptions = ({navigation}) => ({
@@ -107,24 +108,5 @@ class AddHome extends Component {
     );
   }
 }
-
-
-
-const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      marginTop: 30,
-      marginLeft: 10,
-      marginRight: 10,
-    },
-    instruction: {
-      fontWeight: 'bold',
-      fontSize: 23,
-      marginBottom: 20,
-    },
-    description: {
-      fontSize: 15,
-    },
-});
 
 export default AddHome;

@@ -1,10 +1,11 @@
 import React from 'react';
 import { Button, View, Text, StyleSheet, Alert, TouchableOpacity, Dimensions } from 'react-native';
 
-import PasswordTextBox from '../../CustomClass/PasswordTextBox.js';
-import InputTextBox from '../../CustomClass/InputTextBox.js';
-import {CSRF_KEY,COOKIE_KEY, EMAIL_KEY, SERVER_KEY} from '../../CustomClass/Storage.js';
-import {FetchURL} from '../../CustomClass/Fetch.js';
+import PasswordTextBox from '../../CustomClass/PasswordTextBox';
+import InputTextBox from '../../CustomClass/InputTextBox';
+import {CSRF_KEY,COOKIE_KEY, EMAIL_KEY, SERVER_KEY} from '../../CustomClass/Storage';
+import {FetchURL} from '../../CustomClass/Fetch';
+import {homeStyles as styles} from './styles';
 
 import AsyncStorage from '@react-native-community/async-storage';
 import CookieManager from 'react-native-cookies';
@@ -20,7 +21,7 @@ class Home extends React.Component {
     const { params } = navigation.state;
 
     return {
-      title: params ? params.title : 'Sign in',
+      header: null,
     }
   };
 
@@ -113,7 +114,6 @@ class Home extends React.Component {
           AsyncStorage.setItem(COOKIE_KEY, 'true');
           AsyncStorage.setItem(CSRF_KEY, csrftoken);
           this.setState({csrftoken: csrftoken});
-          this.props.navigation.setParams({title: 'Home'});
         }
       });
     }).catch((error) => {
@@ -137,7 +137,7 @@ class Home extends React.Component {
       return response.text().then((text) => {
         text = JSON.parse(text);
         if (text['success'] != null){
-          if (text['success']){AsyncStorage.setItem(COOKIE_KEY, 'true'); this.props.navigation.setParams({title: 'Home'})}
+          if (text['success']){AsyncStorage.setItem(COOKIE_KEY, 'true')}
           else{AsyncStorage.setItem(COOKIE_KEY, 'false'); AsyncStorage.removeItem(CSRF_KEY)}
         } else {
           AsyncStorage.setItem(COOKIE_KEY, 'false');
@@ -164,7 +164,6 @@ class Home extends React.Component {
     AsyncStorage.removeItem(EMAIL_KEY);
     this.setState({cookieValid: false});
     this.setState({email: '', password: ''})
-    this.props.navigation.setParams({title: 'Sign in'});
   }
 
   render(){
@@ -247,46 +246,5 @@ class Home extends React.Component {
     );
   }
 }
-
-const {height,width} = Dimensions.get('window');
-
-const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      marginTop: 30,
-    },
-    instruction: {
-      fontWeight: 'bold',
-      fontSize: 23,
-      marginBottom: 10,
-      marginLeft: 10,
-      marginRight: 10,
-    },
-    description: {
-      fontSize: 15,
-      marginLeft: 10,
-      marginRight: 10,
-    },
-    wrapper:{
-      marginTop: 10,
-      width: '90%',
-    },
-    MenuStyle:{
-      borderRadius: 15,
-      width: width*0.9*0.4,
-      height: width*0.9*0.4,
-      paddingHorizontal: 20,
-      paddingVertical: 20,
-      marginLeft: width*0.9*0.1,
-      marginBottom: width*0.9*0.1,
-    },
-    buttonText:{
-      color: 'white',
-      textAlignVertical: "center",
-      textAlign: "center",
-      fontSize: 17,
-      fontWeight: 'bold'
-    }
-});
 
 export default Home;

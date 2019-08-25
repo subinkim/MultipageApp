@@ -4,6 +4,7 @@ import {Icon} from 'native-base';
 import { withNavigation } from "react-navigation";
 
 import {CSRF_KEY,COOKIE_KEY, EMAIL_KEY} from '../CustomClass/Storage';
+import {homeStyles as styles} from './styles';
 
 import AsyncStorage from '@react-native-community/async-storage';
 
@@ -25,8 +26,6 @@ class Home extends Component {
     }
   }
 
-  //TODO: find a way to reload so that email gets updated
-  //(not updated when travelling from Settings Home -> Register Home -> Sign into account -> back to Settings Home)
   componentWillMount(){
     AsyncStorage.getItem(EMAIL_KEY).then((email) => {
       if (email != null){
@@ -136,43 +135,5 @@ class Home extends Component {
     );
   }
 }
-
-
-
-const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      marginHorizontal: 10,
-      marginTop: 30,
-    },
-    instruction: {
-      fontWeight: 'bold',
-      fontSize: 25,
-      marginBottom: 10,
-    },
-    header: {
-      fontSize: 13,
-    },
-    account:{
-      flexDirection: 'row',
-      flexWrap: 'wrap',
-      paddingVertical: 13,
-      paddingHorizontal: 10,
-      marginVertical: 10,
-      backgroundColor: '#e6e6e6',
-      borderRadius: 5,
-    },
-    listItem: {
-      paddingVertical: 7,
-      borderBottomWidth: 1,
-      borderBottomColor: '#cfcfcf',
-      flexDirection: 'row',
-      flexWrap: 'wrap',
-      alignItems: 'center',
-    },
-    itemText:{
-      fontSize: 17,
-    }
-});
 
 export default Home;

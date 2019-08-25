@@ -6,10 +6,11 @@ import { WebView } from 'react-native-webview';
 import Wifi from 'react-native-iot-wifi';
 import AsyncStorage from '@react-native-community/async-storage';
 
-import { DEVICE_SSID_KEY, DEVICE_PWD_KEY, INITIAL_SSID_KEY } from '../../CustomClass/Storage.js';
+import { DEVICE_SSID_KEY, DEVICE_PWD_KEY, INITIAL_SSID_KEY } from '../../CustomClass/Storage';
+import { basicStyles as styles } from '../styles'
 
-import PasswordTextBox from '../../CustomClass/PasswordTextBox.js';
-import InputTextBox from '../../CustomClass/InputTextBox.js';
+import PasswordTextBox from '../../CustomClass/PasswordTextBox';
+import InputTextBox from '../../CustomClass/InputTextBox';
 
 class ConnectHome extends Component {
   static navigationOptions = ({navigation}) => ({
@@ -86,23 +87,5 @@ function connectToDevice(ssid, pwd, nav, initial){
     }
   }
 }
-
-const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      marginTop: 30,
-      marginLeft: 10,
-      marginRight: 10,
-    },
-    instruction: {
-      fontWeight: 'bold',
-      fontSize: 23,
-      marginBottom: 10,
-    },
-    description: {
-      top: 50,
-      fontSize: 15,
-    },
-});
 
 export default ConnectHome;

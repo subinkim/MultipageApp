@@ -1,12 +1,13 @@
 import React, { Component } from 'react';
-import { Button, View, Text, StyleSheet, Alert, Platform, PermissionsAndroid } from 'react-native';
+import { Button, View, Text, Alert, Platform, PermissionsAndroid } from 'react-native';
 
 import WifiManager from 'react-native-wifi';
 import { WebView } from 'react-native-webview';
 import Wifi from 'react-native-iot-wifi';
 
-import PasswordTextBox from '../../CustomClass/PasswordTextBox.js';
-import InputTextBox from '../../CustomClass/InputTextBox.js';
+import PasswordTextBox from '../../CustomClass/PasswordTextBox';
+import InputTextBox from '../../CustomClass/InputTextBox';
+import {basicStyles as styles} from './styles';
 
 class Home extends Component {
   static navigationOptions = ({navigation}) => ({
@@ -121,23 +122,5 @@ async function requestLocationPermission(){
     console.warn(err);
   }
 }
-
-const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      marginTop: 30,
-      marginLeft: 10,
-      marginRight: 10,
-    },
-    instruction: {
-      fontWeight: 'bold',
-      fontSize: 23,
-      marginBottom: 10,
-    },
-    description: {
-      top: 50,
-      fontSize: 15,
-    },
-});
 
 export default Home;

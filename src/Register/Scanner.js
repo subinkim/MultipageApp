@@ -9,6 +9,7 @@ import QRCodeScanner from 'react-native-qrcode-scanner';
 import AsyncStorage from '@react-native-community/async-storage';
 
 import {DEVICE_UUID_KEY, DEVICE_SSID_KEY, DEVICE_PWD_KEY} from '../CustomClass/Storage.js';
+import {scannerStyles as styles} from './styles';
 
 class Scanner extends React.Component {
 
@@ -67,23 +68,5 @@ class Scanner extends React.Component {
     );
   }
 }
-
-const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      marginTop: 30,
-      marginLeft: 10,
-      marginRight: 10,
-    },
-    instruction: {
-      fontWeight: 'bold',
-      fontSize: 23,
-      marginBottom: 10,
-    },
-    description: {
-      top: 50,
-      fontSize: 15,
-    },
-});
 
 export default Scanner;

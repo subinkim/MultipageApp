@@ -7,8 +7,9 @@ import Wifi from 'react-native-iot-wifi';
 import CookieManager from 'react-native-cookies';
 import AsyncStorage from '@react-native-community/async-storage';
 
-import {FetchURL} from '../../CustomClass/Fetch.js';
-import {SERVER_KEY, CSRF_KEY} from '../../CustomClass/Storage.js';
+import {FetchURL} from '../../CustomClass/Fetch';
+import {SERVER_KEY, CSRF_KEY} from '../../CustomClass/Storage';
+import {basicStyles as styles} from '../styles';
 
 const URI = 'http://wireless.devemerald.com';
 
@@ -152,23 +153,5 @@ function disconnectFromDevice(ssid, initialSSID, nav, urls) {
   });
   //END
 }
-
-const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      marginTop: 30,
-      marginLeft: 10,
-      marginRight: 10,
-    },
-    instruction: {
-      fontWeight: 'bold',
-      fontSize: 23,
-      marginBottom: 10,
-    },
-    description: {
-      top: 50,
-      fontSize: 15,
-    },
-});
 
 export default Details;

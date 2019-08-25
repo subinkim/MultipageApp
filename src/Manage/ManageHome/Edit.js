@@ -5,12 +5,11 @@ import { Icon, Picker } from 'native-base';
 
 import AsyncStorage from '@react-native-community/async-storage';
 
-import {CSRF_KEY, COOKIE_KEY, SERVER_KEY} from '../../CustomClass/Storage.js';
-import {FetchURL} from '../../CustomClass/Fetch.js';
+import {CSRF_KEY, COOKIE_KEY, SERVER_KEY} from '../../CustomClass/Storage';
+import {FetchURL} from '../../CustomClass/Fetch';
+import {editStyles as styles} from './styles';
 
 const EMERALD_COLOUR1 = '#17AA9D';
-const EMERALD_COLOUR2 = '#28B674';
-const EMERALD_COLOUR3 = '#8CC641';
 
 class Edit extends React.Component {
 
@@ -275,53 +274,5 @@ class Edit extends React.Component {
     );
   }
 }
-
-
-const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      marginTop: 30,
-      marginLeft: 20,
-      marginRight: 20,
-    },
-    instruction: {
-      fontWeight: 'bold',
-      fontSize: 23,
-      marginBottom: 5,
-    },
-    description: {
-      marginTop: 5,
-      fontSize: 15,
-    },
-    descriptionSubtitle: {
-      fontSize: 13,
-      color: EMERALD_COLOUR1,
-      fontWeight: 'bold',
-      marginTop: 10,
-    },
-    deviceSubtitle: {
-      fontSize: 12,
-      color: 'grey',
-      marginTop: 3,
-      fontWeight: 'bold'
-    },
-    modalWrapper:{
-      backgroundColor: 'white',
-      margin:0,
-      borderRadius: 10,
-      marginHorizontal: '5%',
-      paddingTop: '5%',
-      paddingHorizontal: '5%',
-      flex: 0,
-      height: '60%',
-      top: '20%',
-    },
-    modalSubtitle:{
-      fontSize: 12,
-      color: EMERALD_COLOUR1,
-      marginVertical: 5,
-      fontWeight: 'bold'
-    }
-});
 
 export default Edit;

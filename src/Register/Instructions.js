@@ -3,6 +3,7 @@ import { Button, Image, View, Text, StyleSheet, Dimensions, ScrollView } from 'r
 
 import Carousel, {Pagination} from 'react-native-snap-carousel';
 import { ENTRIES1 } from './data/entries.js';
+import { instructionsStyles as styles } from './styles'; 
 
 const SLIDER_1_FIRST_ITEM = 0;
 const EMERALD_COLOUR1 = '#17AA9D';
@@ -89,56 +90,5 @@ class Instructions extends React.Component {
     );
   }
 }
-
-const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      top: 30,
-    },
-    instruction: {
-      fontWeight: 'bold',
-      fontSize: 23,
-      bottom: 5,
-      left: 20,
-    },
-    description: {
-      fontSize: 15,
-      bottom: 10,
-      left: 20,
-      top: 5,
-    },
-    paginationDot: {
-      width: 8,
-      height: 8,
-      borderRadius: 4,
-      marginHorizontal: 8,
-    },
-    itemTitle:{
-      fontSize: 15,
-      fontWeight: 'bold',
-      color: 'white'
-    },
-    itemSubtitle:{
-      fontSize: 13,
-      color: 'white'
-    },
-    itemTitleContainer:{
-      padding: 10,
-      backgroundColor: EMERALD_COLOUR3,
-      borderRadius: 5,
-      width: '80%',
-    },
-    sliderContentContainer:{
-      bottom: 10,
-      top: 10,
-    },
-    itemContainer:{
-      justifyContent: 'center',
-      left: '10%',
-    },
-    paginationContainer:{
-      alignItems:'center',
-    },
-});
 
 export default Instructions;

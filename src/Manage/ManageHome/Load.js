@@ -3,17 +3,13 @@ import { Button, View, Text, StyleSheet, Alert, TouchableOpacity, FlatList, Scro
 import { Icon } from 'native-base';
 import { Button as ElementsButton } from 'react-native-elements';
 
-import { HeaderBackButton } from 'react-navigation';
 import AsyncStorage from '@react-native-community/async-storage';
 import Swipeout from 'react-native-swipeout';
 import Modal from "react-native-modal";
 
-import {CSRF_KEY, COOKIE_KEY, SERVER_KEY} from '../../CustomClass/Storage.js';
-import {FetchURL} from '../../CustomClass/Fetch.js';
-
-const EMERALD_COLOUR1 = '#17AA9D';
-const EMERALD_COLOUR2 = '#28B674';
-const EMERALD_COLOUR3 = '#8CC641';
+import {CSRF_KEY, COOKIE_KEY, SERVER_KEY} from '../../CustomClass/Storage';
+import {FetchURL} from '../../CustomClass/Fetch';
+import {loadStyles as styles} from './styles';
 
 class Load extends React.Component {
 
@@ -311,59 +307,5 @@ function addHome(navigation){
   })
 
 }
-
-const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      marginTop: 30,
-      marginLeft: 10,
-      marginRight: 10,
-    },
-    instruction: {
-      fontWeight: 'bold',
-      fontSize: 23,
-      marginBottom: 20,
-    },
-    description: {
-      top: 50,
-      fontSize: 15,
-    },
-    item:{
-      fontSize: 16,
-      paddingTop:12,
-    },
-    swipeout:{
-      backgroundColor: 'white',
-      marginBottom: 5,
-      paddingHorizontal: '3%',
-      borderBottomWidth: 1.5,
-      borderBottomColor: '#bcbcbc',
-      borderRightWidth: 1,
-      borderRightColor: '#bcbcbc',
-    },
-    modalWrapper:{
-      backgroundColor: 'white',
-      margin:0,
-      borderRadius: 10,
-      marginHorizontal: '5%',
-      paddingTop: '5%',
-      paddingHorizontal: '5%',
-      flex: 0,
-      height: '60%',
-      top: '20%',
-    },
-    modalSubtitle:{
-      fontSize: 12,
-      color: EMERALD_COLOUR1,
-      marginTop: 8,
-      fontWeight: 'bold'
-    },
-    deviceSubtitle: {
-      fontSize: 10,
-      color: 'grey',
-      marginTop: 3,
-      fontWeight: 'bold'
-    }
-});
 
 export default Load;
