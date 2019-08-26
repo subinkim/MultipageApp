@@ -1,6 +1,6 @@
 import {StyleSheet} from 'react-native';
 
-const homeStyles = StyleSheet.create({
+export const homeStyles = StyleSheet.create({
     container: {
       flex: 1,
       marginHorizontal: 10,
@@ -36,7 +36,7 @@ const homeStyles = StyleSheet.create({
     }
 });
 
-const serverStyles = StyleSheet.create({
+export const serverStyles = StyleSheet.create({
     container: {
       flex: 1,
       marginHorizontal: '5%',

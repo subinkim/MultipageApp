@@ -6,47 +6,68 @@ const EMERALD_COLOUR3 = '#8CC641';
 
 const {height, width} = Dimensions.get('window');
 
-const homeStyles = StyleSheet.create({
+export const homeStyles = StyleSheet.create({
+    background:{
+      flex:1
+    },
     container: {
       flex: 1,
-      marginTop: 30,
+      marginTop: 40,
     },
     instruction: {
       fontWeight: 'bold',
       fontSize: 23,
+      marginBottom: 20,
+      textAlign: 'center',
+      marginTop: 20,
+    },
+    instructionMenu: {
+      fontWeight: 'bold',
+      fontSize: 30,
       marginBottom: 10,
-      marginLeft: 10,
-      marginRight: 10,
+      marginTop: 10,
+      textAlign: 'center',
     },
     description: {
       fontSize: 15,
       marginLeft: 10,
       marginRight: 10,
     },
+    descriptionMenu: {
+      fontSize: 17,
+      textAlign: 'center',
+      textAlignVertical: 'center'
+    },
     wrapper:{
       marginTop: 10,
-      width: '90%',
+      justifyContent: 'center',
+      alignItems: 'center'
+    },
+    menuIcon:{
+      textAlign: 'center',
+      textAlignVertical: 'center',
+      fontSize: 40,
     },
     MenuStyle:{
+      backgroundColor: 'rgba(140,198,65,0.6)',
+      marginBottom: 15,
+      width: '80%',
+      paddingVertical: '8%',
       borderRadius: 15,
-      width: width*0.9*0.4,
-      height: width*0.9*0.4,
-      paddingHorizontal: 20,
-      paddingVertical: 20,
-      marginLeft: width*0.9*0.1,
-      marginBottom: width*0.9*0.1,
+      borderBottomWidth: 2,
+      borderRightWidth: 2,
+      borderBottomColor: '#a1a1a1',
+      borderRightColor: '#a1a1a1'
     },
     buttonText:{
-      color: 'white',
       textAlignVertical: "center",
       textAlign: "center",
       fontSize: 17,
-      fontWeight: 'bold'
     }
 });
 
 
-const loadStyles = StyleSheet.create({
+export const loadStyles = StyleSheet.create({
     container: {
       flex: 1,
       marginTop: 30,
@@ -100,7 +121,7 @@ const loadStyles = StyleSheet.create({
     }
 });
 
-const editStyles = StyleSheet.create({
+export const editStyles = StyleSheet.create({
     container: {
       flex: 1,
       marginTop: 30,
@@ -147,7 +168,7 @@ const editStyles = StyleSheet.create({
     }
 });
 
-const addHomeStyles = StyleSheet.create({
+export const addHomeStyles = StyleSheet.create({
     container: {
       flex: 1,
       marginTop: 30,

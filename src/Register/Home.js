@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, View, Text, Alert, TouchableOpacity, Dimensions, Image } from 'react-native';
+import { Button, View, Text, Alert, TouchableOpacity, Dimensions, Image, ScrollView } from 'react-native';
 import {Icon} from 'native-base';
 
 import AsyncStorage from '@react-native-community/async-storage';
@@ -136,8 +136,7 @@ class Home extends React.Component {
             email: '',
             password: ''
           });
-        }
-        else {
+        } else {
           AsyncStorage.setItem(EMAIL_KEY, email);
           AsyncStorage.setItem(COOKIE_KEY, 'true');
           AsyncStorage.setItem(CSRF_KEY, csrftoken);
@@ -146,7 +145,7 @@ class Home extends React.Component {
       });
 
     }).catch((error) => {
-      Alert.alert("ERROR! Please make sure you have a valid server. \nDetails: "+error);
+      Alert.alert("ERROR! Please make sure you have a valid server. \\nDetails: "+error);
     });
   }
 
@@ -170,13 +169,17 @@ class Home extends React.Component {
     this.setState({cookieValid: false});
   }
 
+  resumeRegister(){
+
+  }
+
   render(){
 
     const inputs = (
       <View>
-        <Text style={ styles.instruction }>Sign in to {this.state.server}</Text>
+        <Text style={ styles.instruction }>Sign in</Text>
         <View style={{marginHorizontal:10}}>
-        <Text>Enter your crendentials for {this.state.server}</Text>
+        <Text style={{textAlign: 'center'}}>Enter your crendentials for {this.state.server}</Text>
         {this.state.invalid?<Text style={{color: 'red', fontSize: 16}}>Invalid credentials.</Text>:null}
           <InputTextBox
             icon="at"
@@ -206,7 +209,15 @@ class Home extends React.Component {
 
       <Text style = { styles.descriptionMenu }>Welcome back, {this.state.email}!</Text>
 
-      <Image source={require('../logos/only-icon.png')} style={{width: '30%', height: '30%', marginLeft: '35%'}}/>
+      <Image source={require('../logos/only-icon.png')}
+        style={{
+          width: '40%', height: '30%', marginLeft: '35%',
+          shadowColor: "#000",
+          shadowOffset: {
+          	width: 0,
+          	height: 4,
+          }, shadowOpacity: 0.30, shadowRadius: 4.65,}}
+      />
 
       <View style={ styles.wrapper }>
 
@@ -215,27 +226,33 @@ class Home extends React.Component {
             style={styles.MenuStyle}
             accessibilityLabel="Sign out from your devemerald account">
               <Icon name="log-out" style={styles.menuIcon}/>
-              <Text style={styles.buttonText} adjustsFontSizeToFit numberOfLines={3}>Sign out from your account</Text>
+              <Text style={styles.buttonText} adjustsFontSizeToFit numberOfLines={2}>Sign out from your account</Text>
           </TouchableOpacity>
-
 
           <TouchableOpacity
             onPress={() => {this.props.navigation.navigate('Scanner')}}
             style={styles.MenuStyle}
-            accessibilityLabel="Add a new deployment">
+            accessibilityLabel="Register a new deployment">
             <Icon name="add" style={styles.menuIcon}/>
             <Text style={styles.buttonText} adjustsFontSizeToFit numberOfLines={2}>Register New deployment</Text>
           </TouchableOpacity>
 
+          <TouchableOpacity
+            onPress={() => {this.resumeRegister()}}
+            style={styles.MenuStyle}
+            accessibilityLabel="Resume registration">
+            <Icon name="bookmark" style={styles.menuIcon}/>
+            <Text style={styles.buttonText} adjustsFontSizeToFit numberOfLines={2}>Resume registration</Text>
+          </TouchableOpacity>
 
       </View>
     </View>);
     return(
-      <View style = { styles.background }>
-        <View style={ styles.container }>
+      <ScrollView style = { styles.background }>
+        <ScrollView style={ styles.container }>
           {!this.state.cookieValid?inputs:menu}
-        </View>
-      </View>
+        </ScrollView>
+      </ScrollView>
     );
   }
 }

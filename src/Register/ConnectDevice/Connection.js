@@ -75,13 +75,11 @@ class Connection extends Component {
   connectToDevice(callback){
     let ssid = this.state.ssid;
     let pwd = this.state.pwd;
-    let success;
     WifiManager.connectToProtectedSSID(ssid,pwd,false).then(() => {
-      success =  true;
+      callback(true);
     }, () => {
-      success = false;
+      callback(false);
     });
-    callback(success);
   }
 
   connect(){
@@ -105,17 +103,21 @@ class Connection extends Component {
 
     let count = Date.now();
     //IF in total less than 2 mins spent on attempting to connect
-    function attemptToConnect(){
+    let attemptToConnect = () => {
       this.connectToDevice(function(response){
-        if (response){console.log("success!")}
+        if (response){
+          this.setState({indicatorAnimating: false}, () => this.props.navigation.navigate('Details',{initialSSID: this.state.initialSSID}))
+        }
         else if (Date.now() - count < 75000){attemptToConnect()}
         else {
           Alert.alert("Failed to connect to device.");
           this.setState({modalIsVisible: true, indicatorText: 'Failed to connect to the device.', indicatorAnimating: false});
           this.updateModalContent();
         }
-      })
+      }.bind(this))
     }
+
+    attemptToConnect();
 
   }
 

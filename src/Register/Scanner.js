@@ -56,12 +56,6 @@ class Scanner extends React.Component {
               Scan the QR code attached to the bottom of device.
           </Text>
         }
-        bottomContent={
-          <Button
-            title="skip qr code for now"
-            onPress={() => {this.props.navigation.navigate('Instructions')}}
-          />
-        }
         permissionDialogTitle="Permission required"
         permissionDialogMessage="This app would like to access your camera."
       />

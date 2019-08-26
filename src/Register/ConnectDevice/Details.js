@@ -13,7 +13,7 @@ import {basicStyles as styles} from '../styles';
 
 const URI = 'http://wireless.devemerald.com';
 
-let urls = null;
+let urls = [];
 
 class Details extends React.Component {
   static navigationOptions = ({ navigation, navigationOptions }) => {
@@ -22,19 +22,19 @@ class Details extends React.Component {
     return {
       title: params ? params.ssid : 'Connect',
       // MARK: comment this if testing with virtual device
-      // headerRight: (
-      //   <Button
-      //     title="Done"
-      //     onPress={() => {disconnectFromDevice(params.ssid, params.initialSSID, navigation);}}
-      //   />
-      // ),
-      //MARK: uncomment this if testing with virtual device
-      headerRight:(
+      headerRight: (
         <Button
           title="Done"
-          onPress={()=> {disconnectFromDevice('','',navigation, urls)}}
+          onPress={() => {disconnectFromDevice(params.ssid, params.initialSSID, navigation, urls);}}
         />
       ),
+      //MARK: uncomment this if testing with virtual device
+      // headerRight:(
+      //   <Button
+      //     title="Done"
+      //     onPress={()=> {disconnectFromDevice('','',navigation, urls)}}
+      //   />
+      // ),
       headerLeft:(
         <Button
           title="Back"
@@ -57,9 +57,8 @@ class Details extends React.Component {
         server = 'www.devemerald.com';
         AsyncStorage.setItem(SERVER_KEY, server);
       }
-      let fetchInstance = new FetchURL(server);
-      this.setState({fetchInstance: fetchInstance});
-      urls = [fetchInstance.GetHomesURL, fetchInstance.GetTrialsURL];
+      this.setState({fetchInstance: new FetchURL(server)}, () => {urls.push(this.state.fetchInstance.GetHomesURL); urls.push(this.state.fetchInstance.GetTrialsURL)});
+
     });
   }
 
@@ -90,6 +89,7 @@ class Details extends React.Component {
         <Button
           title="Reload page"
           onPress={() => {WebViewRef && WebViewRef.reload();}}
+          style={{marginBottom: 10}}
         />
       </View>
     );
@@ -99,17 +99,18 @@ class Details extends React.Component {
 function disconnectFromDevice(ssid, initialSSID, nav, urls) {
 
   // MARK: comment out the whole if statement if testing with virtual device
-  // if (initialSSID != null){
-  //   if (initialSSID !== 'Cannot detect SSID' && !(initialSSID.includes('emerald'))){
-  //     WifiManager.connectToSSID(initialSSID);
-  //   } else {
-  //     WifiManager.disconnectFromSSID(ssid);
-  //     Alert.alert("Manually disconnect from emerald wifi in your device Settings.")
-  //   }
-  // } else {
-  //   WifiManager.disconnectFromSSID(ssid);
-  //   Alert.alert("Manually disconnect from emerald wifi in your device Settings.")
-  // }
+  if (initialSSID != null){
+    if (initialSSID !== 'Cannot detect SSID' && !(initialSSID.includes('emerald'))){
+      WifiManager.connectToSSID(initialSSID);
+      console.log("This is called");
+    } else {
+      WifiManager.disconnectFromSSID(ssid);
+      Alert.alert("Manually disconnect from emerald wifi in your device Settings.")
+    }
+  } else {
+    WifiManager.disconnectFromSSID(ssid);
+    Alert.alert("Manually disconnect from emerald wifi in your device Settings.")
+  }
 
   AsyncStorage.getItem(CSRF_KEY).then((csrftoken)=>{
 

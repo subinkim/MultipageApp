@@ -18,8 +18,9 @@ export const homeStyles = StyleSheet.create({
     instruction: {
       fontWeight: 'bold',
       fontSize: 23,
-      marginBottom: 10,
-      marginLeft: 10,
+      marginBottom: 20,
+      textAlign: 'center',
+      marginTop: 20,
     },
     instructionMenu: {
       fontWeight: 'bold',
@@ -50,10 +51,14 @@ export const homeStyles = StyleSheet.create({
     },
     MenuStyle:{
       backgroundColor: 'rgba(140,198,65,0.6)',
-      marginBottom: 10,
+      marginBottom: 15,
       width: '80%',
       paddingVertical: '8%',
-      borderRadius: 15
+      borderRadius: 15,
+      borderBottomWidth: 2,
+      borderRightWidth: 2,
+      borderBottomColor: '#a1a1a1',
+      borderRightColor: '#a1a1a1'
     },
     buttonText:{
       textAlignVertical: "center",

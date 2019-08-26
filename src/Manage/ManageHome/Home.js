@@ -1,5 +1,6 @@
 import React from 'react';
-import { Button, View, Text, StyleSheet, Alert, TouchableOpacity, Dimensions } from 'react-native';
+import { Button, View, Text, Alert, TouchableOpacity, Image, ScrollView } from 'react-native';
+import { Icon } from 'native-base';
 
 import PasswordTextBox from '../../CustomClass/PasswordTextBox';
 import InputTextBox from '../../CustomClass/InputTextBox';
@@ -47,7 +48,7 @@ class Home extends React.Component {
         server = 'www.devemerald.com';
         AsyncStorage.setItem(SERVER_KEY, server);
       }
-      let fetchInstance = new FetchURL(server)
+      let fetchInstance = new FetchURL(server);
       this.setState({server: server, fetchInstance: fetchInstance}, () => {
         //Check if there's cookie stored on app
         //Use callback to make sure setState happens before this
@@ -60,6 +61,8 @@ class Home extends React.Component {
             });
           }
         });
+
+        AsyncStorage.getItem(EMAIL_KEY).then((email) => {this.setState({email})})
 
       });
 
@@ -170,9 +173,9 @@ class Home extends React.Component {
 
     const inputs = (
       <View>
-        <Text style={ styles.instruction }>Sign in to {this.state.server}</Text>
+        <Text style={ styles.instruction }>Sign in</Text>
         <View style={{marginHorizontal:10}}>
-        <Text>Enter your crendentials for devemerald.com</Text>
+        <Text style={{textAlign: 'center'}}>Enter your crendentials for {this.state.server}</Text>
         {this.state.invalid?<Text style={{color: 'red', fontSize: 16}}>Invalid credentials.</Text>:null}
           <InputTextBox
             icon="at"
@@ -190,7 +193,7 @@ class Home extends React.Component {
           />
           <Button
             title="Sign in"
-            onPress={() => {this.signIn();}}
+            onPress={() => {this.signIn(this.state.email, this.state.password, this.props.navigation);}}
           />
           </View>
       </View>
@@ -198,51 +201,46 @@ class Home extends React.Component {
 
     const menu = (
     <View>
-      <Text style= { styles.instruction }>{this.state.server}</Text>
-      <Text style={ styles.description }>Select an action.</Text>
-      <View style={ styles.wrapper }>
+      <Text style= { styles.instructionMenu }>Emerald</Text>
 
-        <View style={{flexDirection:'row'}}>
+      <Text style = { styles.descriptionMenu }>Welcome back, {this.state.email}!</Text>
+
+      <Image source={require('../../logos/only-icon.png')}
+        style={{
+          width: '40%', height: '30%', marginLeft: '35%',
+          shadowColor: "#000",
+          shadowOffset: {
+          	width: 0,
+          	height: 4,
+          }, shadowOpacity: 0.30, shadowRadius: 4.65,}}
+      />
+
+      <View style={ styles.wrapper }>
 
           <TouchableOpacity
             onPress={() => {this.signOut()}}
-            style={[styles.MenuStyle, {backgroundColor: EMERALD_COLOUR2}]}
-            accessibilityLabel="Sign out from your account">
-            <Text style={styles.buttonText} adjustsFontSizeToFit numberOfLines={3}>Sign out from your account</Text>
+            style={styles.MenuStyle}
+            accessibilityLabel="Sign out from your devemerald account">
+              <Icon name="log-out" style={styles.menuIcon}/>
+              <Text style={styles.buttonText} adjustsFontSizeToFit numberOfLines={2}>Sign out from your account</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             onPress={() => {this.props.navigation.navigate('Load')}}
-            style={[styles.MenuStyle, {backgroundColor: EMERALD_COLOUR1}]}
+            style={styles.MenuStyle}
             accessibilityLabel="Manage Home">
-            <Text style={styles.buttonText} adjustsFontSizeToFit numberOfLines={2}>Manage Home</Text>
+            <Icon name="clipboard" style={styles.menuIcon}/>
+            <Text style={styles.buttonText} adjustsFontSizeToFit numberOfLines={1}>Manage Home</Text>
           </TouchableOpacity>
-
-        </View>
-
-        <View style={{flexDirection:'row'}}>
-
-          <TouchableOpacity
-            onPress={()=>{this.props.navigation.navigate('Register')}}
-            style={[styles.MenuStyle, {backgroundColor: EMERALD_COLOUR3}]}>
-            <Text style={styles.buttonText} adjustsFontSizeToFit numberOfLines={2}>Register new deployment</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            onPress={()=>{this.props.navigation.navigate('Setting')}}
-            style={[styles.MenuStyle, {backgroundColor: EMERALD_COLOUR2}]}>
-            <Text style={styles.buttonText} adjustsFontSizeToFit numberOfLines={1}>Settings</Text>
-          </TouchableOpacity>
-
-        </View>
 
       </View>
     </View>);
-    //MARK:get rid of skip button later
     return(
-      <View style={ styles.container }>
-      {!this.state.cookieValid?inputs:menu}
-      </View>
+      <ScrollView style = { styles.background }>
+        <View style={ styles.container }>
+          {!this.state.cookieValid?inputs:menu}
+        </View>
+      </ScrollView>
     );
   }
 }
