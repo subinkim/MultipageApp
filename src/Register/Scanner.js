@@ -1,9 +1,6 @@
 import React from 'react';
 import { Button, View, Text, StyleSheet, Dimensions, Alert } from 'react-native';
 
-import { HeaderBackButton } from 'react-navigation';
-import WifiManager from 'react-native-wifi';
-import { WebView } from 'react-native-webview';
 import Wifi from 'react-native-iot-wifi';
 import QRCodeScanner from 'react-native-qrcode-scanner';
 import AsyncStorage from '@react-native-community/async-storage';
@@ -28,24 +25,44 @@ class Scanner extends React.Component {
   }
 
   onSuccess = (e) => {
-    let data = JSON.parse(e.data);
-    let ssid = data.ssid;
-    let password = data.password;
-    let uuid = data.uuid;
-    if (ssid == null || password == null || uuid == null){
-      Alert.alert("Invalid QR code","Not a valid QR code.");
-      this.scanner.reactivate();
+    let data;
+    try {
+      data = JSON.parse(e.data);
+
+      let ssid = data.ssid;
+      let password = data.password;
+      let uuid = data.uuid;
+
+      if (ssid == null || password == null || uuid == null){
+        Alert.alert("Invalid QR code", "This is not a valid QR code.", [
+          {
+            text: 'Cancel',
+            style: 'cancel',
+            onPress: () => this.scanner.reactivate(),
+          },
+          {text: 'OK', onPress: () => this.scanner.reactivate()},
+        ]);
+
+      } else {
+        AsyncStorage.setItem(DEVICE_SSID_KEY, ssid);
+        AsyncStorage.setItem(DEVICE_PWD_KEY, password);
+        AsyncStorage.setItem(DEVICE_UUID_KEY, uuid);
+        this.props.navigation.navigate('Instructions');
+      }
+
+    } catch (error) {
+      Alert.alert("Invalid QR code", "This is not a valid QR code.", [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+          onPress: () => this.scanner.reactivate(),
+        },
+        {text: 'OK', onPress: () => this.scanner.reactivate()},
+      ]);
     }
-    AsyncStorage.setItem(DEVICE_SSID_KEY, ssid);
-    AsyncStorage.setItem(DEVICE_PWD_KEY, password);
-    AsyncStorage.setItem(DEVICE_UUID_KEY, uuid);
-    this.props.navigation.navigate('Instructions');
-  }.bind(this);
+  }
 
   render() {
-
-    const { navigation } = this.props;
-    const currentSSID = navigation.getParam('currentSSID', null);
 
     return (
       <QRCodeScanner

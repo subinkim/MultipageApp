@@ -35,6 +35,7 @@ class Home extends React.Component {
       fetchInstance: null,
       invalid: false,
       server: null,
+      email_item: null,
     };
   }
 
@@ -60,7 +61,7 @@ class Home extends React.Component {
           }
         });
 
-        AsyncStorage.getItem(EMAIL_KEY).then((email) => {this.setState({email})})
+        AsyncStorage.getItem(EMAIL_KEY).then((email) => {this.setState({email_item: email})})
 
       });
 
@@ -114,7 +115,7 @@ class Home extends React.Component {
           AsyncStorage.setItem(EMAIL_KEY, this.state.email);
           AsyncStorage.setItem(COOKIE_KEY, 'true');
           AsyncStorage.setItem(CSRF_KEY, csrftoken);
-          this.setState({csrftoken: csrftoken});
+          this.setState({csrftoken: csrftoken, email_item: this.state.email});
           this.props.navigation.navigate('Load');
         }
       });
@@ -202,7 +203,7 @@ class Home extends React.Component {
     <View>
       <Text style= { styles.instructionMenu }>Emerald</Text>
 
-      <Text style = { styles.descriptionMenu }>Welcome back, {this.state.email}!</Text>
+      <Text style = { styles.descriptionMenu }>Welcome back, {this.state.email_item}!</Text>
 
       <Image source={require('../../logos/only-icon.png')}
         style={{

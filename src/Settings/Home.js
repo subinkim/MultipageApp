@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
-import { Button, View, Text, StyleSheet, Alert, SectionList, TouchableOpacity } from 'react-native';
+import { Button, View, Text, Alert, SectionList, TouchableOpacity } from 'react-native';
 import {Icon} from 'native-base';
-import { withNavigation } from "react-navigation";
 
 import {CSRF_KEY,COOKIE_KEY, EMAIL_KEY} from '../CustomClass/Storage';
 import {homeStyles as styles} from './styles';

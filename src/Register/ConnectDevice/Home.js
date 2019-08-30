@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Button, Image, View, Text, Alert } from 'react-native';
+import { Button, Image, View, Text, Alert, ActivityIndicator } from 'react-native';
 
 import Wifi from 'react-native-iot-wifi';
 import Modal from 'react-native-modal';
@@ -13,7 +13,7 @@ import InputTextBox from '../../CustomClass/InputTextBox';
 
 class ConnectHome extends Component {
   static navigationOptions = ({navigation}) => ({
-    headerTitle: "Connect to Wifi",
+    headerTitle: "Connect to Device",
     headerRight: <Button
         onPress={() => {navigation.navigate('Info');}}
         title="Help"
@@ -96,7 +96,7 @@ class ConnectHome extends Component {
         <Modal
           isVisible={this.state.modalIsVisible}
           animationInTiming={400} animationOutTiming={400}
-          style={{ height: '100%', backgroundColor: 'black', opacity: 0.2 , margin: 0}}
+          style={{ height: '100%', backgroundColor: 'rgba(0,0,0,0.2)', margin: 0}}
         >
           <ActivityIndicator size="large" color="red" animating={this.state.modalIsVisible}/>
           <Text style={{ textAlign: 'center', color: 'white' }}>Connecting to the device network...</Text>

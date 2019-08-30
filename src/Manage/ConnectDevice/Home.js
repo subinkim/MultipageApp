@@ -10,7 +10,7 @@ import {basicStyles as styles} from './styles';
 
 class Home extends Component {
   static navigationOptions = ({navigation}) => ({
-    headerTitle: "Connect Device",
+    headerTitle: "Connect to Device",
     headerRight: <Button
         onPress={() => {navigation.navigate('Info');}}
         title="Help"
@@ -120,7 +120,7 @@ class Home extends Component {
         <Modal
           isVisible={this.state.modalIsVisible}
           animationInTiming={400} animationOutTiming={400}
-          style={{ height: '100%', backgroundColor: 'black', opacity: 0.2 , margin: 0}}
+          style={{ height: '100%', backgroundColor: 'rgba(0,0,0,0.2)', margin: 0}}
         >
           <ActivityIndicator size="large" color="red" animating={this.state.modalIsVisible} style={{}}/>
           <Text style={{ textAlign: 'center', color: 'white' }}>Connecting to the device network...</Text>

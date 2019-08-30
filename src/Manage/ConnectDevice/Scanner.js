@@ -1,11 +1,11 @@
 import React from 'react';
 import { Button, View, Text, Alert, ActivityIndicator } from 'react-native';
 
-import { WebView } from 'react-native-webview';
 import Wifi from 'react-native-iot-wifi';
 import QRCodeScanner from 'react-native-qrcode-scanner';
 import Modal from 'react-native-modal';
 import AsyncStorage from '@react-native-community/async-storage';
+
 import { DEVICE_SSID_KEY, DEVICE_PWD_KEY } from '../../CustomClass/Storage';
 
 import {basicStyles as styles} from './styles';
@@ -24,13 +24,19 @@ class Scanner extends React.Component {
     super(props);
     this.state = {
       modalIsVisible: false,
+      
       initialSSID: null,
+      ssid: null,
+      pwd: null,
     }
   }
 
   componentWillMount(){
-    let initial = this.props.navigation.getParam('initialSSID', null);
-    if (initial != null){this.setState({initialSSID: initial})}
+    Wifi.getSSID((initialSSID) => {
+      if (initialSSID != null){
+        this.setState({initialSSID});
+      }
+    });
   }
 
   componentDidMount(){
@@ -38,47 +44,64 @@ class Scanner extends React.Component {
     AsyncStorage.removeItem(DEVICE_PWD_KEY);
   }
 
-  connectToDevice(ssid, pwd, initial){
+  connectToDevice = () => {
 
-    if (ssid === initial){
+    if (this.state.ssid === this.state.initialSSID){
       Alert.alert('You are already connected to this network');
       this.props.navigation.navigate('Details', {
-        ssid: ssid,
+        ssid: this.state.ssid,
       });
     } else {
 
       this.setState({modalIsVisible: true});
-      Wifi.connectSecure(ssid,pwd,false,() => {
+      Wifi.connectSecure(this.state.ssid, this.state.pwd, false, (error) => {
         this.setState({modalIsVisible:false});
         if (error != null){Alert.alert("Cannot connect :(")}
         else {
-          Alert.alert("Connected!");
           this.props.navigation.navigate('Details', {
-              ssid: ssid,
-              initialSSID: initial,
+              ssid: this.state.ssid,
+              initialSSID: this.state.initialSSID,
           });
         }
-
       });
 
     }
+
   }
 
-  onSuccess(e){
+  onSuccess = (e) => {
     let data;
     try {
+
       data = JSON.parse(e.data);
+
+      let ssid = data.ssid;
+      let password = data.password;
+
+      if (ssid == null || password == null){
+        Alert.alert("Invalid QR code", "This is not a valid QR code.", [
+          {
+            text: 'Cancel',
+            style: 'cancel',
+            onPress: () => this.scanner.reactivate(),
+          },
+          {text: 'OK', onPress: () => this.scanner.reactivate()},
+        ]);
+
+      } else {
+        this.setState({ssid: ssid, pwd: password}, () => this.connectToDevice());
+      }
     } catch (error) {
-      Alert.alert("Invalid QR code", "This is not a valid QR code.");
-      this.scanner.reactivate();
+
+      Alert.alert("Invalid QR code", "This is not a valid QR code.", [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+          onPress: () => this.scanner.reactivate(),
+        },
+        {text: 'OK', onPress: () => this.scanner.reactivate()},
+      ]);
     }
-    let ssid = data.ssid;
-    let password = data.password;
-    if (ssid == null || password == null){
-      Alert.alert("Invalid QR code", "This is not a valid QR code.");
-      this.scanner.reactivate();
-    }
-    this.connectToDevice(ssid, password, initial);
   }
 
   render() {
@@ -95,7 +118,7 @@ class Scanner extends React.Component {
         <Modal
           isVisible={this.state.modalIsVisible}
           animationInTiming={400} animationOutTiming={400}
-          style={{ height: '100%', backgroundColor: 'black', opacity: 0.2 , margin: 0}}
+          style={{ height: '100%', backgroundColor: 'rgba(0,0,0,0.2)', margin: 0}}
         >
           <ActivityIndicator size="large" color="red" animating={this.state.modalIsVisible}/>
           <Text style={{ textAlign: 'center', color: 'white' }}>Connecting to the device network...</Text>

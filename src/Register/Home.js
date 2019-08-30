@@ -140,7 +140,7 @@ class Home extends React.Component {
           AsyncStorage.setItem(EMAIL_KEY, this.state.email);
           AsyncStorage.setItem(COOKIE_KEY, 'true');
           AsyncStorage.setItem(CSRF_KEY, csrftoken);
-          this.setState({cookieValid: true, invalid: false}, () => this.props.navigation.navigate('Scanner'));
+          this.setState({cookieValid: true, invalid: false, email_item: this.state.email}, () => this.props.navigation.navigate('Scanner'));
         }
       });
 

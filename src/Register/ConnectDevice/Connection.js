@@ -5,7 +5,7 @@ import Wifi from 'react-native-iot-wifi';
 import AsyncStorage from '@react-native-community/async-storage';
 import Modal from "react-native-modal";
 
-import { DEVICE_SSID_KEY, DEVICE_PWD_KEY, INITIAL_SSID_KEY } from '../../CustomClass/Storage';
+import { DEVICE_SSID_KEY, DEVICE_PWD_KEY } from '../../CustomClass/Storage';
 import { connectionStyles as styles } from '../styles';
 
 import PasswordTextBox from '../../CustomClass/PasswordTextBox';
@@ -143,7 +143,7 @@ class Connection extends Component {
         <Text style={styles.subheader}>If you do not see any text after colon (':') below, click on 'I don't see anything'. If you do, click on 'Next'.</Text>
         <Text style={styles.modalText}>Device SSID: {this.state.ssid}</Text>
         <Text style={styles.modalText}>Device PWD: {this.state.pwd}</Text>
-        <Button onPress={() => {this.setState({modalIsVisible:false});this.props.navigation.navigate('Scanner')}} title="I don't see anything"/>
+        <Button onPress={() => {this.setState({modalIsVisible:false});this.props.navigation.navigate('Scanner')}} title="I don't see anything" style={{marginBottom: 5}}/>
         <Button onPress={() => {this.setState({modalContent: thirdPage})}} title="Next"/>
       </View>
     );
@@ -193,6 +193,7 @@ class Connection extends Component {
   }
 }
 
+//Get location permission if the device platform is Android
 async function requestLocationPermission(){
   try {
     const granted = await PermissionsAndroid.request(

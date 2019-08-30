@@ -6,6 +6,7 @@ import {Icon} from 'native-base';
 
 import RegisterStack from './src/Register';
 import ManageStack from './src/Manage/TabNavigator.js';
+import HelpStack from './src/Help';
 import SettingStack from './src/Settings';
 
 const MyDrawerNavigator = createDrawerNavigator({
@@ -21,6 +22,13 @@ const MyDrawerNavigator = createDrawerNavigator({
     navigationOptions: {
       drawerLabel: 'Manage',
       drawerIcon: ({ tintColor }) => <Icon name={"list"} size={17}/>
+    }
+  },
+  Help:{
+    screen: HelpStack,
+    navigationOptions: {
+      drawerLabel: 'Help',
+      drawerIcon: ({ tintColor }) => <Icon name={"help-circle-outline"} size={17}/>
     }
   },
   Setting:{
