@@ -78,8 +78,8 @@ class Edit extends React.Component {
 
   modalOnSubmit(){
 
-    let deployID = this.state.deployID;
-    let deviceID = this.state.deviceID;
+    let deployID = this.state.deployID; //DEP-
+    let deviceID = this.state.deviceID; //EMR-
     let deployLoc = this.state.deployLoc;
     let height = this.state.height;
 
@@ -100,7 +100,7 @@ class Edit extends React.Component {
             'X-CSRFToken': csrftoken,
             referer: this.state.fetchInstance.MainURL+'/edit/'+this.state.data.uuid,
             Accept: '*/*',
-            'Content-Type': 'application/json',
+            'Content-Type': 'multipart/form-data',
           },
           method:'POST',
           mode: 'cors',
@@ -109,7 +109,7 @@ class Edit extends React.Component {
           this.toggleModal();
           this.reloadData();
         }).catch((error) => {
-          console.log(error);
+          this.toggleModal();
         })
       });
     }
@@ -133,7 +133,7 @@ class Edit extends React.Component {
           'X-CSRFToken': csrftoken,
           referer: this.state.fetchInstance.MainURL+'/edit/'+this.state.data.uuid,
           Accept: '*/*',
-          'Content-Type': 'application/json',
+          'Content-Type': 'multipart/form-data',
         },
         method: 'POST',
         mode: 'cors',
@@ -180,7 +180,7 @@ class Edit extends React.Component {
           style={ styles.modalWrapper }
           onBackdropPress={() => {this.toggleModal()}}
         >
-          <View style={{height: '100%'}}>
+          <ScrollView style={{height: '100%'}}>
             <Text style={{ fontWeight: 'bold', marginBottom: 5, fontSize: 16 }}>Edit deployment</Text>
 
             <Text style={ styles.modalSubtitle }>Deployment uuid</Text>
@@ -188,7 +188,7 @@ class Edit extends React.Component {
 
             <Text style={ styles.modalSubtitle }>Deployment Location</Text>
             <TextInput
-              style={[{height: 20, borderBottomWidth: 1},this.state.isFocusedOne?{borderColor: EMERALD_COLOUR1}:{borderColor: 'grey'}]}
+              style={[{height: 25, borderBottomWidth: 1, fontSize: 15, paddingVertical: 0}, this.state.isFocusedOne?{borderColor: EMERALD_COLOUR1}:{borderColor: 'grey'}]}
               onChangeText={(deployLoc) => this.setState({deployLoc})} value={this.state.deployLoc}
               onFocus={() => {this.setState({isFocusedOne: true})}} onBlur={() => {this.setState({isFocusedOne: false})}}
               placeholder="Deployment location nickname"
@@ -199,28 +199,28 @@ class Edit extends React.Component {
               mode="dropdown" placeholder={this.state.deviceID} selectedValue = {this.state.deviceID}
               onValueChange = {(deviceID)=>this.setState({deviceID:deviceID})}
               textStyle={{maxWidth: '100%'}}
-              style={{borderWidth: 1, borderRadius: 3, borderColor: 'grey', width: '100%'}}>
+              style={{borderWidth: 1, borderRadius: 3, borderColor: 'grey', width: '100%', height: 40}}>
               {this.state.availableDevices!=null?deviceList:null}
             </Picker>
 
             <Text style={ styles.modalSubtitle }>Deployment height</Text>
             <TextInput
-              style={[{height: 20, borderBottomWidth: 1},this.state.isFocusedTwo?{borderColor: EMERALD_COLOUR1}:{borderColor: 'grey'}]}
+              style={[{height: 25, borderBottomWidth: 1, fontSize: 15, paddingVertical: 0},this.state.isFocusedTwo?{borderColor: EMERALD_COLOUR1}:{borderColor: 'grey'}]}
               onChangeText={(height) => this.setState({height})} value={this.state.height.toString()}
               onFocus={() => {this.setState({isFocusedTwo: true})}} onBlur={() => {this.setState({isFocusedTwo: false})}}
               placeholder="Enter deployment height" keyboardType="numeric"
             />
-            <View style={{flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center'}}>
-            <Button
-              onPress={() => {this.toggleModal()}}
-              title="Cancel"
-            />
-            <Button
-              onPress={() => {this.modalOnSubmit()}}
-              title="Done"
-            />
+            <View style={{flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', marginVertical: 10}}>
+              <Button
+                onPress={() => {this.toggleModal()}}
+                title="Cancel"
+              />
+              <Button
+                onPress={() => {this.modalOnSubmit()}}
+                title="Done"
+              />
             </View>
-          </View>
+          </ScrollView>
 
         </Modal>
       );
@@ -260,7 +260,7 @@ class Edit extends React.Component {
     }
 
     return(
-      <View style={ styles.container }>
+      <ScrollView style={ styles.container }>
         <Text style={ styles.instruction }>{this.state.data.nickname}</Text>
 
         <Text style={ styles.descriptionSubtitle }>Home uuid</Text>
@@ -270,7 +270,7 @@ class Edit extends React.Component {
         {devices}
 
         {modal}
-      </View>
+      </ScrollView>
     );
   }
 }

@@ -1,8 +1,6 @@
 import React, { Component } from 'react';
-import { Button, Image, View, Text, StyleSheet, Alert, Platform, PermissionsAndroid, ActivityIndicator, ScrollView } from 'react-native';
+import { Button, Image, View, Text, Alert, Platform, PermissionsAndroid, ActivityIndicator, ScrollView } from 'react-native';
 
-import WifiManager from 'react-native-wifi';
-import { WebView } from 'react-native-webview';
 import Wifi from 'react-native-iot-wifi';
 import AsyncStorage from '@react-native-community/async-storage';
 import Modal from "react-native-modal";
@@ -25,32 +23,32 @@ class Connection extends Component {
   constructor(props){
     super(props);
     this.state = {
-      initialSSID: '',
+      //Indicator
       indicatorText: 'Finishing to set up the device...',
       indicatorColour: EMERALD_COLOUR1,
       indicatorAnimating: true,
 
+      //Device
+      initialSSID: '',
       ssid: null,
       pwd: null,
 
+      //Modal
       modalIsVisible: false,
       modalContentIndex: 0,
       modalContent: null,
     };
   }
 
-  componentDidMount(){
+  componentWillMount(){
     //Sleep for 30 sec
     setTimeout(()=>{
       this.setState({indicatorText:'Trying to connect to the device...'});
       if (Platform.OS === 'android'){
         requestLocationPermission();
       }
-      this.connect();
-    }, 45000); //MARK: change this to 30 sec later
 
-    if (this.state.initialSSID === ''){
-
+      //get initial SSID
       Wifi.getSSID((initialSSID) => {
         if (initialSSID != null){
           this.setState({initialSSID});
@@ -58,11 +56,29 @@ class Connection extends Component {
         if (initialSSID.includes('emerald')){
           this.props.navigation.navigate('Details', {
             initialSSID: initialSSID,
+            ssid: initialSSID,
           });
         }
       });
 
-    }
+      //get device SSID and PWD and attempt to connect
+      AsyncStorage.getAllKeys().then((keys)=>{
+        if (keys.includes(DEVICE_SSID_KEY) && keys.includes(DEVICE_PWD_KEY)){
+
+          AsyncStorage.getItem(DEVICE_SSID_KEY).then((ssid) => {
+            AsyncStorage.getItem(DEVICE_PWD_KEY).then((pwd) => {
+              this.setState({ssid: ssid, pwd: pwd}, () => this.connect()); //attempt to connect only after ssid and pwd have been saved
+            });
+          });
+
+        } else{
+          this.setState({modalIsVisible: true, indicatorText: 'Device SSID and Password not found', indicatorAnimating: false});
+          this.updateModalContent();
+        }
+      });
+
+    }, 30000);
+
 
   }
 
@@ -73,33 +89,15 @@ class Connection extends Component {
   }
 
   connectToDevice(callback){
-    let ssid = this.state.ssid;
-    let pwd = this.state.pwd;
-    WifiManager.connectToProtectedSSID(ssid,pwd,false).then(() => {
-      callback(true);
-    }, () => {
-      callback(false);
-    });
+    if (this.state.ssid!=null && this.state.pwd!=null){
+      Wifi.connectSecure(this.state.ssid,this.state.pwd,false,(error) => {
+        if (error === null){callback(true)}
+        else{callback(false)}
+      });
+    }
   }
 
   connect(){
-
-    let initial = this.state.initialSSID;
-
-    AsyncStorage.getAllKeys().then((keys)=>{
-      if (keys.includes(DEVICE_SSID_KEY) && keys.includes(DEVICE_PWD_KEY)){
-
-        AsyncStorage.getItem(DEVICE_SSID_KEY).then((ssid) => {
-          AsyncStorage.getItem(DEVICE_PWD_KEY).then((pwd) => {
-            this.setState({ssid: ssid, pwd: pwd});
-          });
-        });
-
-      } else{
-        this.setState({modalIsVisible: true, indicatorText: 'Device SSID and Password not found', indicatorAnimating: false});
-        this.updateModalContent();
-      }
-    });
 
     let count = Date.now();
     //IF in total less than 2 mins spent on attempting to connect
@@ -108,7 +106,7 @@ class Connection extends Component {
         if (response){
           this.setState({indicatorAnimating: false}, () => this.props.navigation.navigate('Details',{initialSSID: this.state.initialSSID}))
         }
-        else if (Date.now() - count < 75000){attemptToConnect()}
+        else if (Date.now() - count < 75000 && !response){attemptToConnect();}
         else {
           Alert.alert("Failed to connect to device.");
           this.setState({modalIsVisible: true, indicatorText: 'Failed to connect to the device.', indicatorAnimating: false});
@@ -161,6 +159,7 @@ class Connection extends Component {
       </View>
     );
 
+    //update modal content based on current index
     if (this.state.modalContentIndex === 0){this.setState({modalContent: firstPage, modalContentIndex: this.state.modalContentIndex++})}
     else if (this.state.modalContentIndex === 1){this.setState({modalContent: secondPage, modalContentIndex: this.state.modalContentIndex++})}
     else {this.setState({modalContent: thirdPage})}
@@ -203,8 +202,12 @@ async function requestLocationPermission(){
         'message': 'This app needs access to your location',
       }
     );
+    if (!granted){
+      Alert.alert("Cannot complete the registration without location permission.");
+      this.props.navigation.navigate('Home');
+    }
   } catch (err) {
-    Alert.alert("Cannot use this app.");
+    this.props.navigation.navigate('Home');
   }
 }
 

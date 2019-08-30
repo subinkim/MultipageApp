@@ -1,8 +1,6 @@
 import React, { Component } from 'react';
 import { Button, View, Text, Alert, Platform, PermissionsAndroid } from 'react-native';
 
-import WifiManager from 'react-native-wifi';
-import { WebView } from 'react-native-webview';
 import Wifi from 'react-native-iot-wifi';
 
 import PasswordTextBox from '../../CustomClass/PasswordTextBox';
@@ -32,16 +30,20 @@ class Home extends Component {
       requestLocationPermission();
     }
 
-    if (this.state.initialSSID === null){
-      Wifi.getSSID((initialSSID) => {
-        if (initialSSID != null){
-          this.setState({initialSSID});
-        }
-      })
-    }
+    if (this.state.initialSSID === null){this.getInitialSSID()}
+  }
+
+  getInitialSSID(){
+    Wifi.getSSID((initialSSID) => {
+      if (initialSSID != null){
+        this.setState({initialSSID});
+      }
+    });
   }
 
   connectToDevice(){
+
+    this.getInitialSSID();
 
     if (this.state.ssid === '' || this.state.password === ''){
       Alert.alert('Incomplete','Please complete both fields');
@@ -54,16 +56,15 @@ class Home extends Component {
         });
       } else {
 
-        //Connect to the deivce
-        WifiManager.connectToProtectedSSID(this.state.ssid,this.state.password,false).then(() => {
-          Alert.alert("Connected!");
-          nav.navigate('Details', {
+        Wifi.connectSecure(this.state.ssid,this.state.password,false, (error)  => {
+          if (error != null){Alert.alert("Did not connect")}
+          else{
+            this.props.navigation.navigate('Details', {
               ssid: this.state.ssid,
-              initialSSID: this.state.currentSSID,
-          });
-        }, () => {
-          Alert.alert('Failed to connect to the device.');
-        });
+              initialSSID: this.state.initialSSID,
+            })
+          }
+        })
 
       }
     }
@@ -75,8 +76,9 @@ class Home extends Component {
     const scannerButton = (<Button
       title="Scan QR code"
       onPress={() => {
+        this.getInitialSSID();
         this.props.navigation.navigate('Scanner',{
-          currentSSID: this.state.initialSSID,
+          initialSSID: this.state.initialSSID,
         });
       }}
     />);

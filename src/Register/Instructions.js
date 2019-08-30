@@ -3,7 +3,7 @@ import { Button, Image, View, Text, StyleSheet, Dimensions, ScrollView } from 'r
 
 import Carousel, {Pagination} from 'react-native-snap-carousel';
 import { ENTRIES1 } from './data/entries.js';
-import { instructionsStyles as styles } from './styles'; 
+import { instructionsStyles as styles } from './styles';
 
 const SLIDER_1_FIRST_ITEM = 0;
 const EMERALD_COLOUR1 = '#17AA9D';
@@ -57,35 +57,37 @@ class Instructions extends React.Component {
     const {height, width} = Dimensions.get('window');
 
     return (
-      <ScrollView style={ styles.container }>
+      <ScrollView style={ styles.container } contentContainerStyle={{flexGrow:1}}>
         <Text style={ styles.instruction }>Install your device</Text>
         <Text style={ styles.description }>Swipe to the left for instructions</Text>
-        <Pagination
-          dotsLength={ENTRIES1.length}
-          activeDotIndex={this.state.sliderActiveSlide}
-          dotColor={EMERALD_COLOUR2}
-          dotStyle={styles.paginationDot}
-          inactiveDotColor={'black'}
-          inactiveDotOpacity={0.4}
-          inactiveDotScale={0.6}
-          carouselRef={this._carousel}
-          tappableDots={!!this._carousel}
-          containerStyle={ styles.paginationContainer }
-        />
-        <Carousel
-          ref={(c) => { this._carousel = c; }}
-          data={ENTRIES1}
-          renderItem={this._renderItem}
-          sliderWidth={width}
-          itemWidth={width}
-          sliderHeight={height*0.8}
-          firstItem={SLIDER_1_FIRST_ITEM}
-          inactiveSlideScale={0.94}
-          inactiveSlideOpacity={0.7}
-          contentContainerCustomStyle={styles.sliderContentContainer}
-          layout={'default'}
-          onSnapToItem={(index) => {this.setState({ sliderActiveSlide: index })}}
-        />
+        <View style={{height: '80%'}}>
+          <Pagination
+            dotsLength={ENTRIES1.length}
+            activeDotIndex={this.state.sliderActiveSlide}
+            dotColor={EMERALD_COLOUR2}
+            dotStyle={styles.paginationDot}
+            inactiveDotColor={'black'}
+            inactiveDotOpacity={0.4}
+            inactiveDotScale={0.6}
+            carouselRef={this._carousel}
+            tappableDots={!!this._carousel}
+            containerStyle={ styles.paginationContainer }
+          />
+          <Carousel
+            ref={(c) => { this._carousel = c; }}
+            data={ENTRIES1}
+            renderItem={this._renderItem}
+            sliderWidth={width}
+            itemWidth={width}
+            sliderHeight={height*0.8}
+            firstItem={SLIDER_1_FIRST_ITEM}
+            inactiveSlideScale={0.94}
+            inactiveSlideOpacity={0.7}
+            contentContainerCustomStyle={styles.sliderContentContainer}
+            layout={'default'}
+            onSnapToItem={(index) => {this.setState({ sliderActiveSlide: index })}}
+          />
+        </View>
       </ScrollView>
     );
   }

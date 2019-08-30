@@ -1,10 +1,9 @@
 import React from 'react';
-import { Button, View, Text, StyleSheet, Dimensions, Alert } from 'react-native';
+import { Button, View, Text, Dimensions, Alert } from 'react-native';
 
-import WifiManager from 'react-native-wifi';
 import { WebView } from 'react-native-webview';
 import Wifi from 'react-native-iot-wifi';
-import CookieManager from 'react-native-cookies';
+
 import AsyncStorage from '@react-native-community/async-storage';
 
 import {FetchURL} from '../../CustomClass/Fetch';
@@ -79,12 +78,7 @@ class Details extends React.Component {
           ref={WEBVIEW_REF => (WebViewRef = WEBVIEW_REF)}
           source={{ uri: URI }}
           style={{ width: windowWidth, height: windowHeight, flex: 1 , marginBottom: botMargin, marginHorizontal: horMargin }}
-          renderError={(error) => {return(<Text style={{justifyContent: 'center', alignItems: 'center'}}>Error while loading page. Please try reloading by clicking on the button below. If it still doesn't work, please check your wifi connection and make sure your device is connected to Emerald device. Your device should be connected to 'emerald-XXXXXX' network.</Text>);}}
-          renderLoading={() => {}}
-          startInLoadingState={true}
-          onLoadEnd={() => {}}
-          onLoadStart={() => {}}
-          onLoadProgress={() => {}}
+          renderError={(error) => {return(<Text style={{justifyContent: 'center', alignItems: 'center'}}>Error while loading page. Error: {error}</Text>);}}
         />
         <Button
           title="Reload page"
@@ -101,15 +95,12 @@ function disconnectFromDevice(ssid, initialSSID, nav, urls) {
   // MARK: comment out the whole if statement if testing with virtual device
   if (initialSSID != null){
     if (initialSSID !== 'Cannot detect SSID' && !(initialSSID.includes('emerald'))){
-      WifiManager.connectToSSID(initialSSID);
-      console.log("This is called");
+      Wifi.connect(initialSSID, () => {});
     } else {
-      WifiManager.disconnectFromSSID(ssid);
-      Alert.alert("Manually disconnect from emerald wifi in your device Settings.")
+      Wifi.removeSSID(ssid, () => Alert.alert("Please manually reconnect to your home wifi in the Settings app."));
     }
   } else {
-    WifiManager.disconnectFromSSID(ssid);
-    Alert.alert("Manually disconnect from emerald wifi in your device Settings.")
+    Wifi.removeSSID(ssid, () => Alert.alert("Please manually reconnect to your home wifi in the Settings app."));
   }
 
   AsyncStorage.getItem(CSRF_KEY).then((csrftoken)=>{

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, View, Text, Dimensions } from 'react-native';
+import { Button, View, Text, Dimensions, Alert } from 'react-native';
 
 import WifiManager from 'react-native-wifi';
 import { WebView } from 'react-native-webview';
@@ -19,7 +19,7 @@ class Details extends React.Component {
       headerRight: (
         <Button
           title="Done"
-          onPress={() => {disconnectFromDevice(params.ssid, params.initialSSID, navigation);}}
+          onPress={() => {disconnectFromDevice(params.ssid, params.initialSSID, navigation)}}
         />
       ),
       headerLeft:(
@@ -58,21 +58,24 @@ class Details extends React.Component {
   }
 }
 
-function disconnectFromDevice(ssid, initialSSID, nav){
+function disconnectFromDevice(ssid, initialSSID, navigation){
 
   if (initialSSID != null){
-    if (initialSSID !== 'Cannot detect SSID' && !(initialSSID.includes('emerald'))){
-      WifiManager.connectToSSID(initialSSID);
-      nav.navigate('Home');
+    if (!(initialSSID.includes('emerald'))){
+      Wifi.connect(initialSSID, (error) => {
+        if (error != null){Alert.alert("Please manually disconnect from the device in the Settings.")}
+      });
     } else {
-      WifiManager.disconnectFromSSID(ssid);
-      nav.navigate('Home');
+      Wifi.removeSSID(ssid, (error) => {
+        if (error != null){Alert.alert("Please manually disconnect from the device in the Settings.")}
+      });
     }
   } else {
-    WifiManager.disconnectFromSSID(ssid);
-    nav.navigate('Home');
+    Wifi.removeSSID(ssid, (error) => {
+      if (error != null){Alert.alert("Please manually disconnect from the device in the Settings.")}
+    });
   }
-
+  navigation.navigate('Home');
 }
 
 export default Details;

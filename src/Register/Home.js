@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, View, Text, Alert, TouchableOpacity, Dimensions, Image, ScrollView } from 'react-native';
+import { Button, View, Text, Alert, TouchableOpacity, Dimensions, Image, ScrollView, Platform } from 'react-native';
 import {Icon} from 'native-base';
 
 import AsyncStorage from '@react-native-community/async-storage';
@@ -34,7 +34,7 @@ class Home extends React.Component {
       fetchInstance: null,
       invalid: false,
       server: null,
-      email: null,
+      email_item: null,
     };
   }
 
@@ -48,7 +48,7 @@ class Home extends React.Component {
         });
       }
     });
-    AsyncStorage.getItem(EMAIL_KEY).then((email) => {this.setState({email})})
+    AsyncStorage.getItem(EMAIL_KEY).then((email) => {this.setState({email_item: email})})
     //Check the server - if none exists, set it to default servdr
     AsyncStorage.getItem(SERVER_KEY).then((server) => {
       if (server === null){
@@ -117,14 +117,14 @@ class Home extends React.Component {
     });
   }
 
-  signIn(email, password, nav){
+  signIn(){
     fetch(this.state.fetchInstance.LoginURL, {
       method: 'POST',
       headers: {
         Accept:'*/*',
         'Content-Type': 'application/x-www-form-urlencoded',
       },
-      body: 'email='+email+'&password='+password,
+      body: 'email='+this.state.email+'&password='+this.state.password,
       credentials: "include",
     }).then((response) => {
 
@@ -137,7 +137,7 @@ class Home extends React.Component {
             password: ''
           });
         } else {
-          AsyncStorage.setItem(EMAIL_KEY, email);
+          AsyncStorage.setItem(EMAIL_KEY, this.state.email);
           AsyncStorage.setItem(COOKIE_KEY, 'true');
           AsyncStorage.setItem(CSRF_KEY, csrftoken);
           this.setState({cookieValid: true, invalid: false}, () => this.props.navigation.navigate('Scanner'));
@@ -145,7 +145,8 @@ class Home extends React.Component {
       });
 
     }).catch((error) => {
-      Alert.alert("ERROR! Please make sure you have a valid server. \\nDetails: "+error);
+      Alert.alert(JSON.stringify(error));
+      console.log(error);
     });
   }
 
@@ -197,7 +198,7 @@ class Home extends React.Component {
           />
           <Button
             title="Sign in"
-            onPress={() => {this.signIn(this.state.email, this.state.password, this.props.navigation);}}
+            onPress={() => {this.signIn()}}
           />
           </View>
       </View>
@@ -207,7 +208,7 @@ class Home extends React.Component {
     <View>
       <Text style= { styles.instructionMenu }>Emerald</Text>
 
-      <Text style = { styles.descriptionMenu }>Welcome back, {this.state.email}!</Text>
+      <Text style = { styles.descriptionMenu }>Welcome back, {this.state.email_item}!</Text>
 
       <Image source={require('../logos/only-icon.png')}
         style={{
@@ -219,7 +220,7 @@ class Home extends React.Component {
           }, shadowOpacity: 0.30, shadowRadius: 4.65,}}
       />
 
-      <View style={ styles.wrapper }>
+      <View style={[styles.wrapper, Platform.OS==="android"?{flexDirection: 'row', flexWrap: 'wrap'}:null]}>
 
           <TouchableOpacity
             onPress={() => {this.signOut()}}
@@ -242,17 +243,17 @@ class Home extends React.Component {
             style={styles.MenuStyle}
             accessibilityLabel="Resume registration">
             <Icon name="bookmark" style={styles.menuIcon}/>
-            <Text style={styles.buttonText} adjustsFontSizeToFit numberOfLines={2}>Resume registration</Text>
+            <Text style={styles.buttonText} adjustsFontSizeToFit numberOfLines={2}>Resume last registration</Text>
           </TouchableOpacity>
 
       </View>
     </View>);
     return(
-      <ScrollView style = { styles.background }>
-        <ScrollView style={ styles.container }>
+      <View style = { styles.background }>
+        <ScrollView style={ styles.container } contentContainerStyle={{flexGrow: 1}}>
           {!this.state.cookieValid?inputs:menu}
         </ScrollView>
-      </ScrollView>
+      </View>
     );
   }
 }

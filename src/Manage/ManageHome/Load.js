@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, View, Text, StyleSheet, Alert, TouchableOpacity, FlatList, ScrollView } from 'react-native';
+import { Button, View, Text, StyleSheet, Alert, TouchableOpacity, FlatList, ScrollView, ActivityIndicator } from 'react-native';
 import { Icon } from 'native-base';
 import { Button as ElementsButton } from 'react-native-elements';
 
@@ -37,6 +37,7 @@ class Load extends React.Component {
       selectedItem: null,
       fetchInstance: null,
       updated: true,
+      dataLoaded: false,
 
       //Modal
       modalIsVisible: false,
@@ -97,7 +98,7 @@ class Load extends React.Component {
         mode: 'cors',
       }).then((response) => {
         return response.text().then((res) => {
-          if (res!=null && this._isMounted){res = JSON.parse(res);this.setState({json: res})}
+          if (res!=null && this._isMounted){res = JSON.parse(res);this.setState({json: res, dataLoaded: true})}
         });
       });
     });
@@ -107,6 +108,7 @@ class Load extends React.Component {
     this._isMounted = false;
   }
 
+  //If screen is still mounted, change modalIsVisible state
   toggleModal = () => {
     if (this._isMounted){this.setState({ modalIsVisible: !this.state.modalIsVisible })}
   };
@@ -117,6 +119,7 @@ class Load extends React.Component {
     });
   }
 
+  //User confirms delete
   confirmDelete = () => {
     Alert.alert(
       'Deregister Home',
@@ -266,8 +269,13 @@ class Load extends React.Component {
 
           </Modal>
         </View>
-        <View style={{backgroundColor: '#dfdfdf', paddingHorizontal: 7, paddingVertical: 5}}>
-        { items }
+        <View style={this.state.dataLoaded?{backgroundColor: '#dfdfdf', paddingHorizontal: 7, paddingVertical: 5}:{}}>
+        { this.state.dataLoaded?items:
+          <View>
+            <ActivityIndicator size="large" color="red" animating={this.state.indicatorAnimating}/>
+            <Text style={{textAlign: 'center', fontSize: 13}}>Getting homes...</Text>
+          </View>
+        }
         </View>
       </ScrollView>
     );

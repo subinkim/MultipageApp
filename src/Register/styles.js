@@ -1,5 +1,5 @@
 import React from 'React';
-import {StyleSheet, Dimensions} from 'react-native';
+import {StyleSheet, Dimensions, Platform} from 'react-native';
 
 const EMERALD_COLOUR1 = '#17AA9D';
 const EMERALD_COLOUR2 = '#28B674';
@@ -7,13 +7,15 @@ const EMERALD_COLOUR3 = '#8CC641';
 
 const {height, width} = Dimensions.get('window');
 
+const android = Platform.OS==='android'?true:false;
+
+//Home.js
 export const homeStyles = StyleSheet.create({
     background:{
-      flex:1
+      flex: 1,
     },
     container: {
-      flex: 1,
-      marginTop: 40,
+      paddingTop: 40,
     },
     instruction: {
       fontWeight: 'bold',
@@ -42,17 +44,27 @@ export const homeStyles = StyleSheet.create({
     wrapper:{
       marginTop: 10,
       justifyContent: 'center',
-      alignItems: 'center'
+      alignItems: 'center',
     },
     menuIcon:{
       textAlign: 'center',
       textAlignVertical: 'center',
       fontSize: 40,
     },
-    MenuStyle:{
+    MenuStyle:!android?{
       backgroundColor: 'rgba(140,198,65,0.6)',
       marginBottom: 15,
       width: '80%',
+      paddingVertical: '8%',
+      borderRadius: 15,
+      borderBottomWidth: 2,
+      borderRightWidth: 2,
+      borderBottomColor: '#a1a1a1',
+      borderRightColor: '#a1a1a1'
+    }:{
+      backgroundColor: 'rgba(140,198,65,0.6)',
+      marginBottom: 15,
+      width: '40%',
       paddingVertical: '8%',
       borderRadius: 15,
       borderBottomWidth: 2,
@@ -67,6 +79,7 @@ export const homeStyles = StyleSheet.create({
     }
 });
 
+//Scanner.js
 export const scannerStyles = StyleSheet.create({
     container: {
       flex: 1,
@@ -85,6 +98,7 @@ export const scannerStyles = StyleSheet.create({
     },
 });
 
+//Instructions.js
 export const instructionsStyles = StyleSheet.create({
     container: {
       flex: 1,
@@ -136,6 +150,7 @@ export const instructionsStyles = StyleSheet.create({
     },
 });
 
+//Register/ConnectHome
 export const connectionStyles = StyleSheet.create({
     container: {
       flex: 1,
@@ -177,6 +192,7 @@ export const connectionStyles = StyleSheet.create({
     }
 });
 
+//Basic
 export const basicStyles = StyleSheet.create({
     container: {
       flex: 1,

@@ -6,6 +6,7 @@ const EMERALD_COLOUR3 = '#8CC641';
 
 const {height, width} = Dimensions.get('window');
 
+//Home.js
 export const homeStyles = StyleSheet.create({
     background:{
       flex:1
@@ -66,7 +67,7 @@ export const homeStyles = StyleSheet.create({
     }
 });
 
-
+//Load.js
 export const loadStyles = StyleSheet.create({
     container: {
       flex: 1,
@@ -121,6 +122,7 @@ export const loadStyles = StyleSheet.create({
     }
 });
 
+//Edit.js
 export const editStyles = StyleSheet.create({
     container: {
       flex: 1,
@@ -168,6 +170,7 @@ export const editStyles = StyleSheet.create({
     }
 });
 
+//AddHome.js
 export const addHomeStyles = StyleSheet.create({
     container: {
       flex: 1,

@@ -19,8 +19,6 @@ class Home extends React.Component {
 
   static navigationOptions = ({navigation, navigationOptions}) => {
 
-    const { params } = navigation.state;
-
     return {
       header: null,
     }
@@ -72,7 +70,6 @@ class Home extends React.Component {
 
   //Change view based on cookie validity
   componentDidMount(){
-
     AsyncStorage.getItem(COOKIE_KEY).then((cookieValid) => {
       if (cookieValid === 'true'){this.setState({cookieValid:true})}
       else {this.setState({cookieValid:false})}
@@ -81,6 +78,7 @@ class Home extends React.Component {
 
   componentWillUpdate(){
 
+    //Check if cookie is valid
     AsyncStorage.getItem(COOKIE_KEY).then((cookie) => {
       if (cookie!=null){
         if (cookie==='true'){cookie = true}
@@ -117,6 +115,7 @@ class Home extends React.Component {
           AsyncStorage.setItem(COOKIE_KEY, 'true');
           AsyncStorage.setItem(CSRF_KEY, csrftoken);
           this.setState({csrftoken: csrftoken});
+          this.props.navigation.navigate('Load');
         }
       });
     }).catch((error) => {
@@ -236,11 +235,11 @@ class Home extends React.Component {
       </View>
     </View>);
     return(
-      <ScrollView style = { styles.background }>
-        <View style={ styles.container }>
+      <View style = { styles.background }>
+        <ScrollView style={ styles.container } contentContainerStyle={{flexGrow:1}}>
           {!this.state.cookieValid?inputs:menu}
-        </View>
-      </ScrollView>
+        </ScrollView>
+      </View>
     );
   }
 }

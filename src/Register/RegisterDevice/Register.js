@@ -56,7 +56,6 @@ class Register extends React.Component {
     });
 
     AsyncStorage.getItem(DEVICE_UUID_KEY).then((uuid)=>{
-      uuid = 'EMR-31d2dc94-ceba-4a4d-8f25-bd5efda1cbb1';//MARK: For test purpose - get rid of this later
       this.setState({device_uuid: uuid});
     });
   }
@@ -86,7 +85,7 @@ class Register extends React.Component {
           headers: {
             Accept:'*/*',
             'Content-Type': 'multipart/form-data',
-            referer: 'https://www.devemerald.com/trialsite/edit/'+this.state.home_uuid,
+            referer: this.state.fetchInstance.MainURL+'/edit/'+this.state.home_uuid,
             'X-CSRFToken': csrftoken,
           },
           body: data,

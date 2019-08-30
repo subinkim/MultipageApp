@@ -54,7 +54,7 @@ class AddHome extends Component {
           headers: {
             Accept:'*/*',
             'Content-Type': 'application/x-www-form-urlencoded',
-            referer: 'https://www.devemerald.com/trialsite/register',
+            referer: this.state.fetchInstance.Main+'/register',
             'X-CSRFToken': csrftoken,
           },
           body: 'nickname='+nickname+'&trial_uuid='+trial_uuid,
