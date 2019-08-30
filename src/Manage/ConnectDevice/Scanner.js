@@ -1,10 +1,12 @@
 import React from 'react';
-import { Button, View, Text, Alert } from 'react-native';
+import { Button, View, Text, Alert, ActivityIndicator } from 'react-native';
 
-import WifiManager from 'react-native-wifi';
 import { WebView } from 'react-native-webview';
 import Wifi from 'react-native-iot-wifi';
 import QRCodeScanner from 'react-native-qrcode-scanner';
+import Modal from 'react-native-modal';
+import AsyncStorage from '@react-native-community/async-storage';
+import { DEVICE_SSID_KEY, DEVICE_PWD_KEY } from '../../CustomClass/Storage';
 
 import {basicStyles as styles} from './styles';
 
@@ -18,23 +20,20 @@ class Scanner extends React.Component {
     };
   };
 
-  loadOnSuccess = (initial) => {
-    function onSuccess(e){
-      let data = JSON.parse(e.data);
-      let ssid = data.ssid;
-      let password = data.password;
-      let uuid = data.uuid;
-      if (ssid == null || password == null || uuid == null){
-        Alert.alert("Invalid QR code", "This is not a valid QR code.");
-        this.scanner.reactivate();
-      }
-      connectToDevice(ssid, password, initial);
+  constructor(props){
+    super(props);
+    this.state = {
+      modalIsVisible: false,
+      initialSSID: null,
     }
-    return onSuccess;
+  }
+
+  componentWillMount(){
+    let initial = this.props.navigation.getParam('initialSSID', null);
+    if (initial != null){this.setState({initialSSID: initial})}
   }
 
   componentDidMount(){
-    AsyncStorage.removeItem(DEVICE_UUID_KEY);
     AsyncStorage.removeItem(DEVICE_SSID_KEY);
     AsyncStorage.removeItem(DEVICE_PWD_KEY);
   }
@@ -48,37 +47,60 @@ class Scanner extends React.Component {
       });
     } else {
 
-      WifiManager.connectToProtectedSSID(ssid,pwd,false).then(() => {
-        Alert.alert("Connected!");
-        this.props.navigation.navigate('Details', {
-            ssid: ssid,
-            initialSSID: initial,
-        });
-      }, () => {
-        Alert.alert('Cannot connect');
-        this.scanner.reactivate();
+      this.setState({modalIsVisible: true});
+      Wifi.connectSecure(ssid,pwd,false,() => {
+        this.setState({modalIsVisible:false});
+        if (error != null){Alert.alert("Cannot connect :(")}
+        else {
+          Alert.alert("Connected!");
+          this.props.navigation.navigate('Details', {
+              ssid: ssid,
+              initialSSID: initial,
+          });
+        }
+
       });
 
     }
   }
 
+  onSuccess(e){
+    let data;
+    try {
+      data = JSON.parse(e.data);
+    } catch (error) {
+      Alert.alert("Invalid QR code", "This is not a valid QR code.");
+      this.scanner.reactivate();
+    }
+    let ssid = data.ssid;
+    let password = data.password;
+    if (ssid == null || password == null){
+      Alert.alert("Invalid QR code", "This is not a valid QR code.");
+      this.scanner.reactivate();
+    }
+    this.connectToDevice(ssid, password, initial);
+  }
+
   render() {
 
-    const { navigation } = this.props;
-    const currentSSID = navigation.getParam('currentSSID', null);
-
     return (
-      <QRCodeScanner
-        ref={(node) => { this.scanner = node }}
-        onRead={this.loadOnSuccess(currentSSID)}
-        topContent={
-          <Text>
-              Scan the QR code attached to the bottom of device.
-          </Text>
-        }
-        permissionDialogTitle="Permission required"
-        permissionDialogMessage="This app would like to access your camera."
-      />
+      <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+        <Text>Scan the QR code attached to the bottom of device.</Text>
+        <QRCodeScanner
+          ref={(node) => { this.scanner = node }}
+          onRead={this.onSuccess}
+          permissionDialogTitle="Permission required"
+          permissionDialogMessage="This app would like to access your camera."
+        />
+        <Modal
+          isVisible={this.state.modalIsVisible}
+          animationInTiming={400} animationOutTiming={400}
+          style={{ height: '100%', backgroundColor: 'black', opacity: 0.2 , margin: 0}}
+        >
+          <ActivityIndicator size="large" color="red" animating={this.state.modalIsVisible}/>
+          <Text style={{ textAlign: 'center', color: 'white' }}>Connecting to the device network...</Text>
+        </Modal>
+      </View>
     );
   }
 }

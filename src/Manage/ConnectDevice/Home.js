@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
-import { Button, View, Text, Alert, Platform, PermissionsAndroid } from 'react-native';
+import { Button, View, Text, Alert, Platform, PermissionsAndroid, ActivityIndicator } from 'react-native';
 
 import Wifi from 'react-native-iot-wifi';
+import Modal from 'react-native-modal';
 
 import PasswordTextBox from '../../CustomClass/PasswordTextBox';
 import InputTextBox from '../../CustomClass/InputTextBox';
@@ -22,6 +23,8 @@ class Home extends Component {
       ssid: '',
       password: '',
       initialSSID: null,
+
+      modalIsVisible: false,
     };
   }
 
@@ -45,22 +48,28 @@ class Home extends Component {
 
     this.getInitialSSID();
 
-    if (this.state.ssid === '' || this.state.password === ''){
+    let ssid = this.state.ssid;
+    let pwd = this.state.password;
+
+    if (ssid === '' || pwd === ''){
       Alert.alert('Incomplete','Please complete both fields');
     } else {
       //If already connected to the device
-      if (this.state.ssid === this.state.initialSSID){
+      if (ssid === this.state.initialSSID){
         Alert.alert('You are already connected to this network');
+        this.setState({ssid: '', password: ''});
         this.props.navigation.navigate('Details', {
-          ssid: this.state.ssid,
+          ssid: ssid,
         });
       } else {
 
-        Wifi.connectSecure(this.state.ssid,this.state.password,false, (error)  => {
+        this.setState({modalIsVisible: true});
+        Wifi.connectSecure(ssid,pwd,false, (error)  => {
+          this.setState({modalIsVisible:false, ssid: '', password: ''});
           if (error != null){Alert.alert("Did not connect")}
           else{
             this.props.navigation.navigate('Details', {
-              ssid: this.state.ssid,
+              ssid: ssid,
               initialSSID: this.state.initialSSID,
             })
           }
@@ -84,28 +93,38 @@ class Home extends Component {
     />);
 
     return (
-      <View style={ styles.container }>
-        <Text style={ styles.instruction }>Connect to your device</Text>
-        <Text>Manually enter SSID and password of your device or scan QR code attached to the bottom of the device.</Text>
-        <InputTextBox
-          icon="wifi"
-          label='Device SSID'
-          onChange={(ssid) => {this.setState({ssid})}}
-          keyboard='default'
-          returnKey='next'
-          value={this.state.ssid}
-        />
-        <PasswordTextBox
-          icon='lock'
-          label=' Device password'
-          onChange={(password) => {this.setState({password})}}
-          value={this.state.password}
-        />
-        <Button
-          title="Connect"
-          onPress={() => {this.connectToDevice()}}
-        />
-        { scannerButton }
+      <View style={{flex:1}}>
+        <View style={ styles.container }>
+          <Text style={ styles.instruction }>Connect to your device</Text>
+          <Text>Manually enter SSID and password of your device or scan QR code attached to the bottom of the device.</Text>
+          <InputTextBox
+            icon="wifi"
+            label='Device SSID'
+            onChange={(ssid) => {this.setState({ssid})}}
+            keyboard='default'
+            returnKey='next'
+            value={this.state.ssid}
+          />
+          <PasswordTextBox
+            icon='lock'
+            label=' Device password'
+            onChange={(password) => {this.setState({password})}}
+            value={this.state.password}
+          />
+          <Button
+            title="Connect"
+            onPress={() => {this.connectToDevice()}}
+          />
+          { scannerButton }
+        </View>
+        <Modal
+          isVisible={this.state.modalIsVisible}
+          animationInTiming={400} animationOutTiming={400}
+          style={{ height: '100%', backgroundColor: 'black', opacity: 0.2 , margin: 0}}
+        >
+          <ActivityIndicator size="large" color="red" animating={this.state.modalIsVisible} style={{}}/>
+          <Text style={{ textAlign: 'center', color: 'white' }}>Connecting to the device network...</Text>
+        </Modal>
       </View>
     );
   }
