@@ -8,7 +8,7 @@ import PasswordTextBox from '../../CustomClass/PasswordTextBox';
 import InputTextBox from '../../CustomClass/InputTextBox';
 import {basicStyles as styles} from './styles';
 
-class Home extends Component {
+class CNHome extends Component {
   static navigationOptions = ({navigation}) => ({
     headerTitle: "Connect to Device",
     headerRight: <Button
@@ -144,4 +144,4 @@ async function requestLocationPermission(){
   }
 }
 
-export default Home;
+export default CNHome;

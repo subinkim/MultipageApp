@@ -82,10 +82,13 @@ class Home extends Component {
     </View>
   )
 
+  itemProps = [[[this.changeServer,this.deleteCookies],["link","remove-circle"], ["green", "red"]]];
+  
   _renderItem = ({item, index, section}) => {
-    const onPressFunc = [this.changeServer,this.deleteCookies];
-    const itemIcons = ["link","remove-circle"];
-    const itemColours = ["green", "red"];
+    const onPressFunc = this.itemProps[section.index][0][index];
+    const itemIcons = this.itemProps[section.index][1][index];
+    const itemColours = this.itemProps[section.index][2][index];
+
     return (
       <TouchableOpacity onPress={onPressFunc[index]} style={styles.listItem}>
         <Icon active name={itemIcons[index]} style={{color: itemColours[index], fontSize: 25, marginRight: '2%'}}/>
@@ -97,7 +100,7 @@ class Home extends Component {
   render() {
 
     const data = [
-      {title: 'Manage Account', data: ['Change Server', 'Delete Cookies']},
+      {title: 'Manage Account', data: ['Change Server', 'Sign Out'], index: 0},
     ]
 
     return (

@@ -3,7 +3,7 @@ import { Image, View, Text, Dimensions } from 'react-native';
 
 import {basicStyles as styles} from './styles';
 
-class Info extends React.Component {
+class CNInfo extends React.Component {
   static navigationOptions = {
     title: 'Help',
   };
@@ -25,4 +25,4 @@ class Info extends React.Component {
   }
 }
 
-export default Info;
+export default CNInfo;

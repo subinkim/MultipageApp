@@ -9,7 +9,7 @@ import {FetchURL} from '../../CustomClass/Fetch';
 import {CSRF_KEY, SERVER_KEY} from '../../CustomClass/Storage';
 import {addHomeStyles as styles} from './styles';
 
-class AddHome extends Component {
+class MGAddHome extends Component {
   static navigationOptions = ({navigation}) => ({
     headerTitle: "Register home",
   });
@@ -109,4 +109,4 @@ class AddHome extends Component {
   }
 }
 
-export default AddHome;
+export default MGAddHome;

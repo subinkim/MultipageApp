@@ -220,15 +220,7 @@ class Home extends React.Component {
           }, shadowOpacity: 0.30, shadowRadius: 4.65,}}
       />
 
-      <View style={[styles.wrapper, Platform.OS==="android"?{flexDirection: 'row', flexWrap: 'wrap'}:null]}>
-
-          <TouchableOpacity
-            onPress={() => {this.signOut()}}
-            style={styles.MenuStyle}
-            accessibilityLabel="Sign out from your devemerald account">
-              <Icon name="log-out" style={styles.menuIcon}/>
-              <Text style={styles.buttonText} adjustsFontSizeToFit numberOfLines={2}>Sign out from your account</Text>
-          </TouchableOpacity>
+      <View style={styles.wrapper}>
 
           <TouchableOpacity
             onPress={() => {this.props.navigation.navigate('Scanner')}}
@@ -239,11 +231,27 @@ class Home extends React.Component {
           </TouchableOpacity>
 
           <TouchableOpacity
-            onPress={() => {this.resumeRegister()}}
+            onPress={() => {this.props.navigation.navigate('Load')}}
             style={styles.MenuStyle}
-            accessibilityLabel="Resume registration">
-            <Icon name="bookmark" style={styles.menuIcon}/>
-            <Text style={styles.buttonText} adjustsFontSizeToFit numberOfLines={2}>Resume last registration</Text>
+            accessibilityLabel="Manage existing homes and deployments">
+            <Icon name="clipboard" style={styles.menuIcon}/>
+            <Text style={styles.buttonText} adjustsFontSizeToFit numberOfLines={2}>Manage Home</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={() => {this.props.navigation.navigate('CNHome')}}
+            style={styles.MenuStyle}
+            accessibilityLabel="Connect your EMERALD device to your home Wifi">
+            <Icon name="wifi" style={styles.menuIcon}/>
+            <Text style={styles.buttonText} adjustsFontSizeToFit numberOfLines={2}>Connect Device to Wifi</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={() => {this.signOut()}}
+            style={styles.MenuStyle}
+            accessibilityLabel="Sign out from your devemerald account">
+              <Icon name="log-out" style={styles.menuIcon}/>
+              <Text style={styles.buttonText} adjustsFontSizeToFit numberOfLines={2}>Sign out from your account</Text>
           </TouchableOpacity>
 
       </View>

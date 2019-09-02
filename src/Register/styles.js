@@ -45,26 +45,20 @@ export const homeStyles = StyleSheet.create({
       marginTop: 10,
       justifyContent: 'center',
       alignItems: 'center',
+      flexDirection: 'row',
+      flexWrap: 'wrap',
     },
     menuIcon:{
       textAlign: 'center',
       textAlignVertical: 'center',
       fontSize: 40,
     },
-    MenuStyle:!android?{
+    MenuStyle:{
       backgroundColor: 'rgba(140,198,65,0.6)',
-      marginBottom: 15,
-      width: '80%',
-      paddingVertical: '8%',
-      borderRadius: 15,
-      borderBottomWidth: 2,
-      borderRightWidth: 2,
-      borderBottomColor: '#a1a1a1',
-      borderRightColor: '#a1a1a1'
-    }:{
-      backgroundColor: 'rgba(140,198,65,0.6)',
-      marginBottom: 15,
+      marginVertical: 5,
+      marginHorizontal: 5,
       width: '40%',
+      aspectRatio: 1,
       paddingVertical: '8%',
       borderRadius: 15,
       borderBottomWidth: 2,

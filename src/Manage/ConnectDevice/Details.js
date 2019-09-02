@@ -10,7 +10,7 @@ const URI = 'http://wireless.devemerald.com';
 
 import {basicStyles as styles} from './styles';
 
-class Details extends React.Component {
+class CNDetails extends React.Component {
   static navigationOptions = ({ navigation, navigationOptions }) => {
     const { params } = navigation.state;
 
@@ -78,4 +78,4 @@ function disconnectFromDevice(ssid, initialSSID, navigation){
   navigation.navigate('Home');
 }
 
-export default Details;
+export default CNDetails;

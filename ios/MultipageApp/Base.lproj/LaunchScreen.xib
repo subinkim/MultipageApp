@@ -15,26 +15,40 @@
             <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES" flexibleMaxY="YES"/>
             <subviews>
-                <view contentMode="scaleAspectFit" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="9nf-xy-eGB">
-                    <rect key="frame" x="37" y="256" width="300" height="300"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                <view contentMode="scaleAspectFit" translatesAutoresizingMaskIntoConstraints="NO" id="9nf-xy-eGB">
+                    <rect key="frame" x="37" y="256" width="301" height="300"/>
                     <subviews>
-                        <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" image="Image" translatesAutoresizingMaskIntoConstraints="NO" id="I8A-8Q-4xV">
-                            <rect key="frame" x="0.0" y="50" width="300" height="128"/>
-                            <autoresizingMask key="autoresizingMask"/>
+                        <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Image" translatesAutoresizingMaskIntoConstraints="NO" id="I8A-8Q-4xV">
+                            <rect key="frame" x="0.0" y="50" width="301" height="128"/>
+                            <constraints>
+                                <constraint firstAttribute="height" constant="127.99999999999977" id="y4v-Fs-5z2"/>
+                            </constraints>
                         </imageView>
-                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" preservesSuperviewLayoutMargins="YES" text="EMERALD" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="iiP-uG-Lgf">
-                            <rect key="frame" x="0.0" y="185" width="300" height="57"/>
-                            <autoresizingMask key="autoresizingMask"/>
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" preservesSuperviewLayoutMargins="YES" text="EMERALD" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="iiP-uG-Lgf">
+                            <rect key="frame" x="0.0" y="185" width="301" height="57"/>
                             <fontDescription key="fontDescription" type="system" pointSize="47"/>
                             <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             <nil key="highlightedColor"/>
                         </label>
                     </subviews>
                     <color key="tintColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    <constraints>
+                        <constraint firstItem="I8A-8Q-4xV" firstAttribute="centerX" secondItem="iiP-uG-Lgf" secondAttribute="centerX" id="Abx-AU-Xdy"/>
+                        <constraint firstItem="iiP-uG-Lgf" firstAttribute="leading" secondItem="9nf-xy-eGB" secondAttribute="leading" id="Ld7-Bh-8jB"/>
+                        <constraint firstAttribute="bottom" secondItem="iiP-uG-Lgf" secondAttribute="bottom" constant="58" id="WTV-Oi-Bqc"/>
+                        <constraint firstItem="I8A-8Q-4xV" firstAttribute="leading" secondItem="iiP-uG-Lgf" secondAttribute="leading" id="XEW-4q-kfl"/>
+                        <constraint firstItem="I8A-8Q-4xV" firstAttribute="centerX" secondItem="9nf-xy-eGB" secondAttribute="centerX" id="hMO-Xu-4rJ"/>
+                        <constraint firstItem="iiP-uG-Lgf" firstAttribute="top" secondItem="I8A-8Q-4xV" secondAttribute="bottom" constant="7.0000000000002274" id="skO-ZV-lBg"/>
+                    </constraints>
                 </view>
             </subviews>
             <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+            <constraints>
+                <constraint firstItem="9nf-xy-eGB" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" id="8u0-0Q-UwX"/>
+                <constraint firstItem="9nf-xy-eGB" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" constant="256" id="i22-iH-k4p"/>
+                <constraint firstItem="9nf-xy-eGB" firstAttribute="centerY" secondItem="iN0-l3-epB" secondAttribute="centerY" id="llk-WI-i6b"/>
+                <constraint firstItem="9nf-xy-eGB" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" constant="37" id="v1h-eW-pPf"/>
+            </constraints>
             <nil key="simulatedStatusBarMetrics"/>
             <modalPageSheetSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
             <point key="canvasLocation" x="546.875" y="454.10156249999994"/>

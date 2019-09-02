@@ -10,7 +10,7 @@ import { DEVICE_SSID_KEY, DEVICE_PWD_KEY } from '../../CustomClass/Storage';
 
 import {basicStyles as styles} from './styles';
 
-class Scanner extends React.Component {
+class CNScanner extends React.Component {
 
   static navigationOptions = ({ navigation, navigationOptions }) => {
     const { params } = navigation.state;
@@ -24,7 +24,7 @@ class Scanner extends React.Component {
     super(props);
     this.state = {
       modalIsVisible: false,
-      
+
       initialSSID: null,
       ssid: null,
       pwd: null,
@@ -128,4 +128,4 @@ class Scanner extends React.Component {
   }
 }
 
-export default Scanner;
+export default CNScanner;
