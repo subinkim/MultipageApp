@@ -2,7 +2,8 @@ import React, { Component } from 'react';
 import { Button, View, Text, Alert, SectionList, TouchableOpacity } from 'react-native';
 import {Icon} from 'native-base';
 
-import {CSRF_KEY,COOKIE_KEY, EMAIL_KEY} from '../CustomClass/Storage';
+import {CSRF_KEY,COOKIE_KEY, EMAIL_KEY, SERVER_KEY} from '../CustomClass/Storage';
+import {FetchURL} from '../CustomClass/Fetch';
 import {homeStyles as styles} from './styles';
 
 import AsyncStorage from '@react-native-community/async-storage';
@@ -22,6 +23,7 @@ class Home extends Component {
     super(props);
     this.state={
       email: null,
+      fetchInstance: null,
     }
   }
 
@@ -30,7 +32,12 @@ class Home extends Component {
       if (email != null){
         this.setState({email: email});
       }
-    })
+    });
+    AsyncStorage.getItem(SERVER_KEY).then((server) => {
+      if (server != null) {
+        this.setState({fetchInstance: new FetchURL(server)})
+      }
+    });
   }
 
   componentDidMount() {
@@ -71,7 +78,7 @@ class Home extends Component {
     });
     AsyncStorage.setItem(COOKIE_KEY, 'false');
     AsyncStorage.removeItem(EMAIL_KEY);
-    this.setState({cookieValid: false});
+    this.setState({email: null});
 
   }
 

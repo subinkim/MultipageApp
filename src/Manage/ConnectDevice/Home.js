@@ -12,7 +12,7 @@ class CNHome extends Component {
   static navigationOptions = ({navigation}) => ({
     headerTitle: "Connect to Device",
     headerRight: <Button
-        onPress={() => {navigation.navigate('Info');}}
+        onPress={() => {navigation.navigate('CNInfo');}}
         title="Help"
       />
   });
@@ -58,7 +58,7 @@ class CNHome extends Component {
       if (ssid === this.state.initialSSID){
         Alert.alert('You are already connected to this network');
         this.setState({ssid: '', password: ''});
-        this.props.navigation.navigate('Details', {
+        this.props.navigation.navigate('CNDetails', {
           ssid: ssid,
         });
       } else {
@@ -68,7 +68,7 @@ class CNHome extends Component {
           this.setState({modalIsVisible:false, ssid: '', password: ''});
           if (error != null){Alert.alert("Did not connect")}
           else{
-            this.props.navigation.navigate('Details', {
+            this.props.navigation.navigate('CNDetails', {
               ssid: ssid,
               initialSSID: this.state.initialSSID,
             })
@@ -86,7 +86,7 @@ class CNHome extends Component {
       title="Scan QR code"
       onPress={() => {
         this.getInitialSSID();
-        this.props.navigation.navigate('Scanner',{
+        this.props.navigation.navigate('CNScanner',{
           initialSSID: this.state.initialSSID,
         });
       }}

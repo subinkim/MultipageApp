@@ -25,7 +25,7 @@ class CNDetails extends React.Component {
       headerLeft:(
         <Button
           title="Back"
-          onPress={() => navigation.navigate('Home')}
+          onPress={() => navigation.navigate('CNHome')}
         />
       ),
     };
@@ -75,7 +75,7 @@ function disconnectFromDevice(ssid, initialSSID, navigation){
       if (error != null){Alert.alert("Please manually disconnect from the device in the Settings.")}
     });
   }
-  navigation.navigate('Home');
+  navigation.navigate('CNHome');
 }
 
 export default CNDetails;

@@ -20,20 +20,12 @@ class Details extends React.Component {
 
     return {
       title: params ? params.ssid : 'Connect',
-      // MARK: comment this if testing with virtual device
       headerRight: (
         <Button
           title="Done"
           onPress={() => {disconnectFromDevice(params.ssid, params.initialSSID, navigation, urls);}}
         />
       ),
-      //MARK: uncomment this if testing with virtual device
-      // headerRight:(
-      //   <Button
-      //     title="Done"
-      //     onPress={()=> {disconnectFromDevice('','',navigation, urls)}}
-      //   />
-      // ),
       headerLeft:(
         <Button
           title="Back"
@@ -92,7 +84,6 @@ class Details extends React.Component {
 
 function disconnectFromDevice(ssid, initialSSID, nav, urls) {
 
-  // MARK: comment out the whole if statement if testing with virtual device
   if (initialSSID != null){
     if (initialSSID !== 'Cannot detect SSID' && !(initialSSID.includes('emerald'))){
       Wifi.connect(initialSSID, () => {});
@@ -138,12 +129,12 @@ function disconnectFromDevice(ssid, initialSSID, nav, urls) {
             });
           })
         });
-        //END
+
       });
     });
-    //END
+
   });
-  //END
+
 }
 
 export default Details;

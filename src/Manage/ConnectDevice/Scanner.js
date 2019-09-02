@@ -48,7 +48,7 @@ class CNScanner extends React.Component {
 
     if (this.state.ssid === this.state.initialSSID){
       Alert.alert('You are already connected to this network');
-      this.props.navigation.navigate('Details', {
+      this.props.navigation.navigate('CNDetails', {
         ssid: this.state.ssid,
       });
     } else {
@@ -58,7 +58,7 @@ class CNScanner extends React.Component {
         this.setState({modalIsVisible:false});
         if (error != null){Alert.alert("Cannot connect :(")}
         else {
-          this.props.navigation.navigate('Details', {
+          this.props.navigation.navigate('CNDetails', {
               ssid: this.state.ssid,
               initialSSID: this.state.initialSSID,
           });
@@ -107,8 +107,8 @@ class CNScanner extends React.Component {
   render() {
 
     return (
-      <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-        <Text>Scan the QR code attached to the bottom of device.</Text>
+      <View>
+        <Text style={{ textAlign: 'center', marginTop: '20%', marginBottom: '20%'}}>Scan the QR code attached to the bottom of device.</Text>
         <QRCodeScanner
           ref={(node) => { this.scanner = node }}
           onRead={this.onSuccess}

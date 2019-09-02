@@ -66,11 +66,17 @@ class Home extends React.Component {
     this.focusListener = navigation.addListener("didFocus", () => {
       AsyncStorage.getItem(COOKIE_KEY).then((cookieValid) => {
         if (cookieValid === 'true'){this.setState({cookieValid:true})}
-        else {this.setState({cookieValid:false})}
+        else {
+          this.setState({
+            cookieValid:false,
+            email: '', password: '',
+            email_item: null
+          })}
       });
     });
   }
 
+  //Check if cookie is valid
   componentWillUpdate(){
     AsyncStorage.getItem(COOKIE_KEY).then((cookie) => {
       if (cookie!=null){
@@ -87,6 +93,7 @@ class Home extends React.Component {
     this.focusListener.remove();
   }
 
+  //Check if cookie is valid
   checkToken(csrftoken){
     fetch(this.state.fetchInstance.GetHomesURL, {
       credentials:"include",
@@ -117,6 +124,7 @@ class Home extends React.Component {
     });
   }
 
+  //Sign in
   signIn(){
     fetch(this.state.fetchInstance.LoginURL, {
       method: 'POST',
@@ -127,7 +135,7 @@ class Home extends React.Component {
       body: 'email='+this.state.email+'&password='+this.state.password,
       credentials: "include",
     }).then((response) => {
-
+    
       CookieManager.get(this.state.fetchInstance.LoginURL).then((res) => {
         let csrftoken = res.csrftoken
         if (res.sessionid == null){

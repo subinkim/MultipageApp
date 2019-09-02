@@ -301,7 +301,7 @@ function addHome(navigation){
         credentials: "include"
       }).then((response) => {
         return response.text().then(function(txt){
-          navigation.navigate('AddHome', {
+          navigation.navigate('MGAddHome', {
             list: txt,
           })
         })
