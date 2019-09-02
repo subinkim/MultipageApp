@@ -150,30 +150,6 @@ class Home extends React.Component {
     });
   }
 
-  signOut(){
-    AsyncStorage.getItem(CSRF_KEY).then((csrftoken) => {
-      fetch(this.state.fetchInstance.LogoutURL, {
-        credentials:"include",
-        headers: {
-            'X-CSRFToken': csrftoken,
-            referer: this.state.fetchInstance.MainURL+'/',
-            Accept: '*/*',
-            'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        method:'GET',
-        mode:'cors',
-      });
-      AsyncStorage.removeItem(CSRF_KEY);
-    });
-    AsyncStorage.setItem(COOKIE_KEY, 'false');
-    AsyncStorage.removeItem(EMAIL_KEY);
-    this.setState({cookieValid: false});
-  }
-
-  resumeRegister(){
-
-  }
-
   render(){
 
     const inputs = (
@@ -244,14 +220,6 @@ class Home extends React.Component {
             accessibilityLabel="Connect your EMERALD device to your home Wifi">
             <Icon name="wifi" style={styles.menuIcon}/>
             <Text style={styles.buttonText} adjustsFontSizeToFit numberOfLines={2}>Connect Device to Wifi</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            onPress={() => {this.signOut()}}
-            style={styles.MenuStyle}
-            accessibilityLabel="Sign out from your devemerald account">
-              <Icon name="log-out" style={styles.menuIcon}/>
-              <Text style={styles.buttonText} adjustsFontSizeToFit numberOfLines={2}>Sign out from your account</Text>
           </TouchableOpacity>
 
       </View>

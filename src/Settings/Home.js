@@ -53,27 +53,26 @@ class Home extends Component {
     this.props.navigation.navigate('ChangeServer');
   }
 
-  deleteCookies = () => {
-    Alert.alert(
-      'Delete Cookies',
-      'Are you sure you want to delete cookies? You will be signed out automatically.',
-      [
-        {
-          text: 'Cancel',
-          onPress: () => console.log('Cancel Pressed'),
-          style: 'cancel',
+  signOut = () => {
+
+    AsyncStorage.getItem(CSRF_KEY).then((csrftoken) => {
+      fetch(this.state.fetchInstance.LogoutURL, {
+        credentials:"include",
+        headers: {
+            'X-CSRFToken': csrftoken,
+            referer: this.state.fetchInstance.MainURL+'/',
+            Accept: '*/*',
+            'Content-Type': 'application/x-www-form-urlencoded',
         },
-        {text: 'Confirm', onPress: () =>
-          {
-            AsyncStorage.removeItem(CSRF_KEY);
-            AsyncStorage.setItem(COOKIE_KEY,'false');
-            AsyncStorage.removeItem(EMAIL_KEY);
-            this.setState({email: null});
-          }
-        },
-      ],
-      {cancelable: false},
-    );
+        method:'GET',
+        mode:'cors',
+      });
+      AsyncStorage.removeItem(CSRF_KEY);
+    });
+    AsyncStorage.setItem(COOKIE_KEY, 'false');
+    AsyncStorage.removeItem(EMAIL_KEY);
+    this.setState({cookieValid: false});
+
   }
 
   _renderSectionHeader = ({section: {title}}) => (
@@ -82,12 +81,18 @@ class Home extends Component {
     </View>
   )
 
-  itemProps = [[[this.changeServer,this.deleteCookies],["link","remove-circle"], ["green", "red"]]];
-  
+  itemProps = [
+    {
+      onPress: [this.changeServer,this.signOut],
+      icons: ["link","remove-circle"],
+      iconColour: ["green", "red"]
+    }
+  ];
+
   _renderItem = ({item, index, section}) => {
-    const onPressFunc = this.itemProps[section.index][0][index];
-    const itemIcons = this.itemProps[section.index][1][index];
-    const itemColours = this.itemProps[section.index][2][index];
+    const onPressFunc = this.itemProps[section.index].onPress;
+    const itemIcons = this.itemProps[section.index].icons;
+    const itemColours = this.itemProps[section.index].iconColour;
 
     return (
       <TouchableOpacity onPress={onPressFunc[index]} style={styles.listItem}>
