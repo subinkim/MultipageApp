@@ -237,14 +237,6 @@ class Home extends React.Component {
             <Text style={styles.buttonText} adjustsFontSizeToFit numberOfLines={2}>Connect Device to Wifi</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity
-            onPress={() => {this.props.navigation.navigate('Register')}}
-            style={styles.MenuStyle}
-            accessibilityLabel="Connect your EMERALD device to your home Wifi">
-            <Icon name="wifi" style={styles.menuIcon}/>
-            <Text style={styles.buttonText} adjustsFontSizeToFit numberOfLines={2}>Register</Text>
-          </TouchableOpacity>
-
       </View>
     </View>);
     return(
