@@ -129,7 +129,7 @@ class CNHome extends Component {
     );
   }
 }
-//TODO: change 'this app' to app name
+
 async function requestLocationPermission(){
   try {
     const granted = await PermissionsAndroid.request(

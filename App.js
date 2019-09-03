@@ -2,6 +2,8 @@ import React from 'react'
 import {Platform} from 'react-native';
 
 import { createDrawerNavigator, createAppContainer } from 'react-navigation';
+import {DrawerItems, DrawerNavigation} from 'react-navigation';
+
 import {Icon} from 'native-base';
 
 import RegisterStack from './src/Register';

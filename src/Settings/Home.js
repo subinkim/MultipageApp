@@ -16,6 +16,13 @@ class Home extends Component {
 
     return {
       title: 'Settings',
+      headerLeft: (
+        <TouchableOpacity
+          onPress={() => {navigation.toggleDrawer()}}
+        >
+          <Icon name="menu" style={{fontSize: 30, marginLeft: 10, fontWeight: 'bold'}}/>
+        </TouchableOpacity>
+      )
     }
   };
 

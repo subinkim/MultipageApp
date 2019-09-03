@@ -3,6 +3,7 @@ import { Button, View, Text, StyleSheet, Alert } from 'react-native';
 import {Picker} from 'native-base';
 
 import AsyncStorage from '@react-native-community/async-storage';
+import { basicStyles as styles } from '../styles';
 
 import InputTextBox from '../../CustomClass/InputTextBox.js';
 import {FetchURL} from '../../CustomClass/Fetch.js';
@@ -88,7 +89,7 @@ class AddHome extends Component {
       <View style={ styles.container }>
         <Text style={styles.instruction}>Register new home</Text>
         {this.state.incomplete?<Text style={{color: 'red', marginBottom: 20, fontSize: 17}}>Please complete ALL the fields</Text>:null}
-        <Text style={styles.description}>Enter home nickname</Text>
+        <Text style={{fontSize: 15}}>Enter home nickname</Text>
         <InputTextBox
           icon="home"
           label="Home Nickname"
@@ -114,24 +115,5 @@ class AddHome extends Component {
     );
   }
 }
-
-
-
-const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      marginTop: 30,
-      marginLeft: 10,
-      marginRight: 10,
-    },
-    instruction: {
-      fontWeight: 'bold',
-      fontSize: 23,
-      marginBottom: 20,
-    },
-    description: {
-      fontSize: 15,
-    },
-});
 
 export default AddHome;

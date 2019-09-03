@@ -70,7 +70,7 @@ class Details extends React.Component {
           ref={WEBVIEW_REF => (WebViewRef = WEBVIEW_REF)}
           source={{ uri: URI }}
           style={{ width: windowWidth, height: windowHeight, flex: 1 , marginBottom: botMargin, marginHorizontal: horMargin }}
-          renderError={(error) => {return(<Text style={{justifyContent: 'center', alignItems: 'center'}}>Error while loading page. Error: {error}</Text>);}}
+          renderError={(error) => {return(<Text style={{marginBottom: '50%'}}>Error while loading page. Please reload the page. Error: {error}</Text>);}}
         />
         <Button
           title="Reload page"

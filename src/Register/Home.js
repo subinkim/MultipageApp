@@ -20,7 +20,14 @@ class Home extends React.Component {
     const { params } = navigation.state;
 
     return {
-      header: null,
+      title: params?params.title: 'Sign In',
+      headerLeft: (
+        <TouchableOpacity
+          onPress={() => {navigation.toggleDrawer()}}
+        >
+          <Icon name="menu" style={{fontSize: 30, marginLeft: 10, fontWeight: 'bold'}}/>
+        </TouchableOpacity>
+      )
     }
 
   };
@@ -65,7 +72,7 @@ class Home extends React.Component {
     const { navigation } = this.props;
     this.focusListener = navigation.addListener("didFocus", () => {
       AsyncStorage.getItem(COOKIE_KEY).then((cookieValid) => {
-        if (cookieValid === 'true'){this.setState({cookieValid:true})}
+        if (cookieValid === 'true'){this.setState({cookieValid:true});this.props.navigation.setParams({title: 'Home'})}
         else {
           this.setState({
             cookieValid:false,
@@ -80,7 +87,7 @@ class Home extends React.Component {
   componentWillUpdate(){
     AsyncStorage.getItem(COOKIE_KEY).then((cookie) => {
       if (cookie!=null){
-        if (cookie==='true'){cookie = true}
+        if (cookie==='true'){cookie = true; this.props.navigation.setParams({title: 'Home'})}
         else {cookie = false}
         if (cookie!=this.state.cookieValid){
           this.setState({cookieValid: cookie});
@@ -135,7 +142,7 @@ class Home extends React.Component {
       body: 'email='+this.state.email+'&password='+this.state.password,
       credentials: "include",
     }).then((response) => {
-    
+
       CookieManager.get(this.state.fetchInstance.LoginURL).then((res) => {
         let csrftoken = res.csrftoken
         if (res.sessionid == null){
@@ -148,7 +155,7 @@ class Home extends React.Component {
           AsyncStorage.setItem(EMAIL_KEY, this.state.email);
           AsyncStorage.setItem(COOKIE_KEY, 'true');
           AsyncStorage.setItem(CSRF_KEY, csrftoken);
-          this.setState({cookieValid: true, invalid: false, email_item: this.state.email}, () => this.props.navigation.navigate('Scanner'));
+          this.setState({cookieValid: true, invalid: false, email_item: this.state.email}, () => {this.props.navigation.setParams({title: 'Home'});this.props.navigation.navigate('Scanner')});
         }
       });
 
@@ -164,7 +171,7 @@ class Home extends React.Component {
       <View>
         <Text style={ styles.instruction }>Sign in</Text>
         <View style={{marginHorizontal:10}}>
-        <Text style={{textAlign: 'center'}}>Enter your crendentials for {this.state.server}</Text>
+        <Text>Enter your crendentials for {this.state.server}</Text>
         {this.state.invalid?<Text style={{color: 'red', fontSize: 16}}>Invalid credentials.</Text>:null}
           <InputTextBox
             icon="at"
@@ -228,6 +235,14 @@ class Home extends React.Component {
             accessibilityLabel="Connect your EMERALD device to your home Wifi">
             <Icon name="wifi" style={styles.menuIcon}/>
             <Text style={styles.buttonText} adjustsFontSizeToFit numberOfLines={2}>Connect Device to Wifi</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={() => {this.props.navigation.navigate('Register')}}
+            style={styles.MenuStyle}
+            accessibilityLabel="Connect your EMERALD device to your home Wifi">
+            <Icon name="wifi" style={styles.menuIcon}/>
+            <Text style={styles.buttonText} adjustsFontSizeToFit numberOfLines={2}>Register</Text>
           </TouchableOpacity>
 
       </View>

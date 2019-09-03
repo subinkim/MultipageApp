@@ -15,14 +15,14 @@ export const homeStyles = StyleSheet.create({
       flex: 1,
     },
     container: {
-      paddingTop: 40,
+      paddingTop: 10,
     },
     instruction: {
       fontWeight: 'bold',
       fontSize: 23,
       marginBottom: 20,
-      textAlign: 'center',
       marginTop: 20,
+      marginHorizontal: 10,
     },
     instructionMenu: {
       fontWeight: 'bold',
@@ -144,7 +144,7 @@ export const instructionsStyles = StyleSheet.create({
     },
 });
 
-//Register/ConnectHome
+//Register/Connection
 export const connectionStyles = StyleSheet.create({
     container: {
       flex: 1,
@@ -184,6 +184,34 @@ export const connectionStyles = StyleSheet.create({
     text: {
       fontSize: 12
     }
+});
+
+//RegisterDevice/Home
+export const registerStyles = StyleSheet.create({
+    container: {
+      margin: '5%',
+    },
+    instruction: {
+      fontWeight: 'bold',
+      fontSize: 23,
+      marginBottom: 5,
+    },
+    description: {
+      marginBottom: 10,
+      fontSize: 15,
+    },
+    selected:{
+      backgroundColor: '#8f8f8f',
+      marginBottom: 5,
+      paddingVertical: '5%',
+      paddingHorizontal: '3%',
+    },
+    listItem: {
+      backgroundColor: 'white',
+      marginBottom: 5,
+      paddingVertical: '5%',
+      paddingHorizontal: '3%',
+    },
 });
 
 //Basic

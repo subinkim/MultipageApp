@@ -1,7 +1,8 @@
 import React from 'react';
-import { Button, View, Text, StyleSheet, Alert, TouchableOpacity, Keyboard } from 'react-native';
+import { Button, View, Text, Alert, Keyboard } from 'react-native';
 
 import AsyncStorage from '@react-native-community/async-storage';
+import { basicStyles as styles } from '../styles';
 
 import InputTextBox from '../../CustomClass/InputTextBox.js';
 import {CSRF_KEY,DEVICE_UUID_KEY, SERVER_KEY} from '../../CustomClass/Storage.js';
@@ -26,7 +27,7 @@ class Register extends React.Component {
       //Required for register
       home_uuid:null,
       device_uuid:null,
-      height: '1.15',
+      height: 1.15,
       loc_nickname:null,
       fetchInstance: null,
 
@@ -114,8 +115,8 @@ class Register extends React.Component {
 
         {/*INSTRUCTIONS*/}
         <Text style={ styles.instruction }>Register deployment</Text>
-        <Text style={ styles.description }>Register deployment to {this.state.nickname}</Text>
-        <Text>HOME uuid:{this.state.home_uuid}</Text>
+        <Text style={{ fontSize: 15, marginTop: 5}}>Register deployment to {this.state.nickname}</Text>
+        <Text style={{ marginBottom: 3 }}>HOME uuid:{this.state.home_uuid}</Text>
         <Text>Device uuid:{this.state.device_uuid}</Text>
 
         {/*ERROR MESSAGES depending on type of error*/}
@@ -123,18 +124,21 @@ class Register extends React.Component {
         {this.state.deviceRegistered?<Text style={{color: 'red', fontSize: 17}}>"ERROR: This Device has already been registered."</Text>:null}
 
         {/*INPUT FIELDS*/}
+        <Text style={{ marginTop: 5, fontWeight: 'bold' }}>Enter deployment location nickname</Text>
         <InputTextBox
-          icon="create"
-          label="Deploy location name"
+          icon="locate"
+          label="e.g. Living room"
           onChange={(loc) => this.setState({loc_nickname:loc})}
           keyboard="default"
           value={this.state.loc_nickname}
           returnKey="next"
           onEndEditing={Keyboard.dismiss}
+          autoFocus={true}
         />
+        <Text style={{ marginTop: 5, fontWeight: 'bold' }}>Enter deployment height</Text>
         <InputTextBox
           icon="create"
-          label="Device Height"
+          label="e.g. 1.15"
           onChange={(height) => this.setState({height:height})}
           keyboard="numeric"
           value={this.state.height.toString()}
@@ -145,27 +149,10 @@ class Register extends React.Component {
           onPress={this.register.bind(this)}
           title="Register"
         />
+        {this.state.deviceRegistered?<Button style={{marginTop: 10}} onPress={() => this.props.navigation.navigate('Home')} title="Cancel register?"/>:null}
       </View>
     );
   }
 }
-
-const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      marginTop: 30,
-      marginLeft: 10,
-      marginRight: 10,
-    },
-    instruction: {
-      fontWeight: 'bold',
-      fontSize: 23,
-      marginBottom: 10,
-    },
-    description: {
-      marginTop: 20,
-      fontSize: 15,
-    },
-});
 
 export default Register;

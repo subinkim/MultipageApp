@@ -5,7 +5,7 @@ import { Button as ElementsButton } from 'react-native-elements';
 
 import AsyncStorage from '@react-native-community/async-storage';
 import Swipeout from 'react-native-swipeout';
-import Modal from "react-native-modal";
+import Modal from 'react-native-modal';
 
 import {CSRF_KEY, COOKIE_KEY, SERVER_KEY} from '../../CustomClass/Storage';
 import {FetchURL} from '../../CustomClass/Fetch';
@@ -64,7 +64,7 @@ class Load extends React.Component {
           credentials: "include",
           headers: {
             'X-CSRFToken': csrftoken,
-            referer: this.state.fetchInstance.MainURL+'/',
+            referer: fetchInstance.MainURL+'/',
             Accept: '*/*',
             'Content-Type': 'application/x-www-form-urlencoded',
           },

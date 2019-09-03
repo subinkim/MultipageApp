@@ -1,7 +1,9 @@
 import React from 'react';
-import { Button, View, Text, StyleSheet, Alert, TouchableOpacity, ScrollView, FlatList } from 'react-native';
+import { Button, View, Text, Alert, TouchableOpacity, ScrollView, FlatList } from 'react-native';
 
 import AsyncStorage from '@react-native-community/async-storage';
+import Modal from 'react-native-modal';
+import {registerStyles as styles} from '../styles'
 
 const EMERALD_COLOUR1 = '#17AA9D';
 const EMERALD_COLOUR2 = '#28B674';
@@ -26,11 +28,32 @@ class RegisterHome extends React.Component {
     }
   }
 
+  componentDidMount(){
+    Alert.alert(
+      'Register device to home',
+      'Add your EMERALD device to existing home or create new home',
+      [
+        {
+          text: 'Add Home',
+          onPress: () => {this.props.navigation.navigate('AddHome', {list: this.props.navigation.getParam('list', null)})},
+        },
+
+        {
+          text: 'Choose Home',
+          onPress: () => {},
+        },
+      ],
+      {cancelable: false},
+    );
+  }
+
   _renderItem = ({item, index}) => {
     if (!item['deregistered']){
       return(
-        <TouchableOpacity onPress={() => {this.setState({selected:index, disabled: false})}} style={{alignItems: 'center'}}>
-          <Text key={index} style={index===this.state.selected?styles.selected:styles.listItem}>{item.nickname}</Text>
+        <TouchableOpacity
+          onPress={() => {this.setState({selected:index, disabled: false})}}
+          style={index===this.state.selected?styles.selected:styles.listItem}>
+          <Text key={index} style={{textAlign: 'left', fontSize: 15}}>{item.nickname}</Text>
         </TouchableOpacity>
       );
     } else {
@@ -40,9 +63,7 @@ class RegisterHome extends React.Component {
 
   render(){
     var data = this.props.navigation.getParam('data',null);
-    var list = this.props.navigation.getParam('list', null);
     if (data != null){data = JSON.parse(data);data = data['data']}
-    if (list != null){list = JSON.parse(list)}
 
     const selectButton = (<Button title="Select" disabled = {this.state.disabled} onPress={() => {
         let selectedData = data[this.state.selected];
@@ -56,68 +77,22 @@ class RegisterHome extends React.Component {
     />);
 
     return(
-      <View style={styles.container}>
-        <View>
-          <Text style={styles.instruction}>Add New Home</Text>
-          <Button
-            onPress={() => {this.props.navigation.navigate('AddHome', {
-              list: JSON.stringify(list),
-            })}}
-            title="Add Home"
-          />
-          <Text style={styles.description}>Or</Text>
-        </View>
-        <View style={{flex:1}}>
+      <View style={{flex:1}}>
+        <View style={styles.container}>
           <Text style={styles.instruction}>Choose Home</Text>
           <Text style={styles.description}>Choose from existing home</Text>
-          <ScrollView>
-            {selectButton}
-            <FlatList
-              renderItem={this._renderItem}
-              data={data}
-              keyExtractor={(item, index) => index.toString()}
-            />
-          </ScrollView>
+          {selectButton}
         </View>
+        <ScrollView style={{backgroundColor: '#bfbfbf', paddingHorizontal: 10, paddingVertical: 10, height: '90%' }}>
+          <FlatList
+            renderItem={this._renderItem}
+            data={data}
+            keyExtractor={(item, index) => index.toString()}
+          />
+        </ScrollView>
       </View>
     );
   }
 }
-
-const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      margin: '5%',
-      width: '90%',
-      height: '90%',
-    },
-    instruction: {
-      fontWeight: 'bold',
-      fontSize: 23,
-      marginBottom: 5,
-    },
-    description: {
-      marginBottom: 10,
-      fontSize: 15,
-    },
-    selected:{
-      width: '100%',
-      padding: 10,
-      fontSize: 17,
-      backgroundColor: 'grey',
-      color: 'white',
-      opacity: 0.8,
-      marginBottom: 2,
-    },
-    listItem: {
-      width: '100%',
-      padding: 10,
-      fontSize: 17,
-      backgroundColor: 'grey',
-      color: 'white',
-      opacity: 0.5,
-      marginBottom: 2,
-    },
-});
 
 export default RegisterHome;

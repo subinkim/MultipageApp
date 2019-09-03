@@ -2,17 +2,17 @@ export const ENTRIES1 = [
     {
         title: 'Start the installment of the device',
         subtitle: 'Swipe to left to start',
-        illustration: require('./images/swipeLeft.png'),
+        illustration: null,
     },
     {
         title: 'Choose a suitable location',
         subtitle: 'Please refer to the installation guide for more details on choosing a suitable location',
-        illustration: require('./images/attachStrips.png'),
+        illustration: null,
     },
     {
         title: 'Mounting device',
         subtitle: 'Clean the wall area where the device will go. Do not use household cleaners. \nRecommended: rubbing alcohol',
-        illustration: require('./images/attachStrips.png'),
+        illustration: null,
     },
     {
         title: 'Attach strips',

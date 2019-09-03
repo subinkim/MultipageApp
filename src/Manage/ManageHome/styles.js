@@ -1,3 +1,4 @@
+import React from 'React';
 import {StyleSheet, Dimensions, Platform} from 'react-native';
 
 const EMERALD_COLOUR1 = '#17AA9D';

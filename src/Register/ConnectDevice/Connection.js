@@ -77,7 +77,7 @@ class Connection extends Component {
         }
       });
 
-    }, 30000);
+    }, 30000); //30 sec
 
 
   }
@@ -105,9 +105,8 @@ class Connection extends Component {
       this.connectToDevice(function(response){
         if (response){
           this.setState({indicatorAnimating: false}, () => this.props.navigation.navigate('Details',{initialSSID: this.state.initialSSID}))
-        }
-        else if (Date.now() - count < 75000 && !response){attemptToConnect();}
-        else {
+        } else if (Date.now() - count < 75000 && !response){attemptToConnect()
+        } else {
           Alert.alert("Failed to connect to device.");
           this.setState({modalIsVisible: true, indicatorText: 'Failed to connect to the device.', indicatorAnimating: false});
           this.updateModalContent();
@@ -168,27 +167,27 @@ class Connection extends Component {
   render() {
 
     return (
-      <View style={styles.container}>
-        <Text>{this.state.indicatorText}</Text>
-        <Text>This can take up to 2 minutes. Please don't quit the app.</Text>
-        <ActivityIndicator size="large" color={this.state.indicatorColour} animating={this.state.indicatorAnimating} style={{top: '2%'}}/>
+        <View style={styles.container}>
+          <Text>{this.state.indicatorText}</Text>
+          <Text>This can take up to 2 minutes. Please don't quit the app.</Text>
+          <ActivityIndicator size="large" color={this.state.indicatorColour} animating={this.state.indicatorAnimating} style={{top: '2%'}}/>
 
-        <Modal
-          isVisible={this.state.modalIsVisible}
-          animationInTiming={400} animationOutTiming={400}
-          backdropOpacity={0.5}
-          style={ styles.modalWrapper }
-        >
+          <Modal
+            isVisible={this.state.modalIsVisible}
+            animationInTiming={400} animationOutTiming={400}
+            backdropOpacity={0.5}
+            style={ styles.modalWrapper }
+          >
 
-          <ScrollView style={{flex: 1}}>
-            <Text style={styles.instruction}>Failed to connect to the device</Text>
-            <Text>Failed to connect to your device's network. There may be several reasons for this. Please Follow the instructions below to make sure that the installment has been done correctly before attempting to connect to the device again.{'\n'}</Text>
+            <ScrollView style={{flex: 1}}>
+              <Text style={styles.instruction}>Failed to connect to the device</Text>
+              <Text>Failed to connect to your device's network. There may be several reasons for this. Please Follow the instructions below to make sure that the installment has been done correctly before attempting to connect to the device again.{'\n'}</Text>
 
-            { this.state.modalContent }
+              { this.state.modalContent }
 
-          </ScrollView>
-      </Modal>
-    </View>
+            </ScrollView>
+          </Modal>
+        </View>
     );
   }
 }

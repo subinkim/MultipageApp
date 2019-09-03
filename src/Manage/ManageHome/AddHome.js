@@ -46,7 +46,6 @@ class MGAddHome extends Component {
     if (nickname == null||trial_uuid == null){this.setState({incomplete: true})}
     else {
 
-      //TODO: Alert to get final confirmation from the user if entered info is correct
       AsyncStorage.getItem(CSRF_KEY).then((csrftoken) => {
 
         fetch(this.state.fetchInstance.RegisterHomeURL, {
